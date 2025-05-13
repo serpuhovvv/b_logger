@@ -1,0 +1,95 @@
+{% macro render_steps(steps) %}
+    <ul>
+    {% for step in steps %}
+        <li>
+            <strong>{{ step.title }}</strong> — <span class="{{ step.status }}">{{ step.status }}</span>
+            {% if step.errors %}
+                <ul>
+                {% for error in step.errors %}
+                    <li style="color: red;">❌ <pre>{{ error.exc }}</pre>{{ error.tb }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% if step.steps %}
+                {{ render_steps(step.steps) }}
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endmacro %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #2c3e50; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .passed { color: green; }
+        .failed { color: red; }
+        .broken { color: orange; }
+        .skipped { color: gray; }
+        details { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>📊 Тестовый отчёт по проекту: {{ report.proj_name }}</h1>
+    <p><strong>Окружение:</strong> {{ report.env }}</p>
+    <p><strong>Время запуска:</strong> {{ report.start_time }}</p>
+    <p><strong>Время окончания:</strong> {{ report.end_time }}</p>
+    <p><strong>Длительность:</strong> {{ report.duration }}</p>
+
+    <h2>📈 Результаты прогона</h2>
+    <ul>
+        <li class="passed">Пройдено: {{ report.run_results.passed }}</li>
+        <li class="failed">Провалено: {{ report.run_results.failed }}</li>
+        <li class="broken">Сломано: {{ report.run_results.broken }}</li>
+        <li class="skipped">Пропущено: {{ report.run_results.skipped }}</li>
+    </ul>
+
+    <h2>📂 Модули</h2>
+    {% for module_name, module_data in report.modules.items() %}
+        <h3>{{ module_name }}</h3>
+        <p>
+            ✅ {{ module_data.module_results.passed }} |
+            ❌ {{ module_data.module_results.failed }} |
+            ⚠️ {{ module_data.module_results.broken }} |
+            ⏭️ {{ module_data.module_results.skipped }}
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Тест</th>
+                    <th>Статус</th>
+                    <th>Длительность</th>
+                    <th>Шаги</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for test_name, test_data in module_data.module_tests.items() %}
+                    <tr class="{{ test_data.status }}">
+                        <td>{{ test_name }}</td>
+                        <td>{{ test_data.status }}</td>
+                        <td>{{ test_data.duration }}</td>
+                        <td>
+                            {% if test_name in steps_by_test %}
+                                <details>
+                                    <summary>Показать шаги</summary>
+                                    {{ render_steps(steps_by_test[test_name]) }}
+                                </details>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</body>
+</html>

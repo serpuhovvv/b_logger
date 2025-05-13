@@ -1,0 +1,4 @@
+project_name: "AIM"
+env: None
+qase: True
+allure: True
