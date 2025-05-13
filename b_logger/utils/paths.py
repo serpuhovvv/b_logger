@@ -51,7 +51,7 @@ def root_path():
 
 @lru_cache(maxsize=5)
 def file_path(path):
-    marker_file = 'conftest.py'
+    marker_file = 'pyproject.toml'
     current_path = Path.cwd()
 
     while marker_file not in os.listdir(current_path):
@@ -74,7 +74,7 @@ def logs_path():
 
 @lru_cache(maxsize=1)
 def tmp_logs_path():
-    return f'{b_logger_root()}/tmp_logs'
+    return file_path('tmp_logs')
 
 
 @lru_cache(maxsize=1)

@@ -1,0 +1,4 @@
+logs
+*.egg-info/
+tmp_logs
+screenshots

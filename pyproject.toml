@@ -1,0 +1,24 @@
+[project]
+name = "b_logger"
+version = "1.0.0"
+description = "Pytest plugin for logging and combining allure and qase functionality as well as generating lightweight reports"
+authors = [{name="serpuhovvv", email="pudikovserg@gmail.com"}]
+dependencies = [
+    'pytest',
+    'pytest-xdist',
+    'allure-pytest',
+    'pathlib',
+    'qase-pytest',
+    'pyyaml',
+    'filelock',
+    'Jinja2',
+    'selenium'
+]
+requires-python = ">=3.12"
+
+[project.entry-points.pytest11]
+b_logger = "b_logger.plugin"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

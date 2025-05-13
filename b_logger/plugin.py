@@ -19,16 +19,21 @@ runtime = RunTime()
 
 
 def pytest_addoption(parser):
-    pass
+    parser.addoption(
+        "--env",
+        action="store",
+        default="dev",
+        help="Environment to run tests against (e.g., dev, stage, prod)"
+    )
 
 
 def pytest_configure(config):
     env = config.getoption('--env')
     logger_config.set_env(env)
 
-    if config.getoption('--jenkins_build_link'):
-        jbl = config.getoption('--jenkins_build_link')
-        logger_config.set_jbl(jbl)
+    # if config.getoption('--jenkins_build_link'):
+    #     jbl = config.getoption('--jenkins_build_link')
+    #     logger_config.set_jbl(jbl)
 
 
 @pytest.hookimpl(tryfirst=True)

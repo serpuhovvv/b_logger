@@ -35,8 +35,8 @@ class TestReport(BaseDataModel):
         self.steps_id = None
         self.error = None
 
-    def set_parameters(self, params):
-        self.parameters.extend(params)
+    # def set_parameters(self, params):
+    #     self.parameters.extend(params)
 
     def add_parameter(self, name, value):
         self.parameters.add_parameter(TestParameter(name, value))

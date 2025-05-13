@@ -23,7 +23,7 @@ class LoggerConfig(BaseDataModel):
     #         cls._instance._load(path)
     #     return cls._instance
 
-    def __init__(self, path: str = f'{b_logger_root()}/logger.config.yaml'):
+    def __init__(self, path: str = fr'C:\Users\serg.pudikov\PycharmProjects\b_logger\logger.config.yaml'):
         conf = self._load(path)
 
         self.set_project_name(conf.project_name)
@@ -32,7 +32,7 @@ class LoggerConfig(BaseDataModel):
 
     def _load(self, path: str):
         config_path = Path(path)
-        if not config_path.exists():
+        if not os.path.exists(config_path):
             raise FileNotFoundError(f'Config file not found: {path}')
 
         with config_path.open('r') as f:
