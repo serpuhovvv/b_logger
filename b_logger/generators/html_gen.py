@@ -2,12 +2,12 @@ import json
 from jinja2 import Environment, FileSystemLoader
 
 from b_logger.entities.reports import Report
-from b_logger.utils.paths import logs_path, b_logger_root
+from b_logger.utils.paths import pathfinder, logs_path
 
 
 class HTMLGenerator:
     def __init__(self):
-        env = Environment(loader=FileSystemLoader(f'{b_logger_root()}/templates'))
+        env = Environment(loader=FileSystemLoader(f'{pathfinder.library_root()}/b_logger/templates'))
         self.template = env.get_template(f'adm_template.html')
         self.report_path = f'{logs_path()}/combined_report.json'
 

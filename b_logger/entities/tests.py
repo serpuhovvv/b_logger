@@ -1,3 +1,6 @@
+import uuid
+from typing import Any
+
 from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.entities.statuses import TestStatus
 
@@ -24,19 +27,21 @@ class TestParametersContainer(BaseDataModel, list):
 
 class TestReport(BaseDataModel):
 
-    def __init__(self,
-                 name: str = None,
-                 status: TestStatus = None):
+    def __init__(self, name: str = None):
+        self.id_ = uuid.uuid4()
         self.name = name
-        self.status: TestStatus = status
+        self.status: TestStatus = None
         self.duration = None
         self.parameters: TestParametersContainer = TestParametersContainer()
         self.preconditions_id = None
         self.steps_id = None
         self.error = None
 
-    # def set_parameters(self, params):
-    #     self.parameters.extend(params)
+    def set_status(self, status: TestStatus):
+        self.status = status
+
+    def set_duration(self, duration: float):
+        self.duration = duration
 
     def add_parameter(self, name, value):
         self.parameters.add_parameter(TestParameter(name, value))
@@ -46,3 +51,5 @@ class TestReport(BaseDataModel):
 
     def set_preconditions_id(self, preconditions_id):
         self.preconditions_id = preconditions_id
+
+

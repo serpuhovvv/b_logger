@@ -3,7 +3,7 @@ import yaml
 import json
 import os
 from pathlib import Path
-from .utils.paths import b_logger_root
+from .utils.paths import pathfinder
 from .utils.basedatamodel import BaseDataModel
 from .utils.dotdict import DotDict
 
@@ -23,7 +23,7 @@ class LoggerConfig(BaseDataModel):
     #         cls._instance._load(path)
     #     return cls._instance
 
-    def __init__(self, path: str = fr'C:\Users\serg.pudikov\PycharmProjects\b_logger\logger.config.yaml'):
+    def __init__(self, path: str = f'{pathfinder.project_root()}/b_logger.config.yaml'):
         conf = self._load(path)
 
         self.set_project_name(conf.project_name)

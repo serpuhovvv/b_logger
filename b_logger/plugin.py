@@ -2,7 +2,7 @@ import pytest
 import os
 from xdist import is_xdist_controller, get_xdist_worker_id
 
-from b_logger.logger_config import logger_config
+from b_logger.config import logger_config
 from b_logger.entities.statuses import TestStatus, py_outcome_to_tstatus
 from b_logger.utils.paths import (
     screenshots_path,

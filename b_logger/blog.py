@@ -12,7 +12,7 @@ class BLogger:
 
     @staticmethod
     def set_base_url(base_url: str):
-        runtime.set_test_base_url(base_url)
+        runtime.set_base_url(base_url)
 
     @staticmethod
     def set_driver(driver: WebDriver):

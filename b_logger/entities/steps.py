@@ -20,8 +20,8 @@ class StepManager:
     def __init__(self):
         self.current_step_id = None
 
-    # def drop_current_step(self):
-    #     self.current_step = None
+    def set_current_step(self, step_id):
+        self.current_step_id = step_id
 
 
 class StepError(BaseDataModel):

@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil import parser
 from filelock import FileLock
 
-from b_logger.logger_config import logger_config
+from b_logger.config import logger_config
 from b_logger.entities.statuses import TestStatus
 from b_logger.entities.tests import TestReport
 from b_logger.entities.steps import StepContainer

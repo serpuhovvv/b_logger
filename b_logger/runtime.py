@@ -4,9 +4,9 @@ from b_logger.entities.reports import Report
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.entities.tests import TestReport, TestStatus, TestError
 from b_logger.entities.steps import Step, StepStatus, StepError, StepManager, StepContainer
-from b_logger.html_gen import HTMLGenerator
+from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.utils.formatters import format_tb
-from b_logger.report_gen import ReportGenerator
+from b_logger.generators.report_gen import ReportGenerator
 
 
 class RunTime:
@@ -18,8 +18,8 @@ class RunTime:
         self.report_generator: ReportGenerator = ReportGenerator()
         self.html_generator: HTMLGenerator = HTMLGenerator()
 
-    def set_test_base_url(self, base_url: str):
-        self.test_report.base_url = base_url
+    def set_base_url(self, base_url: str):
+        self.run_report.base_url = base_url
 
     def start_test(self, item):
         test_name = item.name
@@ -36,10 +36,10 @@ class RunTime:
                 self.test_report.add_parameter(param_name, param_value)
 
     def set_test_status(self, status: TestStatus):
-        self.test_report.status = status
+        self.test_report.set_status(status)
 
     def set_test_duration(self, duration: float):
-        self.test_report.duration = duration
+        self.test_report.set_duration(duration)
 
     def set_test_error(self, error: TestError):
         self.test_report.error = error
@@ -62,7 +62,7 @@ class RunTime:
         if self.step_manager.current_step_id is not None:
             step.set_parent_id(self.step_manager.current_step_id)
         else:
-            self.step_manager.current_step_id = step.id
+            self.step_manager.set_current_step(step.id)
             self.step_container.add_step(step)
 
     @staticmethod
