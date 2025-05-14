@@ -9,6 +9,8 @@ dependencies = [
     'allure-pytest',
     'pathlib',
     'qase-pytest',
+    'pytest-playwright',
+    'playwright',
     'pyyaml',
     'filelock',
     'Jinja2',

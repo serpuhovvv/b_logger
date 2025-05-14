@@ -4,11 +4,13 @@ from xdist import is_xdist_controller, get_xdist_worker_id
 
 from b_logger.config import logger_config
 from b_logger.entities.statuses import py_outcome_to_tstatus
+from b_logger.generators.html_gen import HTMLGenerator
+from b_logger.generators.report_gen import ReportGenerator
 from b_logger.utils.paths import (
-    screenshots_path,
+    attachments_path,
     b_logs_path,
     b_logs_tmp_path,
-    clear_screenshots,
+    clear_attachments,
     clear_logs,
     clear_tmp_logs, b_logs_tmp_reports_path, b_logs_tmp_steps_path, b_logs_tmp_preconditions_path,
 )
@@ -35,14 +37,14 @@ def pytest_configure(config):
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session):
     if is_xdist_controller(session) or get_xdist_worker_id(session) == 'master':
-        os.makedirs(f'{screenshots_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_path()}', exist_ok=True)
+        os.makedirs(f'{attachments_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_steps_path()}', exist_ok=True)
 
-        clear_screenshots()
+        clear_attachments()
         clear_logs()
         clear_tmp_logs()
 
@@ -64,8 +66,11 @@ def pytest_sessionfinish(session):
         runtime.run_report.save_json()
 
     if is_xdist_controller(session) or get_xdist_worker_id(session) == 'master':
-        runtime.report_generator.generate_combined_report()
-        runtime.html_generator.generate_html()
+        report_generator: ReportGenerator = ReportGenerator()
+        html_generator: HTMLGenerator = HTMLGenerator()
+
+        report_generator.generate_combined_report()
+        html_generator.generate_html()
 
 
 @pytest.hookimpl(tryfirst=True)

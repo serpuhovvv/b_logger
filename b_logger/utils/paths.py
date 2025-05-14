@@ -121,25 +121,16 @@ def clear_directory(directory: str):
             shutil.rmtree(path)
 
 
-def clear_screenshots():
-    clear_directory(f'{screenshots_path()}')
-    # for pngfile in os.listdir(f'{screenshots_path()}'):
-    #     if pngfile.endswith('.png'):
-    #         os.remove(f'{screenshots_path()}/{pngfile}')
-    #     else:
-    #         pass
+def clear_attachments():
+    clear_directory(f'{attachments_path()}')
 
 
 def clear_logs():
     clear_directory(f'{b_logs_path()}')
-    # for log in os.listdir(f'{logs_path()}'):
-    #     os.remove(f'{logs_path()}/{log}')
 
 
 def clear_tmp_logs():
     clear_directory(f'{b_logs_tmp_path()}')
-    # for log in os.listdir(f'{tmp_logs_path()}'):
-    #     os.remove(f'{tmp_logs_path()}/{log}')
 
 
 @lru_cache(maxsize=1)
@@ -148,13 +139,18 @@ def b_logs_path():
 
 
 @lru_cache(maxsize=1)
-def screenshots_path():
-    return pathfinder.find('b_logs/screenshots')
+def attachments_path():
+    return pathfinder.find('b_logs/attachments')
 
 
 @lru_cache(maxsize=1)
 def b_logs_tmp_path():
     return pathfinder.find('b_logs_tmp')
+
+
+@lru_cache(maxsize=1)
+def screenshots_path():
+    return pathfinder.find('b_logs/attachments/screenshots')
 
 
 @lru_cache(maxsize=1)

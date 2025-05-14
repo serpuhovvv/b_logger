@@ -1,6 +1,7 @@
 import uuid
 from contextlib import contextmanager
 from selenium.webdriver.ie.webdriver import WebDriver
+from playwright.sync_api import Page
 
 from b_logger.entities.steps import StepStatus, Step
 from b_logger.entities.exceptions import possible_exceptions
@@ -10,16 +11,16 @@ from b_logger.plugin import runtime
 class BLogger:
 
     @staticmethod
-    def set_env(env: str):
-        runtime.run_report.set_env(env)
-
-    @staticmethod
     def set_base_url(base_url: str):
         runtime.set_base_url(base_url)
 
     @staticmethod
-    def set_driver(driver: WebDriver):
-        pass
+    def set_env(env: str):
+        runtime.set_env(env)
+
+    @staticmethod
+    def set_browser(browser: WebDriver | Page):
+        runtime.set_browser(browser)
 
     @staticmethod
     def param(name, value):

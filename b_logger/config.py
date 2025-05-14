@@ -10,18 +10,9 @@ from .utils.dotdict import DotDict
 
 class LoggerConfig(BaseDataModel):
     project_name: str = None
-    env: str = None
     jenkins_build_link = None
     qase: bool = None
     allure: bool = None
-
-    # _instance = None
-    #
-    # def __new__(cls, path: str = f'{logger_root()}/b_logger.config.yaml'):
-    #     if cls._instance is None:
-    #         cls._instance = super(LoggerConfig, cls).__new__(cls)
-    #         cls._instance._load(path)
-    #     return cls._instance
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/b_logger.config.yaml'):
         conf = self._load(path)
@@ -47,9 +38,6 @@ class LoggerConfig(BaseDataModel):
     def set_jbl(self, jbl):
         self.jenkins_build_link = jbl
 
-    def set_env(self, env: str):
-        self.env = env
-
     def set_qase(self, qase: bool):
         self.qase = qase
 
@@ -61,10 +49,6 @@ class LoggerConfig(BaseDataModel):
 
     def __getitem__(self, item):
         return self._data[item]
-
-    # @classmethod
-    # def get(cls):
-    #     return cls()
 
 
 logger_config = LoggerConfig()

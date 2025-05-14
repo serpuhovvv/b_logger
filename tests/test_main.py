@@ -8,7 +8,7 @@ blog.set_base_url('https://base-url.url')
 
 
 def test_01():
-    blog.add_parameter('aaa', 123)
+    blog.param('aaa', 123)
 
     with blog.step('step 1'):
         pass
