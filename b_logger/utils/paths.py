@@ -1,8 +1,9 @@
+import sys
 import os
 import shutil
 from pathlib import Path
 from functools import lru_cache, wraps
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Set
 
 
 class PathResolver:
@@ -17,25 +18,43 @@ class PathResolver:
     """
 
     def __init__(
-        self,
-        project_markers: set = None,
-        library_markers: set = None,
+            self,
+            project_markers: Set[str] = None,
+            library_markers: Set[str] = None,
     ):
         # Маркеры, определяющие корень проекта
         self.project_markers = project_markers or {'b_logger.config.yaml', 'requirements.txt', 'conftest.py'}
         # Маркеры, определяющие корень библиотеки
         self.library_markers = library_markers or {'b_logger'}
 
+    @staticmethod
+    def _get_possible_roots(cur_file_dir: str) -> Set[str]:
+        """Возвращает возможные корни, исходя из текущего пути и sys.path"""
+        possible_roots = set()
+        cur_file_components = os.path.normpath(cur_file_dir).split(os.sep)
+
+        for path in sys.path:
+            possible_root_dir = True
+            for cur_file_comp, comp in zip(cur_file_components, os.path.normpath(path).split(os.sep)):
+                if cur_file_comp != comp:
+                    possible_root_dir = False
+            if possible_root_dir:
+                possible_roots.add(path)
+
+        return possible_roots
+
     @lru_cache(maxsize=1)
     def project_root(self) -> Path:
         """
-        Найти корень проекта, начиная от текущей рабочей директории.
+        Найти корень проекта, начиная от текущей рабочей директории или используя sys.path.
         """
-
         current = Path.cwd().resolve()
-        for parent in [current] + list(current.parents):
-            if any((parent / marker).exists() for marker in self.project_markers):
-                return parent
+        possible_roots = self._get_possible_roots(str(current))
+
+        for root in possible_roots:
+            if any((Path(root) / marker).exists() for marker in self.project_markers):
+                return Path(root)
+
         raise RuntimeError(f"Не удалось найти корень проекта. Искомые маркеры: {self.project_markers}")
 
     @lru_cache(maxsize=1)
@@ -43,24 +62,25 @@ class PathResolver:
         """
         Найти корень библиотеки, основываясь на расположении этого модуля.
         """
-
         path = Path(__file__).resolve()
-        for parent in [path] + list(path.parents):
-            if any((parent / marker).exists() for marker in self.library_markers):
-                return parent
+        possible_roots = self._get_possible_roots(str(path))
+
+        for root in possible_roots:
+            if any((Path(root) / marker).exists() for marker in self.library_markers):
+                return Path(root)
+
         raise RuntimeError(f"Не удалось найти корень библиотеки. Искомые маркеры: {self.library_markers}")
 
     def find(
-        self,
-        name: str,
-        from_root: str = 'project',
-        include_dirs: bool = True,
-        exclude_dirs: tuple[str, ...] = ('.git', '.venv', '__pycache__'),
-    ) -> str | Any:
+            self,
+            name: str,
+            from_root: str = 'project',
+            include_dirs: bool = True,
+            exclude_dirs: tuple[str, ...] = ('.git', '.venv', '__pycache__'),
+    ) -> Union[str, Path]:
         """
         Найти файл или директорию по точному имени от указанного корня, исключая служебные папки.
         """
-
         if from_root == 'project':
             root_path = self.project_root()
         elif from_root == 'library':
@@ -103,27 +123,42 @@ def clear_screenshots():
 
 
 def clear_logs():
-    clear_directory(f'{logs_path()}')
+    clear_directory(f'{b_logs_path()}')
     # for log in os.listdir(f'{logs_path()}'):
     #     os.remove(f'{logs_path()}/{log}')
 
 
 def clear_tmp_logs():
-    clear_directory(f'{tmp_logs_path()}')
+    clear_directory(f'{b_logs_tmp_path()}')
     # for log in os.listdir(f'{tmp_logs_path()}'):
     #     os.remove(f'{tmp_logs_path()}/{log}')
 
 
 @lru_cache(maxsize=1)
-def logs_path():
+def b_logs_path():
     return pathfinder.find('b_logs')
 
 
 @lru_cache(maxsize=1)
-def tmp_logs_path():
+def screenshots_path():
+    return pathfinder.find('b_logs/screenshots')
+
+
+@lru_cache(maxsize=1)
+def b_logs_tmp_path():
     return pathfinder.find('b_logs_tmp')
 
 
 @lru_cache(maxsize=1)
-def screenshots_path():
-    return pathfinder.find('screenshots')
+def b_logs_tmp_reports_path():
+    return pathfinder.find('b_logs_tmp/reports')
+
+
+@lru_cache(maxsize=1)
+def b_logs_tmp_steps_path():
+    return pathfinder.find('b_logs_tmp/steps')
+
+
+@lru_cache(maxsize=1)
+def b_logs_tmp_preconditions_path():
+    return pathfinder.find('b_logs_tmp/preconditions')

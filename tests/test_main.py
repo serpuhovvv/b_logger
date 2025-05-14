@@ -2,6 +2,10 @@ import pytest
 
 from b_logger import blog
 
+blog.set_env('prod')
+
+blog.set_base_url('https://base-url.url')
+
 
 def test_01():
     blog.add_parameter('aaa', 123)

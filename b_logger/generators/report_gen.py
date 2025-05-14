@@ -3,13 +3,13 @@ from glob import glob
 from filelock import FileLock
 # from box import Box
 
-from b_logger.entities.reports import Report
-from b_logger.utils.paths import logs_path, tmp_logs_path, clear_tmp_logs
+from b_logger.entities.reports import RunReport
+from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, clear_tmp_logs
 
 
 class ReportGenerator:
     def __init__(self, debug=True):
-        self.combined = Report()
+        self.combined = RunReport()
         self.debug = debug
 
     def generate_combined_report(self):
@@ -21,10 +21,10 @@ class ReportGenerator:
         self.clear_tmp_dir()
 
     def load_reports(self):
-        report_files = glob(f'{tmp_logs_path()}/reports/report_*.json')
+        report_files = glob(f'{b_logs_tmp_path()}/reports/report_*.json')
         for rep in report_files:
             try:
-                report = Report.from_json(rep)
+                report = RunReport.from_json(rep)
                 self.merge(report)
             except Exception as e:
                 print(f"[ERROR] Failed to process {rep}: {e}")
@@ -32,9 +32,10 @@ class ReportGenerator:
             # finally:
             #     os.remove(f'{path}')
 
-    def merge(self, report: Report):
+    def merge(self, report: RunReport):
         self._merge_env(report)
         self._merge_proj_name(report)
+        self._merge_base_url(report)
         self._merge_start_time(report)
         self._merge_end_time(report)
         self._merge_report_ids(report)
@@ -42,7 +43,7 @@ class ReportGenerator:
         self._merge_module_results(report)
 
     def save(self, filename='combined_report'):
-        output_path = f'{logs_path()}/{filename}'
+        output_path = f'{b_logs_path()}/{filename}'
         with FileLock(f'{output_path}.lock'):
             self.combined.to_json_file(output_path)
         print(f"[INFO] Combined report saved to {output_path}")
@@ -50,47 +51,53 @@ class ReportGenerator:
     @staticmethod
     def clear_locks():
         # lock_files = glob(f"{logs_path()}/report_*.json.lock")
-        for lock_file in os.listdir(f'{logs_path()}'):
+        for lock_file in os.listdir(f'{b_logs_path()}'):
             if '.lock' in lock_file:
-                os.remove(f'{logs_path()}/{lock_file}')
+                os.remove(f'{b_logs_path()}/{lock_file}')
 
     def clear_tmp_dir(self):
         if not self.debug:
             clear_tmp_logs()
 
-    def _merge_env(self, report: Report):
+    def _merge_env(self, report: RunReport):
         if self.combined.env is None:
             self.combined.env = report.env
         elif self.combined.env != report.env:
             print(f"[WARN] Inconsistent env: {self.combined.env} vs {report.env}")
 
-    def _merge_proj_name(self, report: Report):
+    def _merge_proj_name(self, report: RunReport):
         if self.combined.proj_name is None:
             self.combined.proj_name = report.proj_name
         elif self.combined.proj_name != report.proj_name:
             print(f"[WARN] Inconsistent project name: {self.combined.proj_name} vs {report.proj_name}")
 
-    def _merge_start_time(self, report: Report):
+    def _merge_base_url(self, report: RunReport):
+        if self.combined.base_url is None:
+            self.combined.base_url = report.base_url
+        elif self.combined.base_url != report.base_url:
+            print(f"[WARN] Inconsistent base url: {self.combined.base_url} vs {report.base_url}")
+
+    def _merge_start_time(self, report: RunReport):
         if report.start_time and (
             self.combined.start_time is None or report.get_iso_start_time() < self.combined.get_iso_start_time()
         ):
             self.combined.start_time = report.start_time
 
-    def _merge_end_time(self, report: Report):
+    def _merge_end_time(self, report: RunReport):
         if report.end_time and (
             self.combined.end_time is None or report.get_iso_end_time() > self.combined.get_iso_end_time()
         ):
             self.combined.end_time = report.end_time
 
-    def _merge_report_ids(self, report: Report):
+    def _merge_report_ids(self, report: RunReport):
         self.combined.report_ids[report.worker] = report.report_id
 
-    def _merge_run_results(self, report: Report):
+    def _merge_run_results(self, report: RunReport):
         for status, count in report.run_results.items():
             self.combined.run_results.increase(status, count)
             # self.combined.run_results[status] += count
 
-    def _merge_module_results(self, report: Report):
+    def _merge_module_results(self, report: RunReport):
         for module_name, module_data in report.modules.items():
             mod_results = module_data['module_results']
             mod_tests = module_data['module_tests']

@@ -2,5 +2,4 @@ b_logs
 b_logs_tmp
 screenshots
 *.egg-info/
-b_logger.config.yaml
 build

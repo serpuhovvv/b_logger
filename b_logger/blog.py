@@ -1,6 +1,5 @@
-from contextlib import contextmanager
 import uuid
-
+from contextlib import contextmanager
 from selenium.webdriver.ie.webdriver import WebDriver
 
 from b_logger.entities.steps import StepStatus, Step
@@ -9,6 +8,10 @@ from b_logger.plugin import runtime
 
 
 class BLogger:
+
+    @staticmethod
+    def set_env(env: str):
+        runtime.run_report.set_env(env)
 
     @staticmethod
     def set_base_url(base_url: str):
@@ -21,6 +24,10 @@ class BLogger:
     @staticmethod
     def add_parameter(name, value):
         runtime.test_report.add_parameter(name, value)
+
+    @staticmethod
+    def info(info_str):
+        runtime.test_report.info = info_str
 
     @staticmethod
     @contextmanager

@@ -28,6 +28,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["b_logger*"]
+
 
 [tool.setuptools.package-data]
-"*" = ["*.*"]
+b_logger = ["templates/*.html"]

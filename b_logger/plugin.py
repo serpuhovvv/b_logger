@@ -3,14 +3,14 @@ import os
 from xdist import is_xdist_controller, get_xdist_worker_id
 
 from b_logger.config import logger_config
-from b_logger.entities.statuses import TestStatus, py_outcome_to_tstatus
+from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.utils.paths import (
     screenshots_path,
-    logs_path,
-    tmp_logs_path,
+    b_logs_path,
+    b_logs_tmp_path,
     clear_screenshots,
     clear_logs,
-    clear_tmp_logs,
+    clear_tmp_logs, b_logs_tmp_reports_path, b_logs_tmp_steps_path, b_logs_tmp_preconditions_path,
 )
 from b_logger.runtime import RunTime
 
@@ -19,17 +19,13 @@ runtime = RunTime()
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--env",
-        action="store",
-        default="dev",
-        help="Environment to run tests against (e.g., dev, stage, prod)"
-    )
+    pass
 
 
 def pytest_configure(config):
-    env = config.getoption('--env')
-    logger_config.set_env(env)
+    pass
+    # env = config.getoption('--env')
+    # logger_config.set_env(env)
 
     # if config.getoption('--jenkins_build_link'):
     #     jbl = config.getoption('--jenkins_build_link')
@@ -40,18 +36,21 @@ def pytest_configure(config):
 def pytest_sessionstart(session):
     if is_xdist_controller(session) or get_xdist_worker_id(session) == 'master':
         os.makedirs(f'{screenshots_path()}', exist_ok=True)
-        os.makedirs(f'{logs_path()}', exist_ok=True)
-        os.makedirs(f'{tmp_logs_path()}', exist_ok=True)
-        os.makedirs(f'{tmp_logs_path()}/reports', exist_ok=True)
-        os.makedirs(f'{tmp_logs_path()}/preconditions', exist_ok=True)
-        os.makedirs(f'{tmp_logs_path()}/steps', exist_ok=True)
+        os.makedirs(f'{b_logs_path()}', exist_ok=True)
+        os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
+        os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
+        os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
+        os.makedirs(f'{b_logs_tmp_steps_path()}', exist_ok=True)
 
         clear_screenshots()
         clear_logs()
         clear_tmp_logs()
 
-    env = session.config.getoption('--env') or os.getenv('RUN_ENV')
-    runtime.run_report.set_env(env)
+    try:
+        env = session.config.getoption('--env') or os.getenv('RUN_ENV')
+        runtime.run_report.set_env(env)
+    except Exception as e:
+        pass
 
     worker = get_xdist_worker_id(session)
     runtime.run_report.set_worker(worker)
@@ -92,10 +91,10 @@ def pytest_runtest_makereport(call, item):
             runtime.handle_failed_test(call, report)
 
         elif report.outcome == 'skipped':
-            runtime.set_test_status(TestStatus.SKIPPED)
+            runtime.handle_skipped_test(call, report)
 
     if report.when == 'call':
-        runtime.set_test_duration(round(report.duration, 2))
+        runtime.test_report.set_duration(round(report.duration, 2))
 
         if report.outcome != 'failed':
             runtime.set_test_status(py_outcome_to_tstatus(report.outcome))

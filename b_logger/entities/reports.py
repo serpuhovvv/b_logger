@@ -11,7 +11,7 @@ from b_logger.entities.statuses import TestStatus
 from b_logger.entities.tests import TestReport
 from b_logger.entities.steps import StepContainer
 from b_logger.utils.basedatamodel import BaseDataModel
-from b_logger.utils.paths import logs_path, tmp_logs_path
+from b_logger.utils.paths import b_logs_path, b_logs_tmp_path
 
 
 class RunResults(BaseDataModel):
@@ -28,11 +28,12 @@ class RunResults(BaseDataModel):
         setattr(self, result, current + amount)
 
 
-class Report(BaseDataModel):
+class RunReport(BaseDataModel):
     def __init__(self):
         self.report_id = f'report_{uuid.uuid4()}'
         self.proj_name = logger_config.project_name
         self.env = None
+        self.base_url = None
         self.worker = None
         self.start_time = datetime.now()
         self.end_time = None
@@ -102,7 +103,7 @@ class Report(BaseDataModel):
             for test_name, test_data in module_data['module_tests'].items():
                 steps_id = test_data['steps_id']
                 if steps_id:
-                    steps_path = f'{tmp_logs_path()}/steps/{steps_id}.json'
+                    steps_path = f'{b_logs_tmp_path()}/steps/{steps_id}.json'
                     try:
                         steps_by_test[test_name] = StepContainer.from_json(steps_path)
                     except FileNotFoundError:
@@ -113,7 +114,7 @@ class Report(BaseDataModel):
         pass
 
     def save_json(self, file_name=None):
-        root = f'{tmp_logs_path()}/reports'
+        root = f'{b_logs_tmp_path()}/reports'
         if file_name:
             path = f'{root}/{file_name}'
         else:

@@ -4,7 +4,7 @@ import uuid
 from enum import Enum
 from filelock import FileLock
 
-from b_logger.utils.paths import tmp_logs_path
+from b_logger.utils.paths import b_logs_tmp_path
 from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.utils.formatters import format_exc, format_tb
 
@@ -80,6 +80,6 @@ class StepContainer(BaseDataModel, list):
 
     def save_json(self, path=None):
         if not path:
-            path = f'{tmp_logs_path()}/steps/{self.container_id}'
+            path = f'{b_logs_tmp_path()}/steps/{self.container_id}'
         with FileLock(f'{path}.lock'):
             self.to_json_file(path)

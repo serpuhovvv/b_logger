@@ -1,6 +1,6 @@
 import traceback
 
-from b_logger.entities.reports import Report
+from b_logger.entities.reports import RunReport
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.entities.tests import TestReport, TestStatus, TestError
 from b_logger.entities.steps import Step, StepStatus, StepError, StepManager, StepContainer
@@ -11,7 +11,7 @@ from b_logger.generators.report_gen import ReportGenerator
 
 class RunTime:
     def __init__(self):
-        self.run_report: Report = Report()
+        self.run_report: RunReport = RunReport()
         self.test_report: TestReport = TestReport()
         self.step_manager = StepManager()
         self.step_container = StepContainer()
@@ -37,9 +37,6 @@ class RunTime:
 
     def set_test_status(self, status: TestStatus):
         self.test_report.set_status(status)
-
-    def set_test_duration(self, duration: float):
-        self.test_report.set_duration(duration)
 
     def set_test_error(self, error: TestError):
         self.test_report.error = error
