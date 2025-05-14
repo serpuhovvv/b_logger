@@ -4,7 +4,7 @@ from filelock import FileLock
 # from box import Box
 
 from b_logger.entities.reports import RunReport
-from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, clear_tmp_logs
+from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, clear_tmp_logs, b_logs_tmp_reports_path
 
 
 class ReportGenerator:
@@ -21,7 +21,7 @@ class ReportGenerator:
         self.clear_tmp_dir()
 
     def load_reports(self):
-        report_files = glob(f'{b_logs_tmp_path()}/reports/report_*.json')
+        report_files = glob(f'{b_logs_tmp_reports_path()}/report_*.json')
         for rep in report_files:
             try:
                 report = RunReport.from_json(rep)

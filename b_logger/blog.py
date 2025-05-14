@@ -22,11 +22,24 @@ class BLogger:
         pass
 
     @staticmethod
-    def add_parameter(name, value):
+    def param(name, value):
+        """
+        Add test parameter
+
+        :param name:
+        :param value:
+        :return:
+        """
         runtime.test_report.add_parameter(name, value)
 
     @staticmethod
     def info(info_str):
+        """
+        Add any test info
+
+        :param info_str:
+        :return:
+        """
         runtime.test_report.info = info_str
 
     @staticmethod

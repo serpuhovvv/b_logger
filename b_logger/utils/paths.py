@@ -46,14 +46,22 @@ class PathResolver:
     @lru_cache(maxsize=1)
     def project_root(self) -> Path:
         """
-        Найти корень проекта, начиная от текущей рабочей директории или используя sys.path.
+        Найти корень проекта:
+        - Сначала ищет вверх от текущей директории (как при запуске из терминала)
+        - Потом по sys.path
         """
         current = Path.cwd().resolve()
-        possible_roots = self._get_possible_roots(str(current))
 
-        for root in possible_roots:
-            if any((Path(root) / marker).exists() for marker in self.project_markers):
-                return Path(root)
+        # Проверка вверх по директориям
+        for parent in [current, *current.parents]:
+            if any((parent / marker).exists() for marker in self.project_markers):
+                return parent
+
+        # Если не нашли — проверяем sys.path
+        for path in sys.path:
+            p = Path(path).resolve()
+            if any((p / marker).exists() for marker in self.project_markers):
+                return p
 
         raise RuntimeError(f"Не удалось найти корень проекта. Искомые маркеры: {self.project_markers}")
 
