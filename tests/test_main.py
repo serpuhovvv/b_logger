@@ -1,7 +1,6 @@
 import pytest
-
+from pytest_playwright.pytest_playwright import Playwright
 from selenium import webdriver
-from playwright.sync_api import sync_playwright
 
 from b_logger import blog
 
@@ -11,8 +10,9 @@ blog.set_base_url('https://base-url.url')
 
 
 @pytest.fixture()
-def driver():
+def selenium_driver():
     driver = webdriver.Chrome()
+    driver.set_window_size(1920, 1080)
 
     blog.set_browser(driver)
 
@@ -22,11 +22,11 @@ def driver():
 
 
 @pytest.fixture()
-def playwright_browser():
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-
-    page = browser.new_page()
+def playwright_page(playwright: Playwright):
+    browser = playwright.chromium.launch()
+    context = browser.new_context()
+    page = context.new_page()
+    page.set_viewport_size({"width": 1920, "height": 1080})
 
     blog.set_browser(page)
 
@@ -63,11 +63,18 @@ def test_parametrized(paramchik):
 
 
 @pytest.mark.xfail
-def test_selenium(driver):
+def test_selenium(selenium_driver):
     with blog.step('step 1'):
-        driver.get(f'google.com')
+        selenium_driver.get(f'https://google.com')
 
         with blog.step('step 2'):
             assert 1 == 2
 
 
+@pytest.mark.xfail
+def test_playwright(playwright_page):
+    with blog.step('step 1'):
+        playwright_page.goto(f'https://google.com')
+
+        with blog.step('step 2'):
+            assert 1 == 2

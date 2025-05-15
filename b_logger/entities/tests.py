@@ -32,11 +32,12 @@ class TestReport(BaseDataModel):
         self.name = name
         self.status: TestStatus = None
         self.duration = None
-        self.parameters: TestParametersContainer = TestParametersContainer()
+        self.parameters = []
+        # self.attachments = {}
         self.preconditions_id = None
         self.steps_id = None
         self.error = None
-        # self.stacktrace = None
+        self.stacktrace = None
 
     def set_status(self, status: TestStatus):
         self.status = status
@@ -45,7 +46,7 @@ class TestReport(BaseDataModel):
         self.duration = duration
 
     def add_parameter(self, name, value):
-        self.parameters.add_parameter(TestParameter(name, value))
+        self.parameters.append(TestParameter(name, value))
 
     def set_steps_id(self, steps_id):
         self.steps_id = steps_id

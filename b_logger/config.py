@@ -3,12 +3,12 @@ import yaml
 import json
 import os
 from pathlib import Path
-from .utils.paths import pathfinder
-from .utils.basedatamodel import BaseDataModel
-from .utils.dotdict import DotDict
+from b_logger.utils.paths import pathfinder
+from b_logger.utils.basedatamodel import BaseDataModel
+from b_logger.utils.dotdict import DotDict
 
 
-class LoggerConfig(BaseDataModel):
+class BLoggerConfig(BaseDataModel):
     project_name: str = None
     jenkins_build_link = None
     qase: bool = None
@@ -51,4 +51,4 @@ class LoggerConfig(BaseDataModel):
         return self._data[item]
 
 
-logger_config = LoggerConfig()
+b_logger_config = BLoggerConfig()

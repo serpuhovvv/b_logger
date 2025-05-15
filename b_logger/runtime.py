@@ -1,22 +1,28 @@
 import traceback
 
 from playwright.sync_api import Page
-from selenium.webdriver.ie.webdriver import WebDriver
+from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
 
 from b_logger.entities.reports import RunReport
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.entities.tests import TestReport, TestStatus, TestError
 from b_logger.entities.steps import Step, StepStatus, StepError, StepManager, StepContainer
-from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.utils.formatters import format_tb
-from b_logger.generators.report_gen import ReportGenerator
 from b_logger.utils.paths import pathfinder, attachments_path, screenshots_path
+
+
+class MainRun:
+    pass
+
+
+class TestRun:
+    pass
 
 
 class RunTime:
     def __init__(self):
         self.run_report: RunReport = RunReport()
-        self.browser: WebDriver | Page = None
+        self.browser: RemoteWebDriver | WebDriver | Page = None
         self.test_report: TestReport = None
         self.step_manager: StepManager = None
         self.step_container: StepContainer = None
@@ -27,7 +33,7 @@ class RunTime:
     def set_env(self, env: str):
         self.run_report.set_env(env)
 
-    def set_browser(self, browser: WebDriver | Page):
+    def set_browser(self, browser: RemoteWebDriver | WebDriver | Page):
         self.browser = browser
 
     def start_test(self, item):
@@ -47,18 +53,47 @@ class RunTime:
     def finish_test(self):
         self.step_container.save_json()
         self.test_report.set_steps_id(self.step_container.container_id)
+        del self.step_manager, self.step_container, self.test_report
 
-    def handle_failed_test(self, call, report):
-        status = py_outcome_to_tstatus(report.outcome)
+    def process_test_result(self, report, call, item):
+        """Process test results and set appropriate status."""
+        status = self._process_test_status(report)
         self.test_report.set_status(status)
 
+        self.test_report.set_duration(round(report.duration, 2))
+
+        if report.failed:
+            self._handle_failed_test(call, report, item)
+
+        elif report.skipped:
+            self._handle_skipped_test(call, report, item)
+
+        else:
+            self._handle_passed_test(call, report, item)
+
+    @staticmethod
+    def _process_test_status(report):
+        if hasattr(report, 'wasxfail'):
+            if report.outcome == 'skipped':
+                status = TestStatus.PASSED
+            elif report.outcome == 'passed':
+                status = TestStatus.FAILED
+            else:
+                status = py_outcome_to_tstatus(report.outcome)
+        else:
+            status = py_outcome_to_tstatus(report.outcome)
+
+        return status
+
+    def _handle_failed_test(self, call, report, item):
         self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
 
-    def handle_skipped_test(self, call, report):
-        status = py_outcome_to_tstatus(report.outcome)
-        self.test_report.set_status(status)
-
+    def _handle_skipped_test(self, call, report, item):
         self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
+
+    def _handle_passed_test(self, call, report, item):
+        if report.longrepr:
+            self.test_report.stacktrace = report.longreprtext
 
     def start_step(self, step: Step):
         if self.step_manager.current_step_id is not None:
@@ -97,15 +132,15 @@ class RunTime:
 
         scr_path = f'{screenshots_path()}/{scr_name}.png'
 
-        if isinstance(self.browser, WebDriver):
+        if isinstance(self.browser, (RemoteWebDriver, WebDriver)):
             self.browser.save_screenshot(filename=scr_path)
 
         elif isinstance(self.browser, Page):
             self.browser.screenshot(path=scr_path)
 
         else:
-            raise RuntimeError(f'Browser is incorrect, unable to make screenshot!!!'
+            raise RuntimeError(f'Browser is incorrect, unable to make screenshot!!! '
                                f'Current browser is {self.browser}')
 
-    def attach(self):
-        pass
+    # def attach(self, name, attachment):
+    #     self.test_report.attachments[name] = attachment

@@ -44,11 +44,15 @@ class Step(BaseDataModel):
         self.title = title
         self.status = status
         self.parent_id = None
+        self.attachments = []
         self.steps = []
         self.errors = []
 
     def set_parent_id(self, parent_id):
         self.parent_id = parent_id
+
+    def add_attachment(self, attachment):
+        self.attachments.append(attachment)
 
     def set_status(self, status: StepStatus):
         self.status = status

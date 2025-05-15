@@ -2,7 +2,7 @@ import pytest
 import os
 from xdist import is_xdist_controller, get_xdist_worker_id
 
-from b_logger.config import logger_config
+from b_logger.config import b_logger_config
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.generators.report_gen import ReportGenerator
@@ -12,7 +12,7 @@ from b_logger.utils.paths import (
     b_logs_tmp_path,
     clear_attachments,
     clear_logs,
-    clear_tmp_logs, b_logs_tmp_reports_path, b_logs_tmp_steps_path, b_logs_tmp_preconditions_path,
+    clear_tmp_logs, b_logs_tmp_reports_path, b_logs_tmp_steps_path, b_logs_tmp_preconditions_path, screenshots_path,
 )
 from b_logger.runtime import RunTime
 
@@ -26,12 +26,6 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     pass
-    # env = config.getoption('--env')
-    # logger_config.set_env(env)
-
-    # if config.getoption('--jenkins_build_link'):
-    #     jbl = config.getoption('--jenkins_build_link')
-    #     logger_config.set_jbl(jbl)
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -39,6 +33,7 @@ def pytest_sessionstart(session):
     if is_xdist_controller(session) or get_xdist_worker_id(session) == 'master':
         os.makedirs(f'{b_logs_path()}', exist_ok=True)
         os.makedirs(f'{attachments_path()}', exist_ok=True)
+        os.makedirs(f'{screenshots_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
         os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
@@ -49,7 +44,7 @@ def pytest_sessionstart(session):
         clear_tmp_logs()
 
     try:
-        env = session.config.getoption('--env') or os.getenv('RUN_ENV')
+        env = os.getenv('RUN_ENV') or session.config.getoption('--env')
         runtime.run_report.set_env(env)
     except Exception as e:
         pass
@@ -91,31 +86,17 @@ def pytest_runtest_makereport(call, item):
     if call.when not in ["setup", "call"]:
         return
 
-    if report.when == 'setup':
-        if report.outcome == 'failed':
-            runtime.handle_failed_test(call, report)
-
-        elif report.outcome == 'skipped':
-            runtime.handle_skipped_test(call, report)
-
-    if report.when == 'call':
-        runtime.test_report.set_duration(round(report.duration, 2))
-
-        if report.outcome == 'passed':
-            runtime.test_report.set_status(py_outcome_to_tstatus(report.outcome))
-
-        elif report.outcome == 'failed':
-            runtime.handle_failed_test(call, report)
-
-        elif report.outcome == 'skipped':
-            runtime.handle_skipped_test(call, report)
+    runtime.process_test_result(report, call, item)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_logreport(report):
+    if report.when not in ["setup", "call"]:
+        return
+
     if report.when == 'setup':
         outcome = report.outcome
-        if outcome == 'passed':
+        if report.outcome == 'passed':
             return
 
     elif report.when == 'call':
@@ -129,4 +110,7 @@ def pytest_runtest_logreport(report):
     module = report.location[0]
     runtime.run_report.add_run_result(valid_outcome)
     runtime.run_report.add_module_result(module, valid_outcome)
-    runtime.run_report.add_test_report(module, runtime.test_report)
+    if runtime.test_report:
+        runtime.run_report.add_test_report(module, runtime.test_report)
+    else:
+        print(f"[WARN] test_report is None in {report.nodeid} ({report.when}, {report.outcome})")

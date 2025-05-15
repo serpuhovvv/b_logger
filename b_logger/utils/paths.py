@@ -110,15 +110,15 @@ pathfinder = PathResolver()
 
 
 def clear_directory(directory: str):
-    if not os.path.exists(directory):
+    dir_path = Path(directory)
+    if not dir_path.exists():
         return
 
-    for entry in os.listdir(directory):
-        path = os.path.join(directory, entry)
-        if os.path.isfile(path) or os.path.islink(path):
-            os.remove(path)
-        elif os.path.isdir(path):
-            shutil.rmtree(path)
+    for entry in dir_path.iterdir():
+        if entry.is_file() or entry.is_symlink():
+            entry.unlink()
+        elif entry.is_dir():
+            clear_directory(str(entry))
 
 
 def clear_attachments():
