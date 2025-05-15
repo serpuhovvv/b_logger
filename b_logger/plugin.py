@@ -101,11 +101,14 @@ def pytest_runtest_makereport(call, item):
     if report.when == 'call':
         runtime.test_report.set_duration(round(report.duration, 2))
 
-        if report.outcome != 'failed':
-            runtime.set_test_status(py_outcome_to_tstatus(report.outcome))
+        if report.outcome == 'passed':
+            runtime.test_report.set_status(py_outcome_to_tstatus(report.outcome))
 
         elif report.outcome == 'failed':
             runtime.handle_failed_test(call, report)
+
+        elif report.outcome == 'skipped':
+            runtime.handle_skipped_test(call, report)
 
 
 @pytest.hookimpl(tryfirst=True)

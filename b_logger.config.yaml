@@ -1,4 +1,3 @@
-project_name: "AIM"
-env: None
+project_name: "Any Project"
 qase: True
 allure: True

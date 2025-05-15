@@ -36,6 +36,7 @@ class TestReport(BaseDataModel):
         self.preconditions_id = None
         self.steps_id = None
         self.error = None
+        # self.stacktrace = None
 
     def set_status(self, status: TestStatus):
         self.status = status
@@ -52,4 +53,5 @@ class TestReport(BaseDataModel):
     def set_preconditions_id(self, preconditions_id):
         self.preconditions_id = preconditions_id
 
-
+    def set_error(self, error: TestError):
+        self.error = error

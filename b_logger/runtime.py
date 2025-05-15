@@ -44,28 +44,21 @@ class RunTime:
             for param_name, param_value in params.items():
                 self.test_report.add_parameter(param_name, param_value)
 
-    def set_test_status(self, status: TestStatus):
-        self.test_report.set_status(status)
-
-    def set_test_error(self, error: TestError):
-        self.test_report.error = error
-
     def finish_test(self):
         self.step_container.save_json()
         self.test_report.set_steps_id(self.step_container.container_id)
 
     def handle_failed_test(self, call, report):
-        self.make_screenshot(f'{self.test_report.name}_error')
-
         status = py_outcome_to_tstatus(report.outcome)
-        self.set_test_status(status)
+        self.test_report.set_status(status)
 
-        self.set_test_error(TestError(call.excinfo.exconly(), report.longreprtext))
+        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
 
     def handle_skipped_test(self, call, report):
         status = py_outcome_to_tstatus(report.outcome)
-        self.set_test_status(status)
-        self.set_test_error(call.excinfo.value)
+        self.test_report.set_status(status)
+
+        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
 
     def start_step(self, step: Step):
         if self.step_manager.current_step_id is not None:
@@ -74,13 +67,15 @@ class RunTime:
             self.step_manager.set_current_step(step.id)
             self.step_container.add_step(step)
 
-    @staticmethod
-    def handle_step_result(step: Step, exc=None):
+    def handle_step_result(self, step: Step, exc=None):
         if exc:
+            self.make_screenshot(f'{self.test_report.name}_error')
+
             step.set_status(StepStatus.FAILED)
             err = StepError(exc, format_tb(traceback.format_exc(4)))
             step.add_error(err)
             return
+
         step.set_status(StepStatus.PASSED)
 
     def finish_step(self, step: Step):
