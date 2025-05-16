@@ -110,7 +110,4 @@ def pytest_runtest_logreport(report):
     module = report.location[0]
     runtime.run_report.add_run_result(valid_outcome)
     runtime.run_report.add_module_result(module, valid_outcome)
-    if runtime.test_report:
-        runtime.run_report.add_test_report(module, runtime.test_report)
-    else:
-        print(f"[WARN] test_report is None in {report.nodeid} ({report.when}, {report.outcome})")
+    runtime.run_report.add_test_report(module, runtime.test_report)

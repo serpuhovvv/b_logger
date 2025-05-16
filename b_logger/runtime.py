@@ -11,10 +11,6 @@ from b_logger.utils.formatters import format_tb
 from b_logger.utils.paths import pathfinder, attachments_path, screenshots_path
 
 
-class MainRun:
-    pass
-
-
 class TestRun:
     pass
 
@@ -23,9 +19,9 @@ class RunTime:
     def __init__(self):
         self.run_report: RunReport = RunReport()
         self.browser: RemoteWebDriver | WebDriver | Page = None
-        self.test_report: TestReport = None
-        self.step_manager: StepManager = None
-        self.step_container: StepContainer = None
+        self.test_report: TestReport = TestReport()
+        self.step_manager: StepManager = StepManager()
+        self.step_container: StepContainer = StepContainer()
 
     def set_base_url(self, base_url: str):
         self.run_report.base_url = base_url

@@ -4,3 +4,4 @@ screenshots
 *.egg-info/
 build
 .idea
+dist
