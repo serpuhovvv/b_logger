@@ -3,3 +3,4 @@ b_logs_tmp
 screenshots
 *.egg-info/
 build
+.idea
