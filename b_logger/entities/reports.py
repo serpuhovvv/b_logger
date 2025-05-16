@@ -99,16 +99,31 @@ class RunReport(BaseDataModel):
 
     def get_steps_by_test(self):
         steps_by_test = {}
-        for module_name, module_data in self.modules.items():
-            for test_name, test_data in module_data['module_tests'].items():
-                steps_id = test_data['steps_id']
+        for module_tests in self._get_module_tests().values():
+            for test_name, test_data in module_tests.items():
+                steps_id = test_data.get('steps_id')
                 if steps_id:
                     steps_path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
                     try:
                         steps_by_test[test_name] = StepContainer.from_json(steps_path)
                     except FileNotFoundError:
                         pass
+
+        # if test_name:
+        #     return steps_by_test.get(test_name, {})
+
         return steps_by_test
+
+    def _get_module_tests(self):
+        module_tests = {}
+        for module_name, module_data in self.modules.items():
+            tests = dict(module_data['module_tests'])
+            module_tests[module_name] = tests
+
+        # if module_name:
+        #     return module_tests.get(module_name, {})
+
+        return module_tests
 
     def combine(self):
         pass

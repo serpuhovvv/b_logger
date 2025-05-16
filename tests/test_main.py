@@ -35,18 +35,31 @@ def playwright_page(playwright: Playwright):
     browser.close()
 
 
+@blog.description(
+    'Test with base functionality, '
+    'this description is more priority than the one below'
+)
+@blog.known_bug(
+    'Fake Bug Description',
+    'https://link-to-your-bug.com'
+)
+@blog.param('Some Param you want to add', 'Param Value')
 def test_main_functionality():
-    blog.param('aaa', 123)
+    blog.description('Test with base functionality, this description is less priority')
 
-    blog.info(f'some info')
+    blog.param('Some dynamic param', 222)
+
+    blog.info(f'Just some helpful info')
 
     with blog.step('step 1'):
+
         blog.print(f'print 1')
 
     with blog.step('step 2'):
         pass
 
         with blog.step('step 2.1'):
+
             blog.print(f'print 2')
 
             with blog.step('step 2.3'):

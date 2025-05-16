@@ -75,6 +75,8 @@ def pytest_runtest_setup(item):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_teardown(item):
+    _apply_markers(item)
+
     runtime.finish_test()
 
 
@@ -111,3 +113,23 @@ def pytest_runtest_logreport(report):
     runtime.run_report.add_run_result(valid_outcome)
     runtime.run_report.add_module_result(module, valid_outcome)
     runtime.run_report.add_test_report(module, runtime.test_report)
+
+
+def _apply_markers(item):
+    __apply_description(item)
+    __apply_params(item)
+
+
+def __apply_params(item):
+    for param in item.iter_markers(name='blog_param'):
+        name = param.kwargs.get('name')
+        value = param.kwargs.get('value')
+        if name and value:
+            runtime.test_report.add_parameter(name, value)
+        else:
+            print(f'[WARN] blog.param usage is incorrect: {param}')
+
+
+def __apply_description(item):
+    desc = item.get_closest_marker('blog_description').kwargs.get('description')
+    runtime.test_report.description = desc

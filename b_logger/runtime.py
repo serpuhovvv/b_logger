@@ -67,6 +67,16 @@ class RunTime:
         else:
             self._handle_passed_test(call, report, item)
 
+    def _handle_failed_test(self, call, report, item):
+        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
+
+    def _handle_skipped_test(self, call, report, item):
+        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
+
+    def _handle_passed_test(self, call, report, item):
+        if report.longrepr:
+            self.test_report.stacktrace = report.longreprtext
+
     @staticmethod
     def _process_test_status(report):
         if hasattr(report, 'wasxfail'):
@@ -80,16 +90,6 @@ class RunTime:
             status = py_outcome_to_tstatus(report.outcome)
 
         return status
-
-    def _handle_failed_test(self, call, report, item):
-        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
-
-    def _handle_skipped_test(self, call, report, item):
-        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
-
-    def _handle_passed_test(self, call, report, item):
-        if report.longrepr:
-            self.test_report.stacktrace = report.longreprtext
 
     def start_step(self, step: Step):
         if self.step_manager.current_step_id is not None:

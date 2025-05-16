@@ -15,11 +15,11 @@ class BLoggerConfig(BaseDataModel):
     allure: bool = None
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/b_logger.config.yaml'):
-        conf = self._load(path)
+        config_data = self._load(path)
 
-        self.set_project_name(conf.project_name)
-        self.set_qase(conf.qase)
-        self.set_allure(conf.allure)
+        self.set_project_name(config_data.project_name)
+        self.set_qase(config_data.qase)
+        self.set_allure(config_data.allure)
 
     def _load(self, path: str):
         config_path = Path(path)
