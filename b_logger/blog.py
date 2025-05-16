@@ -1,50 +1,14 @@
+import pytest
 import uuid
 from contextlib import contextmanager
 
-import allure
-import pytest
 from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
 from playwright.sync_api import Page
 
 from b_logger.entities.steps import StepStatus, Step
 from b_logger.entities.exceptions import possible_exceptions
+from b_logger.integrations import Integrations
 from b_logger.plugin import runtime
-from b_logger.config import b_logger_config
-from qase.pytest import qase
-
-
-class Integrations:
-    qase_enabled = b_logger_config.qase
-    allure_enabled = b_logger_config.allure
-
-    @staticmethod
-    @contextmanager
-    def steps(title):
-        if Integrations.qase_enabled and Integrations.allure_enabled:
-            with qase.step(title), allure.step(title):
-                yield
-        elif Integrations.qase_enabled:
-            with qase.step(title):
-                yield
-        elif Integrations.allure_enabled:
-            with allure.step(title):
-                yield
-        else:
-            yield
-
-    @staticmethod
-    def description(description):
-        if Integrations.qase_enabled:
-            qase.description(description)
-        if Integrations.allure_enabled:
-            allure.dynamic.description(description)
-
-    @staticmethod
-    def attach():
-        if Integrations.qase_enabled:
-            qase.attach()
-        if Integrations.allure_enabled:
-            allure.attach()
 
 
 class BLogger:

@@ -47,7 +47,7 @@ def playwright_page(playwright: Playwright):
 def test_main_functionality():
     blog.description('Test with base functionality, this description is less priority')
 
-    blog.param('Some dynamic param', 222)
+    blog.param('Some dynamic Param', 222)
 
     blog.info(f'Just some helpful info')
 
@@ -56,13 +56,12 @@ def test_main_functionality():
         blog.print(f'print 1')
 
     with blog.step('step 2'):
-        pass
 
         with blog.step('step 2.1'):
 
             blog.print(f'print 2')
 
-            with blog.step('step 2.3'):
+            with blog.step('step 2.1.1'):
                 pass
 
 
