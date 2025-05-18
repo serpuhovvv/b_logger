@@ -4,7 +4,7 @@ from filelock import FileLock
 # from box import Box
 
 from b_logger.entities.reports import RunReport
-from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, clear_tmp_logs, b_logs_tmp_reports_path
+from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, clear_b_logs_tmp, b_logs_tmp_reports_path
 
 
 class ReportGenerator:
@@ -57,19 +57,19 @@ class ReportGenerator:
 
     def clear_tmp_dir(self):
         if not self.debug:
-            clear_tmp_logs()
-
-    def _merge_env(self, report: RunReport):
-        if self.combined.env is None:
-            self.combined.env = report.env
-        elif self.combined.env != report.env:
-            print(f"[WARN] Inconsistent env: {self.combined.env} vs {report.env}")
+            clear_b_logs_tmp(rmdir=True)
 
     def _merge_proj_name(self, report: RunReport):
         if self.combined.proj_name is None:
             self.combined.proj_name = report.proj_name
         elif self.combined.proj_name != report.proj_name:
             print(f"[WARN] Inconsistent project name: {self.combined.proj_name} vs {report.proj_name}")
+
+    def _merge_env(self, report: RunReport):
+        if self.combined.env is None:
+            self.combined.env = report.env
+        elif self.combined.env != report.env:
+            print(f"[WARN] Inconsistent env: {self.combined.env} vs {report.env}")
 
     def _merge_base_url(self, report: RunReport):
         if self.combined.base_url is None:

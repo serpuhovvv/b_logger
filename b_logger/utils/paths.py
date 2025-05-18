@@ -6,15 +6,15 @@ from functools import lru_cache, wraps
 from typing import Optional, Union, Any, Set
 
 
-class PathResolver:
+class PathFinder:
     """
-    Утилита для определения корня проекта, корня библиотеки и поиска файлов/директорий.
+    Utility for defining library and project roots and for file search
 
     Usage:
-        resolver = PathResolver()
-        project_root = resolver.project_root()
-        library_root = resolver.library_root()
-        path = resolver.find('settings.py', from_root='project')
+        pathfinder = PathResolver()
+        project_root = pathfinder.project_root()
+        library_root = pathfinder.library_root()
+        path = pathfinder.find('settings.py', from_root='project')
     """
 
     def __init__(
@@ -29,7 +29,8 @@ class PathResolver:
 
     @staticmethod
     def _get_possible_roots(cur_file_dir: str) -> Set[str]:
-        """Возвращает возможные корни, исходя из текущего пути и sys.path"""
+        """
+        Returns possible roots based on current path ans sys.path"""
         possible_roots = set()
         cur_file_components = os.path.normpath(cur_file_dir).split(os.sep)
 
@@ -46,29 +47,27 @@ class PathResolver:
     @lru_cache(maxsize=1)
     def project_root(self) -> Path:
         """
-        Найти корень проекта:
-        - Сначала ищет вверх от текущей директории (как при запуске из терминала)
-        - Потом по sys.path
+        Find project root
         """
         current = Path.cwd().resolve()
 
-        # Проверка вверх по директориям
+        # Search directory up
         for parent in [current, *current.parents]:
             if any((parent / marker).exists() for marker in self.project_markers):
                 return parent
 
-        # Если не нашли — проверяем sys.path
+        # Search through sys.path
         for path in sys.path:
             p = Path(path).resolve()
             if any((p / marker).exists() for marker in self.project_markers):
                 return p
 
-        raise RuntimeError(f"Не удалось найти корень проекта. Искомые маркеры: {self.project_markers}")
+        raise RuntimeError(f"Unable to find project root. Markers to search through: {self.project_markers}")
 
     @lru_cache(maxsize=1)
     def library_root(self) -> Path:
         """
-        Найти корень библиотеки, основываясь на расположении этого модуля.
+        Find library root
         """
         path = Path(__file__).resolve()
         possible_roots = self._get_possible_roots(str(path))
@@ -77,7 +76,7 @@ class PathResolver:
             if any((Path(root) / marker).exists() for marker in self.library_markers):
                 return Path(root)
 
-        raise RuntimeError(f"Не удалось найти корень библиотеки. Искомые маркеры: {self.library_markers}")
+        raise RuntimeError(f"Unable to find library root. Markers to search through: {self.library_markers}")
 
     def find(
             self,
@@ -87,7 +86,7 @@ class PathResolver:
             exclude_dirs: tuple[str, ...] = ('.git', '.venv', '__pycache__'),
     ) -> Union[str, Path]:
         """
-        Найти файл или директорию по точному имени от указанного корня, исключая служебные папки.
+        Search for file by its name
         """
         if from_root == 'project':
             root_path = self.project_root()
@@ -106,10 +105,24 @@ class PathResolver:
         return str(root_path / name)
 
 
-pathfinder = PathResolver()
+pathfinder = PathFinder()
 
 
-def clear_directory(directory: str):
+def init_dirs():
+    os.makedirs(f'{b_logs_path()}', exist_ok=True)
+    os.makedirs(f'{attachments_path()}', exist_ok=True)
+    os.makedirs(f'{screenshots_path()}', exist_ok=True)
+    os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
+    os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
+    os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
+    os.makedirs(f'{b_logs_tmp_steps_path()}', exist_ok=True)
+
+    clear_b_logs()
+    clear_attachments()
+    clear_b_logs_tmp()
+
+
+def clear_directory(directory: str, rmdir=False):
     dir_path = Path(directory)
     if not dir_path.exists():
         return
@@ -120,17 +133,11 @@ def clear_directory(directory: str):
         elif entry.is_dir():
             clear_directory(str(entry))
 
+        if rmdir:
+            entry.rmdir()
 
-def clear_attachments():
-    clear_directory(f'{attachments_path()}')
-
-
-def clear_logs():
-    clear_directory(f'{b_logs_path()}')
-
-
-def clear_tmp_logs():
-    clear_directory(f'{b_logs_tmp_path()}')
+    if rmdir:
+        dir_path.rmdir()
 
 
 @lru_cache(maxsize=1)
@@ -144,13 +151,13 @@ def attachments_path():
 
 
 @lru_cache(maxsize=1)
-def b_logs_tmp_path():
-    return pathfinder.find('b_logs_tmp')
+def screenshots_path():
+    return pathfinder.find('b_logs/attachments/screenshots')
 
 
 @lru_cache(maxsize=1)
-def screenshots_path():
-    return pathfinder.find('b_logs/attachments/screenshots')
+def b_logs_tmp_path():
+    return pathfinder.find('b_logs_tmp')
 
 
 @lru_cache(maxsize=1)
@@ -166,3 +173,15 @@ def b_logs_tmp_steps_path():
 @lru_cache(maxsize=1)
 def b_logs_tmp_preconditions_path():
     return pathfinder.find('b_logs_tmp/preconditions')
+
+
+def clear_b_logs():
+    clear_directory(f'{b_logs_path()}')
+
+
+def clear_attachments():
+    clear_directory(f'{attachments_path()}')
+
+
+def clear_b_logs_tmp(rmdir=False):
+    clear_directory(f'{b_logs_tmp_path()}', rmdir)

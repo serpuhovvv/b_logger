@@ -28,7 +28,7 @@ class BLogger:
     @staticmethod
     def description(description):
         Integrations.description(description)
-        runtime.test_report.description = description
+        runtime.test_report.set_or_modify_description(description)
 
         return pytest.mark.blog_description(description=description)
 
@@ -46,7 +46,7 @@ class BLogger:
         return pytest.mark.blog_param(name=name, value=value)
 
     @staticmethod
-    def info(info_str):
+    def info(info_str: str):
         """
         Leave any info or note about test run before or during execution
 
@@ -55,16 +55,14 @@ class BLogger:
         """
         runtime.test_report.add_info(info_str)
 
+        # return pytest.mark.blog_info(info_str=info_str)
+
     @staticmethod
     @contextmanager
     def step(title: str, expected: str = None):
         with Integrations.steps(title):
-            step_id = uuid.uuid4()
 
-            step = Step(
-                id_=step_id,
-                title=title
-            )
+            step = Step(title=title)
 
             runtime.start_step(step)
 
@@ -80,14 +78,14 @@ class BLogger:
                 runtime.finish_step(step)
 
     @staticmethod
-    def print(message, status: StepStatus = StepStatus.NONE):
+    def print(message: str, status: StepStatus = StepStatus.NONE):
         mes = Step(title=message, status=status)
         runtime.print_message(mes)
 
     @staticmethod
-    def attach():
-        pass
+    def attach(path: str, name: str):
+        runtime.attach(path, name)
 
     @staticmethod
-    def known_bug(description, url):
+    def known_bug(description: str, url: str):
         return pytest.mark.blog_known_bug(description=description, url=url)

@@ -1,16 +1,17 @@
 import uuid
 from typing import Any
 
+from b_logger.entities.attachments import Attachment
 from b_logger.entities.steps import StepContainer
-from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.entities.statuses import TestStatus
+from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.utils.paths import b_logs_tmp_steps_path
 
 
 class TestError(BaseDataModel):
-    def __init__(self, e, tb):
-        self.exc = e
-        self.tb = tb
+    def __init__(self, exc, stacktrace):
+        self.exception = exc
+        self.stacktrace = stacktrace
 
 
 class TestParameter(BaseDataModel):
@@ -19,30 +20,35 @@ class TestParameter(BaseDataModel):
         self.value = value
 
 
-class TestParametersContainer(BaseDataModel, list):
-    def __init__(self):
-        super().__init__()
-
-    def add_parameter(self, parameter: TestParameter):
-        self.append(parameter)
+# class TestParametersContainer(BaseDataModel, list):
+#     def __init__(self):
+#         super().__init__()
+#
+#     def add_parameter(self, parameter: TestParameter):
+#         self.append(parameter)
 
 
 class TestReport(BaseDataModel):
 
     def __init__(self, name: str = None):
-        self.id_ = uuid.uuid4()
-        self.name = name
-        self.description = None
+        self.id_ = f'test_report_{uuid.uuid4()}'
+        self.name: str = name
+        self.description: str | None = None
         self.status: TestStatus = TestStatus.NONE
-        self.duration = None
-        # self.parameters = []
+        self.duration: float | None = None
         self.parameters = {}
-        # self.attachments = {}
+        self.attachments = []
         self.info = []
         self.preconditions_id = None
         self.steps_id = None
         self.error = None
         self.stacktrace = None
+
+    def set_or_modify_description(self, description: str):
+        if not self.description:
+            self.description = description
+        else:
+            self.description += f'\n\n{description}'
 
     def set_status(self, status: TestStatus):
         self.status = status
@@ -51,8 +57,10 @@ class TestReport(BaseDataModel):
         self.duration = duration
 
     def add_parameter(self, name, value):
-        # self.parameters.append(TestParameter(name, value))
         self.parameters[name] = value
+
+    def add_attachment(self, attachment: Attachment):
+        self.attachments.append(attachment)
 
     def set_steps_id(self, steps_id):
         self.steps_id = steps_id
@@ -71,5 +79,5 @@ class TestReport(BaseDataModel):
         try:
             steps = StepContainer.from_json(steps_path)
             return steps
-        except FileNotFoundError:
-            pass
+        except Exception as e:
+            print(f'[WARN] Unable to get steps for {self.name}: {e}')
