@@ -1,16 +1,14 @@
 import os
 from glob import glob
 from filelock import FileLock
-# from box import Box
 
 from b_logger.entities.reports import RunReport
-from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, clear_b_logs_tmp, b_logs_tmp_reports_path
+from b_logger.utils.paths import b_logs_path, clear_b_logs_tmp, b_logs_tmp_reports_path
 
 
 class ReportGenerator:
-    def __init__(self, debug=True):
+    def __init__(self):
         self.combined = RunReport()
-        self.debug = debug
 
     def generate_combined_report(self):
         self.load_reports()
@@ -18,7 +16,6 @@ class ReportGenerator:
         self.combined.count_duration()
         self.save()
         self.clear_locks()
-        self.clear_tmp_dir()
 
     def load_reports(self):
         report_files = glob(f'{b_logs_tmp_reports_path()}/report_*.json')
@@ -29,12 +26,10 @@ class ReportGenerator:
             except Exception as e:
                 print(f"[ERROR] Failed to process {rep}: {e}")
                 raise e
-            # finally:
-            #     os.remove(f'{path}')
 
     def merge(self, report: RunReport):
-        self._merge_env(report)
         self._merge_proj_name(report)
+        self._merge_env(report)
         self._merge_base_url(report)
         self._merge_start_time(report)
         self._merge_end_time(report)
@@ -50,14 +45,9 @@ class ReportGenerator:
 
     @staticmethod
     def clear_locks():
-        # lock_files = glob(f"{logs_path()}/report_*.json.lock")
-        for lock_file in os.listdir(f'{b_logs_path()}'):
-            if '.lock' in lock_file:
-                os.remove(f'{b_logs_path()}/{lock_file}')
-
-    def clear_tmp_dir(self):
-        if not self.debug:
-            clear_b_logs_tmp(rmdir=True)
+        for each in os.listdir(f'{b_logs_path()}'):
+            if '.lock' in each:
+                os.remove(f'{b_logs_path()}/{each}')
 
     def _merge_proj_name(self, report: RunReport):
         if self.combined.proj_name is None:
@@ -101,7 +91,6 @@ class ReportGenerator:
         for module_name, module_data in report.modules.items():
             mod_results = module_data['module_results']
             mod_tests = module_data['module_tests']
-            # self.combined.add_test_report(module_name)
 
             mod_combined = self.combined.modules[module_name]
 
@@ -110,8 +99,6 @@ class ReportGenerator:
 
             for test_name, test_data in mod_tests.items():
                 mod_combined['module_tests'][test_name] = test_data
-
-            # mod_combined["tests"].extend(mod_data.get("tests", []))
 
 
 # class ReportGenerator:

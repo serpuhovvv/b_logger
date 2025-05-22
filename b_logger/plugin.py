@@ -54,6 +54,8 @@ def pytest_sessionfinish(session):
         report_generator.generate_combined_report()
         html_generator.generate_html()
 
+        clear_b_logs_tmp(rmdir=True)
+
 
 def _is_main_worker(session):
     return is_xdist_controller(session) or get_xdist_worker_id(session) == 'master'

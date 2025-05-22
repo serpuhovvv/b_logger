@@ -14,3 +14,4 @@ class BLoggerMarkers:
         config.addinivalue_line('markers', 'blog_description')
         config.addinivalue_line('markers', 'blog_known_bug')
         config.addinivalue_line('markers', 'blog_param')
+        config.addinivalue_line('markers', 'blog_info')

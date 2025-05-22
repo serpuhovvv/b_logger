@@ -12,8 +12,8 @@ import allure
 
 
 class Integrations:
-    qase_enabled = b_logger_config.qase
-    allure_enabled = b_logger_config.allure
+    qase_enabled: bool = b_logger_config.qase
+    allure_enabled: bool = b_logger_config.allure
 
     @staticmethod
     @contextmanager
@@ -36,6 +36,13 @@ class Integrations:
             qase.description(description)
         if Integrations.allure_enabled:
             allure.dynamic.description(description)
+
+    @staticmethod
+    def param(name, value):
+        if Integrations.qase_enabled:
+            qase.fields((name, value))
+        if Integrations.allure_enabled:
+            allure.dynamic.parameter(name, value)
 
     @staticmethod
     def attach(object_: Union[str, bytes, Path], name: str, type_: Optional[str] = None):

@@ -15,14 +15,14 @@ class BLogger:
     @staticmethod
     def set_base_url(base_url: str):
         """
-        Set base_url for entire Run
+        Set base_url for the entire Run
         """
         runtime.set_base_url(base_url)
 
     @staticmethod
     def set_env(env: str):
         """
-        Set env for entire Run
+        Set env for the entire Run
         """
         runtime.set_env(env)
 

@@ -76,7 +76,8 @@ class PathFinder:
             if any((Path(root) / marker).exists() for marker in self.library_markers):
                 return Path(root)
 
-        raise RuntimeError(f"Unable to find library root. Markers to search through: {self.library_markers}")
+        raise RuntimeError(f'Unable to find library root. '
+                           f'Probably you forgot to add "b_logger.config.yaml" to your project')
 
     def find(
             self,
@@ -111,7 +112,6 @@ pathfinder = PathFinder()
 def init_dirs():
     os.makedirs(f'{b_logs_path()}', exist_ok=True)
     os.makedirs(f'{attachments_path()}', exist_ok=True)
-    # os.makedirs(f'{screenshots_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
@@ -148,11 +148,6 @@ def b_logs_path():
 @lru_cache(maxsize=1)
 def attachments_path():
     return pathfinder.find('b_logs/attachments')
-
-
-# @lru_cache(maxsize=1)
-# def screenshots_path():
-#     return pathfinder.find('b_logs/attachments/screenshots')
 
 
 @lru_cache(maxsize=1)

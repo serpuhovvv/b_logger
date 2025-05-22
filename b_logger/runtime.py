@@ -135,7 +135,8 @@ class RunTime:
 
     def apply_param(self, name, value):
         self.test_report.add_parameter(name, value)
-        # Integrations.param()
+
+        # Integrations.param(name, value)
 
     def apply_info(self, info_str):
         self.test_report.add_info(info_str)

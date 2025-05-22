@@ -44,8 +44,8 @@ def test_main_functionality():
 
 
 @pytest.mark.parametrize('py_param', [111, 222])
-@blog.param('a', 'b')
-@blog.param('c', 'd')
+@blog.param('a', '1')
+@blog.param('b', 2)
 def test_parametrized(py_param):
     with blog.step('step 1'):
 
@@ -72,7 +72,6 @@ def selenium_driver():
                   'We can also do it in "selenium_driver" fixture')
 @blog.info('To run this test you\'ll need to download chromedriver and put it in your python folder')
 def test_selenium_with_set_browser(selenium_driver):
-    blog.info('To run this test you\'ll need to download chromedriver and put it in your python folder')
 
     blog.set_browser(selenium_driver)
 

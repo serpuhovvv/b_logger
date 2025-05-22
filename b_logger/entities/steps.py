@@ -34,9 +34,10 @@ class StepError(BaseDataModel):
 
 
 class Step(BaseDataModel):
-    def __init__(self, title=None,
+    def __init__(self,
+                 title: str = None,
                  status: StepStatus = None,
-                 expected=None
+                 expected: str = None
                  ):
         self.id = f'step_{uuid.uuid4()}'
         self.title = title
