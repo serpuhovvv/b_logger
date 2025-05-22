@@ -131,6 +131,7 @@ def _apply_markers(item):
     __apply_description_mark(item)
     __apply_param_marks(item)
     __apply_info_marks(item)
+    __apply_known_bug_marks(item)
 
 
 def __apply_description_mark(item):
@@ -159,6 +160,19 @@ def __apply_info_marks(item):
         for info in item.iter_markers(name='blog_info'):
             info_str = info.kwargs.get('info_str')
             runtime.apply_info(info_str)
+    except AttributeError as e:
+        pass
+
+
+def __apply_known_bug_marks(item):
+    try:
+        for bug in reversed(list(item.iter_markers(name='blog_known_bug'))):
+            description = bug.kwargs.get('description')
+            url = bug.kwargs.get('url') or None
+            if description:
+                runtime.apply_known_bug(description, url)
+            else:
+                print(f'[WARN] blog.known_bug usage is incorrect: {bug}')
     except AttributeError as e:
         pass
 

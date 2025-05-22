@@ -23,13 +23,13 @@ class BaseDataModel:
         elif isinstance(obj, (UUID, datetime, timedelta, Path)):
             return str(obj)
         elif isinstance(obj, set):
-            return list(obj)
+            return list(obj) if len(obj) != 0 else None
         elif isinstance(obj, defaultdict):
             return dict(obj)
         elif isinstance(obj, dict):
-            return {k: BaseDataModel.custom_serializer(v) for k, v in obj.items()}
+            return {k: BaseDataModel.custom_serializer(v) for k, v in obj.items()} if len(obj) != 0 else None
         elif isinstance(obj, list):
-            return [BaseDataModel.custom_serializer(v) for v in obj]
+            return [BaseDataModel.custom_serializer(v) for v in obj] if len(obj) != 0 else None
         elif hasattr(obj, '__dict__'):
             return vars(obj)
         return str(obj)
@@ -58,15 +58,13 @@ class BaseDataModel:
             if isinstance(value, (UUID, datetime, timedelta, Path)):
                 return str(value)
             if isinstance(value, defaultdict):
-                return {k: convert(v) for k, v in value.items()}
+                return {k: convert(v) for k, v in value.items()} if len(value) != 0 else None
             if isinstance(value, dict):
-                return {k: convert(v) for k, v in value.items()}
+                return {k: convert(v) for k, v in value.items()} if len(value) != 0 else None
             if isinstance(value, list):
-                return [convert(v) for v in value]
+                return [convert(v) for v in value] if len(value) != 0 else None
             if isinstance(value, set):
-                return list(value)
-            # if value is None or len(value) == 0:
-            #     return None
+                return list(value) if len(value) != 0 else None
             return value
 
         return {k: convert(v) for k, v in self.__dict__.items()}
@@ -80,21 +78,6 @@ class BaseDataModel:
 
         for key, value in data.items():
             if hasattr(obj, key):
-                # field_value = getattr(obj, key)
-
-                # if (isinstance(field_value, datetime) and isinstance(value, str)
-                #         or (value is not None and ':' in value and '-' in value)):
-                #     value = datetime.fromisoformat(value)
-                # elif isinstance(field_value, UUID) and isinstance(value, str):
-                #     value = UUID(value)
-                # elif isinstance(field_value, timedelta) and isinstance(value, str):
-                #     value = timedelta(seconds=float(value))
-                # elif isinstance(field_value, Enum) and isinstance(value, str):
-                #     try:
-                #         value = field_value.__class__[value]
-                #     except KeyError:
-                #         pass
-
                 setattr(obj, key, value)
             else:
                 obj.__dict__[key] = value

@@ -13,10 +13,10 @@ blog.set_base_url('https://base-url.url')
     'Test with base functionality, '
     'this description can be modified inside the test'
 )
-# @blog.known_bug(
-#     'Fake Bug Description or Name',
-#     'https://link-to-your-bug.com'
-# )
+@blog.known_bug(
+    'Fake Bug Description or Name',
+    'https://link-to-your-bug/1.com'
+)
 @blog.param('Some Param you want to add apart from pytest.mark.parametrize', 'Param Value')
 def test_main_functionality():
     blog.description('This description will also be added')
@@ -34,6 +34,8 @@ def test_main_functionality():
         blog.print(f'print 2')
 
         with blog.step('step 2.1'):
+
+            blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
 
             blog.print(f'print 3')
 

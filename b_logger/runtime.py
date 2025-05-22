@@ -141,6 +141,15 @@ class RunTime:
         self.test_report.add_info(info_str)
         # Integrations.info()
 
+    def apply_known_bug(self, description: str, url: str = None):
+        bug = {"description": description, "url": url}
+
+        current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
+        if current_step:
+            current_step.known_bug = bug
+
+        self.test_report.known_bugs.append(bug)
+
     def print_message(self, message: str, status: StepStatus = StepStatus.NONE):
         step = Step(title=message, status=status)
 

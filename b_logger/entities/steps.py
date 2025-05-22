@@ -45,6 +45,7 @@ class Step(BaseDataModel):
         self.parent_id = None
         self.error: StepError | None = None
         self.attachments = []
+        self.known_bug = None
         self.steps = []
 
     def set_parent_id(self, parent_id):

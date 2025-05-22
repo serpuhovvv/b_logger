@@ -39,6 +39,7 @@ class TestReport(BaseDataModel):
         self.parameters = {}
         self.attachments = []
         self.info = []
+        self.known_bugs = []
         self.preconditions = None
         self.steps = None
         self.error = None
