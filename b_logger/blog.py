@@ -83,8 +83,8 @@ class BLogger:
         runtime.print_message(mes)
 
     @staticmethod
-    def attach(path: str, name: str):
-        runtime.attach(path, name)
+    def attach(source: str, name: str = None):
+        runtime.attach(source, name)
 
     @staticmethod
     def known_bug(description: str, url: str):

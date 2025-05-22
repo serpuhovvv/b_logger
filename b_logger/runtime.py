@@ -1,4 +1,7 @@
+import os
 import traceback
+from pathlib import Path
+from typing import Union, BinaryIO
 
 from playwright.sync_api import Page
 from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
@@ -8,8 +11,9 @@ from b_logger.entities.reports import RunReport
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.entities.tests import TestReport, TestStatus, TestError
 from b_logger.entities.steps import Step, StepStatus, StepError, StepManager, StepContainer
+from b_logger.integrations import Integrations
 from b_logger.utils.formatters import format_tb
-from b_logger.utils.paths import pathfinder, attachments_path, screenshots_path
+from b_logger.utils.paths import pathfinder, attachments_path
 
 
 class TestRun:
@@ -125,7 +129,7 @@ class RunTime:
 
     def handle_step_result(self, step: Step, exc=None):
         if exc:
-            self.make_screenshot(f'{self.test_report.name}_error')
+            self.make_screenshot(is_error=True)
 
             step.set_status(StepStatus.FAILED)
             step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
@@ -152,23 +156,36 @@ class RunTime:
         if self.browser is None:
             return
 
-        scr_path = f'{screenshots_path()}/{scr_name}.png'
+        if not scr_name:
+            index = 1
+            while True:
+                if is_error:
+                    scr_name = f'err_scr_{self.test_report.name}_{index}.png'
+                else:
+                    scr_name = f'scr_{self.test_report.name}_{index}.png'
+                if scr_name not in os.listdir(attachments_path()):
+                    break
+                index += 1
 
         if isinstance(self.browser, (RemoteWebDriver, WebDriver)):
-            self.browser.save_screenshot(filename=scr_path)
+            self.attach(self.browser.get_screenshot_as_png(), scr_name)
+
         elif isinstance(self.browser, Page):
-            self.browser.screenshot(path=scr_path)
+            self.attach(self.browser.screenshot(), scr_name)
+
         else:
             raise RuntimeError(f'Browser is incorrect, unable to make screenshot!!! '
                                f'Current browser is {self.browser}')
 
-        self.attach(f'screenshots/{scr_name}.png', f'{scr_name}.png')
 
-    def attach(self, path, name=None):
-        attachment = Attachment(path, name)
-        print(attachment.get_abspath())
+    def attach(self, source: Union[str, Path, bytes, BinaryIO], name: str = None, mime_type: str = None):
+
+        # Integrations.attach(source, name)
+
+        attachment = Attachment(source, name)
 
         current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
-        current_step.add_attachment(attachment)
+        if current_step:
+            current_step.add_attachment(attachment)
 
         self.test_report.add_attachment(attachment)

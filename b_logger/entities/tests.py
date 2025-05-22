@@ -60,6 +60,9 @@ class TestReport(BaseDataModel):
         self.parameters[name] = value
 
     def add_attachment(self, attachment: Attachment):
+        for attach in self.attachments:
+            if attach.name == attachment.name:
+                return
         self.attachments.append(attachment)
 
     def set_steps_id(self, steps_id):

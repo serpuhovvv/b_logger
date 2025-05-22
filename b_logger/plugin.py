@@ -24,17 +24,17 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     BLoggerMarkers.add_blog_markers(config)
 
+    try:
+        env = config.option.blog_env
+        runtime.run_report.set_env(env)
+    except Exception as e:
+        pass
+
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session):
     if _is_main_worker(session):
         init_dirs()
-
-    try:
-        env = os.getenv('RUN_ENV') or session.config.getoption('--env')
-        runtime.run_report.set_env(env)
-    except Exception as e:
-        pass
 
     worker = get_xdist_worker_id(session)
     runtime.run_report.set_worker(worker)

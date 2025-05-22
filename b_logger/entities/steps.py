@@ -5,7 +5,7 @@ from enum import Enum
 from filelock import FileLock
 
 from b_logger.entities.attachments import Attachment
-from b_logger.utils.paths import b_logs_tmp_path
+from b_logger.utils.paths import b_logs_tmp_path, b_logs_tmp_steps_path
 from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.utils.formatters import format_exc, format_tb
 
@@ -49,6 +49,9 @@ class Step(BaseDataModel):
         self.parent_id = parent_id
 
     def add_attachment(self, attachment: Attachment):
+        for attach in self.attachments:
+            if attach.name == attachment.name:
+                return
         self.attachments.append(attachment)
 
     def set_status(self, status: StepStatus):
@@ -88,8 +91,11 @@ class StepContainer(BaseDataModel, list):
 
         return None
 
-    def save_json(self, path=None):
-        if not path:
-            path = f'{b_logs_tmp_path()}/steps/{self.container_id}'
+    def save_json(self, file_name=None):
+        root = f'{b_logs_tmp_steps_path()}'
+        if file_name:
+            path = f'{root}/{file_name}'
+        else:
+            path = f'{root}/{self.container_id}'
         with FileLock(f'{path}.lock'):
             self.to_json_file(path)

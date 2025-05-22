@@ -11,7 +11,7 @@ from b_logger.entities.statuses import TestStatus
 from b_logger.entities.tests import TestReport
 from b_logger.entities.steps import StepContainer
 from b_logger.utils.basedatamodel import BaseDataModel
-from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, b_logs_tmp_steps_path
+from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, b_logs_tmp_steps_path, b_logs_tmp_reports_path
 
 
 class RunResults(BaseDataModel):
@@ -129,7 +129,7 @@ class RunReport(BaseDataModel):
         pass
 
     def save_json(self, file_name=None):
-        root = f'{b_logs_tmp_path()}/reports'
+        root = f'{b_logs_tmp_reports_path()}'
         if file_name:
             path = f'{root}/{file_name}'
         else:

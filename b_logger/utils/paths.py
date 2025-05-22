@@ -111,7 +111,7 @@ pathfinder = PathFinder()
 def init_dirs():
     os.makedirs(f'{b_logs_path()}', exist_ok=True)
     os.makedirs(f'{attachments_path()}', exist_ok=True)
-    os.makedirs(f'{screenshots_path()}', exist_ok=True)
+    # os.makedirs(f'{screenshots_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
@@ -150,9 +150,9 @@ def attachments_path():
     return pathfinder.find('b_logs/attachments')
 
 
-@lru_cache(maxsize=1)
-def screenshots_path():
-    return pathfinder.find('b_logs/attachments/screenshots')
+# @lru_cache(maxsize=1)
+# def screenshots_path():
+#     return pathfinder.find('b_logs/attachments/screenshots')
 
 
 @lru_cache(maxsize=1)
