@@ -46,7 +46,7 @@ class ReportGenerator:
         output_path = f'{b_logs_path()}/{filename}'
         with FileLock(f'{output_path}.lock'):
             self.combined.to_json_file(output_path)
-        print(f"[INFO] Combined report saved to {output_path}")
+        # print(f"[INFO] Combined report saved to {output_path}")
 
     @staticmethod
     def clear_locks():

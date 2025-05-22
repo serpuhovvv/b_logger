@@ -1,5 +1,4 @@
 import pytest
-import uuid
 from contextlib import contextmanager
 
 from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
@@ -27,21 +26,20 @@ class BLogger:
 
     @staticmethod
     def description(description):
-        Integrations.description(description)
-        runtime.test_report.set_or_modify_description(description)
+        runtime.apply_description(description)
 
         return pytest.mark.blog_description(description=description)
 
     @staticmethod
     def param(name, value):
         """
-        Add test parameter
+        Add custom test parameter
 
         :param name:
         :param value:
         :return:
         """
-        runtime.test_report.add_parameter(name, value)
+        runtime.apply_param(name, value)
 
         return pytest.mark.blog_param(name=name, value=value)
 
@@ -53,16 +51,16 @@ class BLogger:
         :param info_str:
         :return:
         """
-        runtime.test_report.add_info(info_str)
+        runtime.apply_info(info_str)
 
-        # return pytest.mark.blog_info(info_str=info_str)
+        return pytest.mark.blog_info(info_str=info_str)
 
     @staticmethod
     @contextmanager
     def step(title: str, expected: str = None):
-        with Integrations.steps(title):
+        with Integrations.steps(title, expected):
 
-            step = Step(title=title)
+            step = Step(title=title, expected=expected)
 
             runtime.start_step(step)
 
@@ -79,13 +77,16 @@ class BLogger:
 
     @staticmethod
     def print(message: str, status: StepStatus = StepStatus.NONE):
-        mes = Step(title=message, status=status)
-        runtime.print_message(mes)
+        runtime.print_message(message, status)
 
     @staticmethod
     def attach(source: str, name: str = None):
         runtime.attach(source, name)
 
     @staticmethod
-    def known_bug(description: str, url: str):
-        return pytest.mark.blog_known_bug(description=description, url=url)
+    def screenshot(name: str = None, is_error: bool = False):
+        runtime.make_screenshot(name, is_error)
+
+    # @staticmethod
+    # def known_bug(description: str, url: str):
+    #     return pytest.mark.blog_known_bug(description=description, url=url)

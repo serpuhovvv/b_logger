@@ -17,12 +17,12 @@ class Integrations:
 
     @staticmethod
     @contextmanager
-    def steps(title):
+    def steps(title, expected):
         if Integrations.qase_enabled and Integrations.allure_enabled:
-            with qase.step(title), allure.step(title):
+            with qase.step(title, expected), allure.step(title):
                 yield
         elif Integrations.qase_enabled:
-            with qase.step(title):
+            with qase.step(title, expected):
                 yield
         elif Integrations.allure_enabled:
             with allure.step(title):
@@ -65,3 +65,11 @@ class Integrations:
                     allure.attach(f.read(), name=name, attachment_type=allure_type)
             else:
                 allure.attach(object_, name=name, attachment_type=allure_type)
+
+
+# def apply_decorators(*decorators):
+#     def meta_decorator(func):
+#         for decorator in reversed(decorators):
+#             func = decorator(func)
+#         return func
+#     return meta_decorator

@@ -13,10 +13,10 @@ blog.set_base_url('https://base-url.url')
     'Test with base functionality, '
     'this description can be modified inside the test'
 )
-@blog.known_bug(
-    'Fake Bug Description or Name',
-    'https://link-to-your-bug.com'
-)
+# @blog.known_bug(
+#     'Fake Bug Description or Name',
+#     'https://link-to-your-bug.com'
+# )
 @blog.param('Some Param you want to add apart from pytest.mark.parametrize', 'Param Value')
 def test_main_functionality():
     blog.description('This description will also be added')
@@ -41,12 +41,13 @@ def test_main_functionality():
                 pass
 
 
-@pytest.mark.parametrize('paramchik', [111, 222])
-# @blog.param('d', 'f')
-# @blog.param('gycha', 'aaa')
-def test_parametrized(paramchik):
+@pytest.mark.parametrize('py_param', [111, 222])
+@blog.param('a', 'b')
+@blog.param('c', 'd')
+def test_parametrized(py_param):
     with blog.step('step 1'):
-        blog.print(paramchik)
+
+        blog.print(py_param)
 
         with blog.step('step 2'):
             pass
@@ -67,7 +68,7 @@ def selenium_driver():
 @pytest.mark.xfail
 @blog.description('This test will make browser screenshot as we did blog.set_browser. '
                   'We can also do it in "selenium_driver" fixture')
-# @blog.info('To run this test you\'ll need to download chromedriver and put it in your python folder')
+@blog.info('To run this test you\'ll need to download chromedriver and put it in your python folder')
 def test_selenium_with_set_browser(selenium_driver):
     blog.info('To run this test you\'ll need to download chromedriver and put it in your python folder')
 
@@ -111,8 +112,8 @@ def playwright_page(playwright: Playwright):
 
 @pytest.mark.xfail
 def test_playwright(playwright_page):
-    with blog.step('step 1'):
+    with blog.step('Open any URL'):
         playwright_page.goto(f'https://google.com')
 
-        with blog.step('step 2'):
+        with blog.step('Raise fake error'):
             assert 1 == 2

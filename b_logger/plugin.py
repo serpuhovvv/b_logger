@@ -63,28 +63,18 @@ def _is_main_worker(session):
 def pytest_runtest_setup(item):
     runtime.start_test(item)
 
-
-_possible_browser_names = ['driver', 'page', 'selenium_driver', 'driver_init', 'playwright_page']
+    _apply_py_params(item)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_call(item):
     _apply_markers(item)
 
-    if not runtime.browser:
-        for browser_name in _possible_browser_names:
-            if browser_name in item.fixturenames:
-                try:
-                    browser = item.funcargs.get(browser_name, None)
-                    runtime.set_browser(browser)
-                except Exception as e:
-                    print(f"[WARN] Error setting up browser automatically: {e}")
+    _apply_browser(item)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_teardown(item):
-    # _apply_markers(item)
-
     runtime.finish_test()
 
 
@@ -107,13 +97,6 @@ def pytest_runtest_logreport(report):
     if report.when == 'setup':
         if report.outcome == 'passed':
             return
-        outcome = report.outcome
-
-    elif report.when == 'call':
-        outcome = report.outcome
-
-    else:
-        return
 
     valid_outcome = runtime.process_test_status(report)
 
@@ -123,32 +106,59 @@ def pytest_runtest_logreport(report):
     runtime.run_report.add_test_report(module, runtime.test_report)
 
 
+def _apply_py_params(item):
+    if hasattr(item, "callspec"):
+        params = item.callspec.params
+        for param_name, param_value in params.items():
+            runtime.apply_param(param_name, param_value)
+
+
+_possible_browser_names = ['driver', 'page', 'selenium_driver', 'driver_init', 'playwright_page']
+
+
+def _apply_browser(item):
+    if not runtime.browser:
+        for browser_name in _possible_browser_names:
+            if browser_name in item.fixturenames:
+                try:
+                    browser = item.funcargs.get(browser_name, None)
+                    runtime.set_browser(browser)
+                except Exception as e:
+                    print(f"[WARN] Error setting up browser automatically: {e}")
+
+
 def _apply_markers(item):
-    __apply_description(item)
-    __apply_params(item)
+    __apply_description_mark(item)
+    __apply_param_marks(item)
+    __apply_info_marks(item)
 
 
-def __apply_params(item):
-    for param in item.iter_markers(name='blog_param'):
-        name = param.kwargs.get('name')
-        value = param.kwargs.get('value')
-        if name and value:
-            runtime.test_report.add_parameter(name, value)
-        else:
-            print(f'[WARN] blog.param usage is incorrect: {param}')
-
-
-def __apply_description(item):
+def __apply_description_mark(item):
     try:
         desc = item.get_closest_marker('blog_description').kwargs.get('description')
-        runtime.test_report.description = desc
+        runtime.apply_description(desc)
     except AttributeError as e:
         pass
 
-def __apply_info(item):
+
+def __apply_param_marks(item):
     try:
-        info = item.get_closest_marker('blog_info').kwargs.get('description')
-        runtime.test_report.description = info
+        for param in reversed(list(item.iter_markers(name='blog_param'))):
+            name = param.kwargs.get('name')
+            value = param.kwargs.get('value')
+            if name and value:
+                runtime.apply_param(name, value)
+            else:
+                print(f'[WARN] blog.param usage is incorrect: {param}')
+    except AttributeError as e:
+        pass
+
+
+def __apply_info_marks(item):
+    try:
+        for info in item.iter_markers(name='blog_info'):
+            info_str = info.kwargs.get('info_str')
+            runtime.apply_info(info_str)
     except AttributeError as e:
         pass
 

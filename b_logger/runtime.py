@@ -46,14 +46,9 @@ class RunTime:
 
         self.test_report = TestReport(test_name)
 
-        if hasattr(item, "callspec"):
-            params = item.callspec.params
-            for param_name, param_value in params.items():
-                self.test_report.add_parameter(param_name, param_value)
-
     def finish_test(self):
         self.step_container.save_json()
-        self.test_report.set_steps_id(self.step_container.container_id)
+        self.test_report.set_steps(self.step_container.container_id)
 
         del self.step_manager, self.step_container, self.test_report
         if self.browser:
@@ -101,20 +96,6 @@ class RunTime:
         return status
 
     def start_step(self, step: Step):
-        # if self.step_manager.failed:
-        #     parent = self.step_container.get_step_by_id(self.step_manager.current_step_id)
-        #
-        #     step.status = StepStatus.SKIPPED
-        #     step.error = None
-        #     step.set_parent_id(parent.id)
-        #
-        #     parent.add_sub_step(step)
-        #
-        #     self.step_manager.set_current_step(step.id)
-        #
-        #     yield step
-        #     return
-
         if self.step_manager.current_step_id is not None:
             parent = self.step_container.get_step_by_id(self.step_manager.current_step_id)
             step.set_parent_id(parent.id)
@@ -129,28 +110,48 @@ class RunTime:
 
     def handle_step_result(self, step: Step, exc=None):
         if exc:
-            self.make_screenshot(is_error=True)
+            if not self.step_manager.failed:
+                self.make_screenshot(is_error=True)
+
+                step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
+
+                self.step_manager.failed = True
 
             step.set_status(StepStatus.FAILED)
-            step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
 
-            self.step_manager.failed = True
             return
 
         step.set_status(StepStatus.PASSED)
 
     def finish_step(self, step: Step):
-        # if step.parent_id:
-        #     parent_step = self.step_container.get_step_by_id(step.parent_id)
-
         self.step_manager.current_step_id = step.parent_id
 
-    def print_message(self, step: Step):
-        parent_step = (self.step_container.get_step_by_id
-                       (self.step_manager.current_step_id)
-                       )
-        step.set_parent_id(parent_step.id)
-        parent_step.add_sub_step(step)
+    def apply_description(self, description):
+        if not self.test_report.description:
+            self.test_report.set_description(description)
+            Integrations.description(description)
+        else:
+            self.test_report.modify_description(description)
+
+    def apply_param(self, name, value):
+        self.test_report.add_parameter(name, value)
+        # Integrations.param()
+
+    def apply_info(self, info_str):
+        self.test_report.add_info(info_str)
+        # Integrations.info()
+
+    def print_message(self, message: str, status: StepStatus = StepStatus.NONE):
+        step = Step(title=message, status=status)
+
+        current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
+        if current_step:
+            step.set_parent_id(current_step.id)
+            current_step.add_sub_step(step)
+        else:
+            self.step_container.add_step(step)
+
+        print(message)
 
     def make_screenshot(self, scr_name: str = None, is_error: bool = False):
         if self.browser is None:
@@ -163,6 +164,7 @@ class RunTime:
                     scr_name = f'err_scr_{self.test_report.name}_{index}.png'
                 else:
                     scr_name = f'scr_{self.test_report.name}_{index}.png'
+
                 if scr_name not in os.listdir(attachments_path()):
                     break
                 index += 1
@@ -177,11 +179,7 @@ class RunTime:
             raise RuntimeError(f'Browser is incorrect, unable to make screenshot!!! '
                                f'Current browser is {self.browser}')
 
-
     def attach(self, source: Union[str, Path, bytes, BinaryIO], name: str = None, mime_type: str = None):
-
-        # Integrations.attach(source, name)
-
         attachment = Attachment(source, name)
 
         current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
@@ -189,3 +187,5 @@ class RunTime:
             current_step.add_attachment(attachment)
 
         self.test_report.add_attachment(attachment)
+
+        # Integrations.attach(source, name)

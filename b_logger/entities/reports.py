@@ -101,7 +101,7 @@ class RunReport(BaseDataModel):
         steps_by_test = {}
         for module_tests in self._get_module_tests().values():
             for test_name, test_data in module_tests.items():
-                steps_id = test_data.get('steps_id')
+                steps_id = test_data.get('steps')
                 if steps_id:
                     steps_path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
                     try:
