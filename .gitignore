@@ -4,4 +4,4 @@ b_logs_tmp
 build
 .idea
 dist
-allure-res
+allure-results

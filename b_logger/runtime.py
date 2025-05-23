@@ -198,4 +198,4 @@ class RunTime:
 
         self.test_report.add_attachment(attachment)
 
-        # Integrations.attach(source, name)
+        Integrations.attach(source, attachment)
