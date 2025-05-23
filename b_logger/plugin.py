@@ -14,6 +14,8 @@ from b_logger.runtime import RunTime
 
 runtime = RunTime()
 
+debug = True
+
 
 def pytest_addoption(parser):
     group = parser.getgroup('blog')
@@ -54,7 +56,8 @@ def pytest_sessionfinish(session):
         report_generator.generate_combined_report()
         html_generator.generate_html()
 
-        clear_b_logs_tmp(rmdir=True)
+        if not debug:
+            clear_b_logs_tmp(rmdir=True)
 
 
 def _is_main_worker(session):

@@ -57,15 +57,6 @@ class TestReport(BaseDataModel):
     def set_duration(self, duration: float):
         self.duration = duration
 
-    def add_parameter(self, name, value):
-        self.parameters[name] = value
-
-    def add_attachment(self, attachment: Attachment):
-        for attach in self.attachments:
-            if attach.name == attachment.name:
-                return
-        self.attachments.append(attachment)
-
     def set_steps(self, steps_id):
         self.steps = steps_id
 
@@ -75,8 +66,20 @@ class TestReport(BaseDataModel):
     def set_error(self, error: TestError):
         self.error = error
 
+    def add_parameter(self, name, value):
+        self.parameters[name] = value
+
+    def add_attachment(self, attachment: Attachment):
+        for attach in self.attachments:
+            if attach.name == attachment.name:
+                return
+        self.attachments.append(attachment)
+
     def add_info(self, info_str):
         self.info.append(info_str)
+
+    def add_known_bug(self, bug):
+        self.known_bugs.append(bug)
 
     def get_steps(self):
         steps_path = f'{b_logs_tmp_steps_path()}/{self.steps}.json'

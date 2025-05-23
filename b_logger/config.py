@@ -10,9 +10,11 @@ from b_logger.utils.dotdict import DotDict
 
 class BLoggerConfig(BaseDataModel):
     project_name: str = None
-    jenkins_build_link = None
+    env: str = None
+    base_url: str = None
     qase: bool = None
     allure: bool = None
+    html_settings = None
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/b_logger.config.yaml'):
         config_data = self._load(path)

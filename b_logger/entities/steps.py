@@ -46,7 +46,8 @@ class Step(BaseDataModel):
         self.parent_id = None
         self.error: StepError | None = None
         self.attachments = []
-        self.known_bug = None
+        self.known_bugs = []
+        self.info = []
         self.steps = []
 
     def set_parent_id(self, parent_id):
@@ -66,6 +67,12 @@ class Step(BaseDataModel):
 
     def add_sub_step(self, step):
         self.steps.append(step)
+
+    def add_info(self, info_str):
+        self.info.append(info_str)
+
+    def add_known_bug(self, bug):
+        self.known_bugs.append(bug)
 
     def get_sub_steps(self, as_dict: bool = False):
         if as_dict:

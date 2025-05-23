@@ -139,22 +139,35 @@ class RunTime:
         # Integrations.param(name, value)
 
     def apply_info(self, info_str):
-        self.test_report.add_info(info_str)
+        # if len(*args) == 1:
+        #     info = args
+        # elif len(*args) == 2:
+        #     info = {kwargs.get()}
+
+        current_step = self._get_current_step()
+
+        if current_step:
+            current_step.add_info(info_str)
+        else:
+            self.test_report.add_info(info_str)
+
         # Integrations.info()
 
     def apply_known_bug(self, description: str, url: str = None):
         bug = {"description": description, "url": url}
 
-        current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
-        if current_step:
-            current_step.known_bug = bug
+        current_step = self._get_current_step()
 
-        self.test_report.known_bugs.append(bug)
+        if current_step:
+            current_step.add_known_bug(bug)
+
+        self.test_report.add_known_bug(bug)
 
     def print_message(self, message: str, status: StepStatus = StepStatus.NONE):
         step = Step(title=message, status=status)
 
-        current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
+        current_step = self._get_current_step()
+
         if current_step:
             step.set_parent_id(current_step.id)
             current_step.add_sub_step(step)
@@ -199,3 +212,6 @@ class RunTime:
         self.test_report.add_attachment(attachment)
 
         Integrations.attach(source, attachment)
+
+    def _get_current_step(self) -> Step:
+        return self.step_container.get_step_by_id(self.step_manager.current_step_id)
