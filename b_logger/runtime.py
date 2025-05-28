@@ -136,22 +136,26 @@ class RunTime:
     def apply_param(self, name, value):
         self.test_report.add_parameter(name, value)
 
-        # Integrations.param(name, value)
+    def apply_info(self, *args, **kwargs):
 
-    def apply_info(self, info_str):
-        # if len(*args) == 1:
-        #     info = args
-        # elif len(*args) == 2:
-        #     info = {kwargs.get()}
+        info = {}
+
+        if kwargs:
+            for k, v in kwargs.items():
+                info[k] = v
+        elif len(args) == 2:
+            info[args[0]] = args[1]
+        elif len(args) == 1:
+            info = str(args[0])
+        else:
+            raise ValueError(f'Invalid arguments passed to apply_info({args}, {kwargs})')
 
         current_step = self._get_current_step()
 
         if current_step:
-            current_step.add_info(info_str)
+            current_step.add_info(info)
         else:
-            self.test_report.add_info(info_str)
-
-        # Integrations.info()
+            self.test_report.add_info(info)
 
     def apply_known_bug(self, description: str, url: str = None):
         bug = {"description": description, "url": url}
@@ -174,7 +178,7 @@ class RunTime:
         else:
             self.step_container.add_step(step)
 
-        print(message)
+        print(f'\n{message}')
 
     def make_screenshot(self, scr_name: str = None, is_error: bool = False):
         if self.browser is None:

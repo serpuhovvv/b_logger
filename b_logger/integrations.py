@@ -39,7 +39,7 @@ class Integrations:
             allure.dynamic.description(description)
 
     @staticmethod
-    def param(name, value):
+    def info(name, value):
         if Integrations.qase_enabled:
             qase.fields((name, value))
         if Integrations.allure_enabled:

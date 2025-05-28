@@ -38,7 +38,7 @@ class BLogger:
         runtime.set_browser(browser)
 
     @staticmethod
-    def description(description):
+    def description(description: str):
         """
         Add Test Description
         Can be used as marker @blog.description()
@@ -49,22 +49,30 @@ class BLogger:
         return pytest.mark.blog_description(description=description)
 
     @staticmethod
-    def param(name, value):
+    def info(*args, **kwargs):
         """
-        Add custom Test Parameter before or during execution
-        """
-        runtime.apply_param(name, value)
+        Leave any info or note about Test Run or Step before or during execution
 
-        return pytest.mark.blog_param(name=name, value=value)
+        Supports:
+            - Single String: blog.info('message')
+            - Key-Value: blog.info(first_parameter='param 1', second_parameter='param 2')
+            - Tuple: blog.info("Name", "Value")
+        """
+        runtime.apply_info(*args, **kwargs)
+
+        return pytest.mark.blog_info(args=args, kwargs=kwargs)
 
     @staticmethod
-    def info(info_str: str):
+    def known_bug(description: str, url: str = None):
         """
-        Leave any info or note about Test Run before or during execution
-        """
-        runtime.apply_info(info_str)
+        Mark the test as having a known bug or apply it to current step.
 
-        return pytest.mark.blog_info(info_str=info_str)
+        :param description: Short explanation of the bug.
+        :param url: Link to bug tracker or documentation.
+        """
+        runtime.apply_known_bug(description, url)
+
+        return pytest.mark.blog_known_bug(description=description, url=url)
 
     @staticmethod
     @contextmanager
@@ -95,7 +103,11 @@ class BLogger:
         runtime.print_message(message, status)
 
     @staticmethod
-    def attach(source: str, name: str = None):
+    def attach(source, name: str = None):
+        """
+        Attach file or screenshot
+            It will be added to Test Run and Current Step
+        """
         runtime.attach(source, name)
 
     @staticmethod
@@ -103,17 +115,6 @@ class BLogger:
         """
         Make screenshot
             It will be automatically attached to Test Run and Current Step
+            Will do nothing if no browser is used
         """
         runtime.make_screenshot(name, is_error)
-
-    @staticmethod
-    def known_bug(description: str, url: str = None):
-        """
-        Mark the test as having a known bug or apply it to current step.
-
-        :param description: Short explanation of the bug.
-        :param url: Link to bug tracker or documentation.
-        """
-        runtime.apply_known_bug(description, url)
-
-        return pytest.mark.blog_known_bug(description=description, url=url)

@@ -92,8 +92,9 @@ class RunReport(BaseDataModel):
 
     def add_test_report(self, module: str, test_report: TestReport):
         test_name = test_report.name
-        # if self.modules[module]['module_tests'].get(test_name, {}):
-        #     self.modules[module]['module_tests'][test_name].parameters.update(test_report.parameters)
+        # if self.modules[module]['module_tests'][test_name]:
+        #     self.modules[module]['module_tests'][test_name] = [self.modules[module]['module_tests'][test_name]]
+        #     self.modules[module]['module_tests'][test_name].append(test_report)
         # else:
         self.modules[module]['module_tests'][test_name] = test_report
 

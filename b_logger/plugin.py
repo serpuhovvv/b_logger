@@ -134,7 +134,6 @@ def _apply_browser(item):
 
 def _apply_markers(item):
     __apply_description_mark(item)
-    __apply_param_marks(item)
     __apply_info_marks(item)
     __apply_known_bug_marks(item)
 
@@ -143,28 +142,19 @@ def __apply_description_mark(item):
     try:
         desc = item.get_closest_marker('blog_description').kwargs.get('description')
         runtime.apply_description(desc)
-    except AttributeError as e:
-        pass
 
-
-def __apply_param_marks(item):
-    try:
-        for param in reversed(list(item.iter_markers(name='blog_param'))):
-            name = param.kwargs.get('name')
-            value = param.kwargs.get('value')
-            if name and value:
-                runtime.apply_param(name, value)
-            else:
-                print(f'[WARN] blog.param usage is incorrect: {param}')
     except AttributeError as e:
         pass
 
 
 def __apply_info_marks(item):
     try:
-        for info in item.iter_markers(name='blog_info'):
-            info_str = info.kwargs.get('info_str')
-            runtime.apply_info(info_str)
+        for info in reversed(list(item.iter_markers(name='blog_info'))):
+            args = info.kwargs.get('args', ())
+            kwargs = info.kwargs.get('kwargs', {})
+
+            runtime.apply_info(*args, **kwargs)
+
     except AttributeError as e:
         pass
 
@@ -178,6 +168,7 @@ def __apply_known_bug_marks(item):
                 runtime.apply_known_bug(description, url)
             else:
                 print(f'[WARN] blog.known_bug usage is incorrect: {bug}')
+
     except AttributeError as e:
         pass
 

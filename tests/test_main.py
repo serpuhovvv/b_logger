@@ -17,19 +17,19 @@ blog.set_base_url('https://base-url.url')
     'Fake Bug Description or Name',
     'https://link-to-your-bug/1.com'
 )
-@blog.param('Some Param you want to add apart from pytest.mark.parametrize', 'Param Value')
+@blog.info('You can leave any useful information by using blog.info()')
 def test_main_functionality():
     blog.description('This description will also be added')
 
-    blog.param('Some dynamic Param', 222)
-
-    blog.info(f'Just some helpful info')
+    blog.info(f'Some info name', 'Some info value')
 
     with blog.step('step 1'):
 
         blog.print(f'print 1')
 
     with blog.step('step 2'):
+
+        blog.info(first_parameter='param 1', second_parameter='param 2')
 
         blog.print(f'print 2')
 
@@ -44,8 +44,6 @@ def test_main_functionality():
 
 
 @pytest.mark.parametrize('py_param', [111, 222])
-@blog.param('a', '1')
-@blog.param('b', 2)
 def test_parametrized(py_param):
     with blog.step('step 1'):
 

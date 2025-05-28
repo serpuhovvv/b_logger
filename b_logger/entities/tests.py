@@ -14,10 +14,10 @@ class TestError(BaseDataModel):
         self.stacktrace = stacktrace
 
 
-class TestParameter(BaseDataModel):
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
+# class TestParameter(BaseDataModel):
+#     def __init__(self, name, value):
+#         self.name = name
+#         self.value = value
 
 
 # class TestParametersContainer(BaseDataModel, list):
@@ -31,7 +31,6 @@ class TestParameter(BaseDataModel):
 class TestReport(BaseDataModel):
 
     def __init__(self, name: str = None):
-        # self.id_ = f'test_report_{uuid.uuid4()}'
         self.name: str = name
         self.description: str | None = None
         self.status: TestStatus = TestStatus.NONE
@@ -75,8 +74,8 @@ class TestReport(BaseDataModel):
                 return
         self.attachments.append(attachment)
 
-    def add_info(self, info_str):
-        self.info.append(info_str)
+    def add_info(self, info):
+        self.info.append(info)
 
     def add_known_bug(self, bug):
         self.known_bugs.append(bug)

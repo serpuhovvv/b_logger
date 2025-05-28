@@ -68,8 +68,8 @@ class Step(BaseDataModel):
     def add_sub_step(self, step):
         self.steps.append(step)
 
-    def add_info(self, info_str):
-        self.info.append(info_str)
+    def add_info(self, info):
+        self.info.append(info)
 
     def add_known_bug(self, bug):
         self.known_bugs.append(bug)
