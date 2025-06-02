@@ -19,35 +19,33 @@ blog.set_base_url('https://base-url.url')
     'Fake Bug Description or Name',
     'https://link-to-your-bug/1.com'
 )
-@blog.info(info_explanation='You can leave any useful information by using blog.info()',
-           meta={'platform': 'linux', 'python_version': 3.12}
+@blog.info(
+    info_explanation='You can leave any useful information by using blog.info()',
+    meta={'platform': 'linux', 'python_version': 3.12}
 )
 def test_main_functionality():
+
     blog.description('This description will also be added')
 
-    with blog.step('step 1'):
+    with blog.step('Step 1'):
 
         data = {"a": 1, "b": 2}
 
         blog.print(f'Some important data: {data}')
 
-    with blog.step('step 2'):
+        with blog.step('Step 1.1'):
 
-        blog.info(step_param_1='param', step_param_2=123)
+            blog.info(step_param_1='param', step_param_2=123)
 
-        blog.print(f'print 2')
+            with blog.step('Step 1.1.1'):
 
-        with blog.step('step 2.1'):
+                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
 
-            blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
-
-            blog.print(f'print 3')
-
-            with blog.step('step 2.1.1'):
+            with blog.step('Step 1.1.2'):
                 pass
 
 
-@pytest.mark.parametrize('py_param', [111, 222])
+@pytest.mark.parametrize('py_param', [111, 222]) # <-- These parameters will be added to test automatically
 def test_parametrized(py_param):
     with blog.step('step 1'):
 
@@ -90,6 +88,7 @@ def test_selenium_with_set_browser(selenium_driver):
                   'based on the following possible browser instance fixture names: '
                   '["driver", "page", "selenium_driver", "driver_init", "playwright_page"]')
 def test_selenium_without_set_browser(selenium_driver): #  <-- Will be detected automatically
+
     blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 
     with blog.step('Open any URL'):

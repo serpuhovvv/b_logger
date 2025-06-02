@@ -1,20 +1,19 @@
 import os
 import mimetypes
 from pathlib import Path
-from typing import Union, Optional
 from contextlib import contextmanager
 from allure_commons.types import AttachmentType
 
 from qase.pytest import qase
 import allure
 
-from b_logger.config import b_logger_config
+from b_logger.config import blog_config
 from b_logger.entities.attachments import Attachment
 
 
 class Integrations:
-    qase_enabled: bool = b_logger_config.qase
-    allure_enabled: bool = b_logger_config.allure
+    qase_enabled: bool = blog_config.qase
+    allure_enabled: bool = blog_config.allure
 
     @staticmethod
     @contextmanager

@@ -1,4 +1,4 @@
-# BLogger — Pytest Logging Plugin for Selenium & Playwright
+# BLogger — Pytest Logging Plugin
 
 ---
 
@@ -12,7 +12,7 @@ Works seamlessly with Selenium WebDriver and Playwright Page instances.
 
 - Set global **base URL**, **environment**, and **browser** instance (Selenium or Playwright).  
 - Add/update **test descriptions** dynamically.
-- Log arbitrary **info** during tests or steps.  
+- Log any **info** during tests or steps.  
 - Mark tests/steps with **known bugs** and optional bug tracker URLs.
 - Print messages attached to current step (supports multiline and complex data).  
 - Take and attach **screenshots** automatically on demand or on errors.  
@@ -24,9 +24,16 @@ Works seamlessly with Selenium WebDriver and Playwright Page instances.
 pip install b_logger
 ```
 
+### Setup
+Add blog.config.yaml file to the root of your project.\
+Bare minimum for everything to work: 
+```yaml
+project_name: "Project Name"
+```
+
 ### Usage examples
 
-You may just read through this test file and understand common usage
+You may just read through this test file and understand common usage.
 
 ```python
 import pytest
@@ -50,35 +57,33 @@ blog.set_base_url('https://base-url.url')
     'Fake Bug Description or Name',
     'https://link-to-your-bug/1.com'
 )
-@blog.info(info_explanation='You can leave any useful information by using blog.info()',
-           meta={'platform': 'linux', 'python_version': 3.12}
+@blog.info(
+    info_explanation='You can leave any useful information by using blog.info()',
+    meta={'platform': 'linux', 'python_version': 3.12}
 )
 def test_main_functionality():
+    
     blog.description('This description will also be added')
 
-    with blog.step('step 1'):
+    with blog.step('Step 1'):
 
         data = {"a": 1, "b": 2}
 
         blog.print(f'Some important data: {data}')
 
-    with blog.step('step 2'):
-
-        blog.info(step_param_1='param', step_param_2=123)
-
-        blog.print(f'print 2')
-
-        with blog.step('step 2.1'):
-
-            blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
-
-            blog.print(f'print 3')
-
-            with blog.step('step 2.1.1'):
+        with blog.step('Step 1.1'):
+    
+            blog.info(step_param_1='param', step_param_2=123)
+    
+            with blog.step('Step 1.1.1'):
+    
+                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+    
+            with blog.step('Step 1.1.2'):
                 pass
 
 
-@pytest.mark.parametrize('py_param', [111, 222])
+@pytest.mark.parametrize('py_param', [111, 222]) # <-- These parameters will be added to test automatically
 def test_parametrized(py_param):
     with blog.step('step 1'):
 
@@ -121,6 +126,7 @@ def test_selenium_with_set_browser(selenium_driver):
                   'based on the following possible browser instance fixture names: '
                   '["driver", "page", "selenium_driver", "driver_init", "playwright_page"]')
 def test_selenium_without_set_browser(selenium_driver): #  <-- Will be detected automatically
+    
     blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 
     with blog.step('Open any URL'):
@@ -155,7 +161,7 @@ def test_playwright(playwright_page): #  <-- Will be detected automatically
             assert 1 == 2
 ```
 
-### More advanced info
+### Documentation on Methods
 
 ```python
 import pytest
@@ -178,7 +184,7 @@ class BLogger:
         """
         Set base_url for the entire Run
 
-            Can also be added in b_logger.config.yaml:
+            Can also be added in blog.config.yaml:
                 base_url: 'https://base-url.com'
 
             Or in command line options:
@@ -191,7 +197,7 @@ class BLogger:
         """
         Set env for the entire Run
 
-            Can also be added in b_logger.config.yaml:
+            Can also be added in blog.config.yaml:
                     env: 'prod'
 
             Or in command line options:
@@ -259,8 +265,11 @@ class BLogger:
 
             or
 
-            with blog.step('step 2'):
-                blog.info(step_param_1='param', step_param_2=123)
+            with blog.step('Step 1'):
+                blog.info(
+                    step_param_1='param',
+                    step_param_2=123
+                )
         """
         runtime.apply_info(**kwargs)
 
@@ -271,8 +280,16 @@ class BLogger:
         """
         Mark the test as having a known bug or apply it to current step.
 
-        :param description: Short explanation of the bug.
-        :param url: Link to bug tracker or documentation.
+        Usage:
+            @blog.known_bug(
+                'Fake Bug Description or Name',
+                'https://link-to-your-bug/1.com'
+            )
+
+            or
+
+            with blog.step('Step 1'):
+                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
         """
         runtime.apply_known_bug(description, url)
 
@@ -320,6 +337,9 @@ class BLogger:
         Make screenshot
             It will be automatically attached to Test Run and Current Step
             Will do nothing if no browser is used
+
+        Usage:
+            blog.screenshot('scr_name')
         """
         runtime.make_screenshot(name, is_error)
 

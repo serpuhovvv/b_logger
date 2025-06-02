@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil import parser
 from filelock import FileLock
 
-from b_logger.config import b_logger_config
+from b_logger.config import blog_config
 from b_logger.entities.statuses import TestStatus
 from b_logger.entities.tests import TestReport
 from b_logger.entities.steps import StepContainer
@@ -31,7 +31,7 @@ class RunResults(BaseDataModel):
 class RunReport(BaseDataModel):
     def __init__(self):
         self.report_id = f'report_{uuid.uuid4()}'
-        self.proj_name = b_logger_config.project_name
+        self.proj_name = blog_config.project_name
         self.env = None
         self.base_url = None
         self.worker = None

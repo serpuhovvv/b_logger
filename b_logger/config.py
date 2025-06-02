@@ -14,14 +14,14 @@ class BLoggerConfig(BaseDataModel):
     base_url: str = None
     qase: bool = None
     allure: bool = None
-    html_settings = None
+    html = None
 
-    def __init__(self, path: str = f'{pathfinder.project_root()}/b_logger.config.yaml'):
+    def __init__(self, path: str = f'{pathfinder.project_root()}/blog.config.yaml'):
         config_data = self._load(path)
 
         self.set_project_name(config_data.project_name)
-        self.set_qase(config_data.integrations.qase)
-        self.set_allure(config_data.integrations.allure)
+        self.set_qase(config_data.integrations.qase or False)
+        self.set_allure(config_data.integrations.allure or False)
 
     def _load(self, path: str):
         config_path = Path(path)
@@ -50,4 +50,4 @@ class BLoggerConfig(BaseDataModel):
         return self._data[item]
 
 
-b_logger_config = BLoggerConfig()
+blog_config = BLoggerConfig()

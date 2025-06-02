@@ -18,7 +18,7 @@ class BLogger:
         """
         Set base_url for the entire Run
 
-            Can also be added in b_logger.config.yaml:
+            Can also be added in blog.config.yaml:
                 base_url: 'https://base-url.com'
 
             Or in command line options:
@@ -31,7 +31,7 @@ class BLogger:
         """
         Set env for the entire Run
 
-            Can also be added in b_logger.config.yaml:
+            Can also be added in blog.config.yaml:
                     env: 'prod'
 
             Or in command line options:
@@ -99,8 +99,11 @@ class BLogger:
 
             or
 
-            with blog.step('step 2'):
-                blog.info(step_param_1='param', step_param_2=123)
+            with blog.step('Step 1'):
+                blog.info(
+                    step_param_1='param',
+                    step_param_2=123
+                )
         """
         runtime.apply_info(**kwargs)
 
@@ -111,8 +114,16 @@ class BLogger:
         """
         Mark the test as having a known bug or apply it to current step.
 
-        :param description: Short explanation of the bug.
-        :param url: Link to bug tracker or documentation.
+        Usage:
+            @blog.known_bug(
+                'Fake Bug Description or Name',
+                'https://link-to-your-bug/1.com'
+            )
+
+            or
+
+            with blog.step('Step 1'):
+                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
         """
         runtime.apply_known_bug(description, url)
 
@@ -160,6 +171,9 @@ class BLogger:
         Make screenshot
             It will be automatically attached to Test Run and Current Step
             Will do nothing if no browser is used
+
+        Usage:
+            blog.screenshot('scr_name')
         """
         runtime.make_screenshot(name, is_error)
 

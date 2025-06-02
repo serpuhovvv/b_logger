@@ -23,7 +23,7 @@ class PathFinder:
             library_markers: Set[str] = None,
     ):
         # Маркеры, определяющие корень проекта
-        self.project_markers = project_markers or {'b_logger.config.yaml', 'requirements.txt', 'conftest.py'}
+        self.project_markers = project_markers or {'blog.config.yaml', 'requirements.txt', 'conftest.py'}
         # Маркеры, определяющие корень библиотеки
         self.library_markers = library_markers or {'b_logger'}
 
@@ -77,7 +77,7 @@ class PathFinder:
                 return Path(root)
 
         raise RuntimeError(f'Unable to find library root. '
-                           f'Probably you forgot to add "b_logger.config.yaml" to your project')
+                           f'Probably you forgot to add "blog.config.yaml" to your project')
 
     def find(
             self,
