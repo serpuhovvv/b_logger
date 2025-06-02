@@ -13,7 +13,7 @@ class PrintStatus(str, Enum):
 
 class Print(BaseDataModel):
     def __init__(self, data, status: PrintStatus):
-        self.id_ = f'print_{uuid.uuid4()}'
+        self.id = f'print_{uuid.uuid4()}'
         self.title = data
         self.status = status
         self.parent_id = None
