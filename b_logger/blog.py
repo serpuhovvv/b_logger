@@ -155,14 +155,6 @@ class BLogger:
         runtime.print_message(data, status)
 
     @staticmethod
-    def attach(source, name: str = None):
-        """
-        Attach file or screenshot
-            It will be added to Test Run and Current Step
-        """
-        runtime.attach(source, name)
-
-    @staticmethod
     def screenshot(name: str = None, is_error: bool = False):
         """
         Make screenshot
@@ -170,3 +162,11 @@ class BLogger:
             Will do nothing if no browser is used
         """
         runtime.make_screenshot(name, is_error)
+
+    @staticmethod
+    def attach(source, name: str = None):
+        """
+        Attach file or screenshot
+            It will be added to Test Run and Current Step
+        """
+        runtime.attach(source, name)

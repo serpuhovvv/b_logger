@@ -11,11 +11,11 @@ class HTMLGenerator:
         self.template = env.get_template(f'base_template.html')
         self.report_path = f'{b_logs_path()}/combined_report.json'
 
-    def load_report(self):
-        return RunReport.from_json(self.report_path)
+    # def load_report(self):
+    #     return RunReport.from_json(self.report_path)
 
     def generate_html(self):
-        combined_report = self.load_report()
+        combined_report = RunReport.from_json(self.report_path)
 
         steps_by_test = combined_report.get_steps_by_test()
 
