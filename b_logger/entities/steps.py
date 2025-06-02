@@ -18,13 +18,13 @@ class StepStatus(str, Enum):
     NONE = 'none'
 
 
-class StepManager:
-    def __init__(self):
-        self.current_step_id = None
-        self.failed = False
-
-    def set_current_step(self, step_id):
-        self.current_step_id = step_id
+# class StepManager:
+#     def __init__(self):
+#         self.current_step_id = None
+#         self.failed = False
+#
+#     def set_current_step(self, step_id):
+#         self.current_step_id = step_id
 
 
 class StepError(BaseDataModel):
@@ -92,6 +92,11 @@ class StepContainer(BaseDataModel, list):
     def __init__(self):
         super().__init__()
         self.container_id = f'steps_{uuid.uuid4()}'
+        self.current_step_id = None
+        self.failed = False
+
+    def set_current_step(self, step_id):
+        self.current_step_id = step_id
 
     def add_step(self, step):
         self.append(step)
@@ -108,6 +113,9 @@ class StepContainer(BaseDataModel, list):
                     return found
 
         return None
+
+    def get_current_step(self) -> Step | None:
+        return self.get_step_by_id(self.current_step_id)
 
     def save_json(self, file_name=None):
         root = f'{b_logs_tmp_steps_path()}'

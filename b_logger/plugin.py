@@ -1,13 +1,10 @@
 import pytest
-import os
 
 from xdist import is_xdist_controller, get_xdist_worker_id
 
-from b_logger.config import b_logger_config
-from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.generators.report_gen import ReportGenerator
-from b_logger.utils.py_addons import BLoggerOptions, BLoggerMarkers
+from b_logger.entities.py_addons import BLoggerOptions, BLoggerMarkers
 from b_logger.utils.paths import *
 from b_logger.runtime import RunTime
 
@@ -62,6 +59,11 @@ def pytest_sessionfinish(session):
 
 def _is_main_worker(session):
     return is_xdist_controller(session) or get_xdist_worker_id(session) == 'master'
+
+
+# @pytest.hookimpl(tryfirst=True)
+# def pytest_runtest_protocol(item, nextitem):
+#     runtime.start_test(item)
 
 
 @pytest.hookimpl(tryfirst=True)

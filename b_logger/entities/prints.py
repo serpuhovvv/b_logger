@@ -14,7 +14,7 @@ class PrintStatus(str, Enum):
 class Print(BaseDataModel):
     def __init__(self, data, status: PrintStatus):
         self.id_ = f'print_{uuid.uuid4()}'
-        self.data = data
+        self.title = data
         self.status = status
         self.parent_id = None
 

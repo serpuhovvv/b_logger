@@ -16,10 +16,10 @@ from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, b_logs_tmp_steps_
 
 class RunResults(BaseDataModel):
     def __init__(self):
-        self.passed: int = 0
-        self.failed: int = 0
-        self.broken: int = 0
-        self.skipped: int = 0
+        self.PASSED: int = 0
+        self.FAILED: int = 0
+        self.BROKEN: int = 0
+        self.SKIPPED: int = 0
 
     def increase(self, result: TestStatus, amount: int = 1):
         if not hasattr(self, result):

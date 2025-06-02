@@ -12,7 +12,7 @@ from b_logger.entities.prints import Print, PrintStatus
 from b_logger.entities.reports import RunReport
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.entities.tests import TestReport, TestStatus
-from b_logger.entities.steps import Step, StepStatus, StepError, StepManager, StepContainer
+from b_logger.entities.steps import Step, StepStatus, StepError, StepContainer
 from b_logger.integrations import Integrations
 from b_logger.utils.formatters import format_tb
 from b_logger.utils.paths import attachments_path
@@ -27,7 +27,6 @@ class RunTime:
         self.run_report: RunReport = RunReport()
         self.browser: RemoteWebDriver | WebDriver | Page | None = None
         self.test_report: TestReport = TestReport()
-        self.step_manager: StepManager = StepManager()
         self.step_container: StepContainer = StepContainer()
 
     def set_base_url(self, base_url: str):
@@ -43,16 +42,14 @@ class RunTime:
         test_name = item.name
         # test_name = item.originalname
 
-        self.step_manager = StepManager()
         self.step_container = StepContainer()
-
         self.test_report = TestReport(test_name)
 
     def finish_test(self):
         self.step_container.save_json()
         self.test_report.set_steps(self.step_container.container_id)
 
-        del self.step_manager, self.step_container, self.test_report
+        del self.step_container, self.test_report
         if self.browser:
             self.browser = None
 
@@ -98,26 +95,26 @@ class RunTime:
         return status
 
     def start_step(self, step: Step):
-        if self.step_manager.current_step_id is not None:
-            parent = self.step_container.get_step_by_id(self.step_manager.current_step_id)
+        if self.step_container.current_step_id is not None:
+            parent = self.step_container.get_current_step()
             step.set_parent_id(parent.id)
 
             parent.add_sub_step(step)
 
-            self.step_manager.set_current_step(step.id)
+            self.step_container.set_current_step(step.id)
 
         else:
-            self.step_manager.set_current_step(step.id)
+            self.step_container.set_current_step(step.id)
             self.step_container.add_step(step)
 
     def handle_step_result(self, step: Step, exc=None):
         if exc:
-            if not self.step_manager.failed:
+            if not self.step_container.failed:
                 self.make_screenshot(is_error=True)
 
                 step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
 
-                self.step_manager.failed = True
+                self.step_container.failed = True
 
             step.set_status(StepStatus.FAILED)
 
@@ -126,7 +123,7 @@ class RunTime:
         step.set_status(StepStatus.PASSED)
 
     def finish_step(self, step: Step):
-        self.step_manager.current_step_id = step.parent_id
+        self.step_container.set_current_step(step.parent_id)
 
     def apply_description(self, description):
         if not self.test_report.description:
@@ -150,7 +147,7 @@ class RunTime:
 
             info[key] = v
 
-        current_step = self._get_current_step()
+        current_step = self.step_container.get_current_step()
 
         if current_step:
             current_step.add_info(info)
@@ -160,7 +157,7 @@ class RunTime:
     def apply_known_bug(self, description: str, url: str = None):
         bug = {"description": description, "url": url}
 
-        current_step = self._get_current_step()
+        current_step = self.step_container.get_current_step()
 
         if current_step:
             current_step.add_known_bug(bug)
@@ -175,7 +172,7 @@ class RunTime:
 
         print_ = Print(data, status)
 
-        current_step = self._get_current_step()
+        current_step = self.step_container.get_current_step()
 
         if current_step:
             print_.set_parent_id(current_step.id)
@@ -214,13 +211,10 @@ class RunTime:
     def attach(self, source: Union[str, Path, bytes, BinaryIO], name: str = None, mime_type: str = None):
         attachment = Attachment(source, name)
 
-        current_step: Step = self.step_container.get_step_by_id(self.step_manager.current_step_id)
+        current_step = self.step_container.get_current_step()
         if current_step:
             current_step.add_attachment(attachment)
 
         self.test_report.add_attachment(attachment)
 
         Integrations.attach(source, attachment)
-
-    def _get_current_step(self) -> Step:
-        return self.step_container.get_step_by_id(self.step_manager.current_step_id)

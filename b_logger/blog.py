@@ -17,6 +17,12 @@ class BLogger:
     def set_base_url(base_url: str):
         """
         Set base_url for the entire Run
+
+            Can also be added in b_logger.config.yaml:
+                base_url: 'https://base-url.com'
+
+            Or in command line options:
+                --blog_base_url 'https://base-url.com'
         """
         runtime.set_base_url(base_url)
 
@@ -24,6 +30,12 @@ class BLogger:
     def set_env(env: str):
         """
         Set env for the entire Run
+
+            Can also be added in b_logger.config.yaml:
+                    env: 'prod'
+
+            Or in command line options:
+                --blog_env 'prod'
         """
         runtime.set_env(env)
 
@@ -35,6 +47,22 @@ class BLogger:
         If browser init fixture name is in
             ["driver", "page", "selenium_driver", "driver_init", "playwright_page"]
         then it will be detected automatically
+
+        Usage:
+            @pytest.fixture()
+            def selenium_driver():
+                driver = webdriver.Chrome()
+
+                blog.set_browser(driver)
+
+                yield driver
+
+                driver.quit()
+
+            or
+
+            def test_playwright(page): <-- Will be detected automatically
+                page.goto(f'https://google.com')
         """
         runtime.set_browser(browser)
 

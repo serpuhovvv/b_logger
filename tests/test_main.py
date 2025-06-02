@@ -78,7 +78,7 @@ def test_selenium_with_set_browser(selenium_driver):
     with blog.step('Open any URL'):
         selenium_driver.get(f'https://google.com')
 
-        with blog.step('Raise fake error'):
+        with blog.step('Raise fake error to check error screenshot'):
             assert 1 == 2
 
 
@@ -87,11 +87,13 @@ def test_selenium_with_set_browser(selenium_driver):
                   'found driver automatically '
                   'based on the following possible browser instance fixture names: '
                   '["driver", "page", "selenium_driver", "driver_init", "playwright_page"]')
-def test_selenium_without_set_browser(selenium_driver):
+def test_selenium_without_set_browser(selenium_driver): #  <-- Will be detected automatically
+    blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
+
     with blog.step('Open any URL'):
         selenium_driver.get(f'https://google.com')
 
-        with blog.step('Raise fake error'):
+        with blog.step('Raise fake error to check error screenshot'):
             assert 1 == 2
 
 
@@ -112,9 +114,9 @@ def playwright_page(playwright: Playwright):
 
 
 @pytest.mark.xfail
-def test_playwright(playwright_page):
+def test_playwright(playwright_page): #  <-- Will be detected automatically
     with blog.step('Open any URL'):
         playwright_page.goto(f'https://google.com')
 
-        with blog.step('Raise fake error'):
+        with blog.step('Raise fake error to check error screenshot'):
             assert 1 == 2

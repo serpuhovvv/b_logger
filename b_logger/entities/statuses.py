@@ -2,11 +2,11 @@ from enum import Enum
 
 
 class TestStatus(str, Enum):
-    PASSED = 'passed'
-    FAILED = 'failed'
-    SKIPPED = 'skipped'
-    BROKEN = 'broken'
-    NONE = 'none'
+    PASSED = 'PASSED'
+    FAILED = 'FAILED'
+    SKIPPED = 'SKIPPED'
+    BROKEN = 'BROKEN'
+    NONE = 'NONE'
 
 
 def py_outcome_to_tstatus(outcome):
