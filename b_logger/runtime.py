@@ -1,3 +1,4 @@
+import json
 import os
 import traceback
 from pathlib import Path
@@ -7,13 +8,14 @@ from playwright.sync_api import Page
 from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
 
 from b_logger.entities.attachments import Attachment
+from b_logger.entities.prints import Print, PrintStatus
 from b_logger.entities.reports import RunReport
 from b_logger.entities.statuses import py_outcome_to_tstatus
-from b_logger.entities.tests import TestReport, TestStatus, TestError
+from b_logger.entities.tests import TestReport, TestStatus
 from b_logger.entities.steps import Step, StepStatus, StepError, StepManager, StepContainer
 from b_logger.integrations import Integrations
 from b_logger.utils.formatters import format_tb
-from b_logger.utils.paths import pathfinder, attachments_path
+from b_logger.utils.paths import attachments_path
 
 
 class TestRun:
@@ -23,7 +25,7 @@ class TestRun:
 class RunTime:
     def __init__(self):
         self.run_report: RunReport = RunReport()
-        self.browser: RemoteWebDriver | WebDriver | Page = None
+        self.browser: RemoteWebDriver | WebDriver | Page | None = None
         self.test_report: TestReport = TestReport()
         self.step_manager: StepManager = StepManager()
         self.step_container: StepContainer = StepContainer()
@@ -59,6 +61,9 @@ class RunTime:
 
         self.test_report.set_duration(round(report.duration, 2))
 
+        if report.longrepr:
+            self.test_report.set_stacktrace(report.longreprtext)
+
         if report.failed:
             self._handle_failed_test(call, report, item)
 
@@ -69,16 +74,13 @@ class RunTime:
             self._handle_passed_test(call, report, item)
 
     def _handle_failed_test(self, call, report, item):
-        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
-        # self.test_report.stacktrace = report.longreprtext
+        self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_skipped_test(self, call, report, item):
-        self.test_report.set_error(TestError(call.excinfo.exconly(), report.longreprtext))
-        # self.test_report.stacktrace = report.longreprtext
+        self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_passed_test(self, call, report, item):
-        if report.longrepr:
-            self.test_report.stacktrace = report.longreprtext
+        pass
 
     def process_test_status(self, report):
         if hasattr(report, 'wasxfail'):
@@ -136,19 +138,17 @@ class RunTime:
     def apply_param(self, name, value):
         self.test_report.add_parameter(name, value)
 
-    def apply_info(self, *args, **kwargs):
+    def apply_info(self, **kwargs):
+
+        if not kwargs:
+            raise ValueError('blog.info() requires at least one keyword argument')
 
         info = {}
 
-        if kwargs:
-            for k, v in kwargs.items():
-                info[k] = v
-        elif len(args) == 2:
-            info[args[0]] = args[1]
-        elif len(args) == 1:
-            info = str(args[0])
-        else:
-            raise ValueError(f'Invalid arguments passed to apply_info({args}, {kwargs})')
+        for k, v in kwargs.items():
+            key = k.replace('_', ' ').capitalize()
+
+            info[key] = v
 
         current_step = self._get_current_step()
 
@@ -167,18 +167,23 @@ class RunTime:
 
         self.test_report.add_known_bug(bug)
 
-    def print_message(self, message: str, status: StepStatus = StepStatus.NONE):
-        step = Step(title=message, status=status)
+    def print_message(self, message, status: PrintStatus = PrintStatus.NONE):
+        if isinstance(message, (dict, list)):
+            data = json.dumps(message, indent=2, ensure_ascii=False)
+        else:
+            data = str(message)
+
+        print_ = Print(data, status)
 
         current_step = self._get_current_step()
 
         if current_step:
-            step.set_parent_id(current_step.id)
-            current_step.add_sub_step(step)
+            print_.set_parent_id(current_step.id)
+            current_step.add_sub_step(print_)
         else:
-            self.step_container.add_step(step)
+            self.step_container.add_step(print_)
 
-        print(f'\n{message}')
+        print(f'\n{data}')
 
     def make_screenshot(self, scr_name: str = None, is_error: bool = False):
         if self.browser is None:

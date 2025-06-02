@@ -134,8 +134,8 @@ def _apply_browser(item):
 
 def _apply_markers(item):
     __apply_description_mark(item)
-    __apply_info_marks(item)
-    __apply_known_bug_marks(item)
+    __apply_info_mark(item)
+    __apply_known_bug_mark(item)
 
 
 def __apply_description_mark(item):
@@ -147,23 +147,23 @@ def __apply_description_mark(item):
         pass
 
 
-def __apply_info_marks(item):
+def __apply_info_mark(item):
     try:
         for info in reversed(list(item.iter_markers(name='blog_info'))):
-            args = info.kwargs.get('args', ())
             kwargs = info.kwargs.get('kwargs', {})
 
-            runtime.apply_info(*args, **kwargs)
+            runtime.apply_info(**kwargs)
 
     except AttributeError as e:
         pass
 
 
-def __apply_known_bug_marks(item):
+def __apply_known_bug_mark(item):
     try:
         for bug in reversed(list(item.iter_markers(name='blog_known_bug'))):
             description = bug.kwargs.get('description')
             url = bug.kwargs.get('url') or None
+
             if description:
                 runtime.apply_known_bug(description, url)
             else:

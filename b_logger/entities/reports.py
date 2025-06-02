@@ -85,14 +85,16 @@ class RunReport(BaseDataModel):
 
     def add_run_result(self, result):
         self.run_results.increase(result)
-        # self.run_results[result] += 1
 
     def add_module_result(self, module, result):
         self.modules[module]['module_results'][result] += 1
 
     def add_test_report(self, module: str, test_report: TestReport):
         test_name = test_report.name
-        # if self.modules[module]['module_tests'][test_name]:
+
+        # test_exists = self.modules[module]['module_tests'].get(test_name, {})
+        #
+        # if test_exists:
         #     self.modules[module]['module_tests'][test_name] = [self.modules[module]['module_tests'][test_name]]
         #     self.modules[module]['module_tests'][test_name].append(test_report)
         # else:
@@ -140,7 +142,3 @@ class RunReport(BaseDataModel):
 
     # def get_modules(self):
     #     return self.modules.keys()
-    #
-    # def get_module_tests(self, module):
-    #     # print(self.modules[module]['module_tests'])
-    #     return self.modules[module]['module_tests'].items()

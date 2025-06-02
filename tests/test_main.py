@@ -17,19 +17,21 @@ blog.set_base_url('https://base-url.url')
     'Fake Bug Description or Name',
     'https://link-to-your-bug/1.com'
 )
-@blog.info('You can leave any useful information by using blog.info()')
+@blog.info(info_explanation='You can leave any useful information by using blog.info()',
+           meta={'platform': 'linux', 'python_version': 3.12}
+)
 def test_main_functionality():
     blog.description('This description will also be added')
 
-    blog.info(f'Some info name', 'Some info value')
-
     with blog.step('step 1'):
 
-        blog.print(f'print 1')
+        data = {"a": 1, "b": 2}
+
+        blog.print(f'Some important data: {data}')
 
     with blog.step('step 2'):
 
-        blog.info(first_parameter='param 1', second_parameter='param 2')
+        blog.info(step_param_1='param', step_param_2=123)
 
         blog.print(f'print 2')
 
@@ -68,7 +70,7 @@ def selenium_driver():
 @pytest.mark.xfail
 @blog.description('This test will make browser screenshot as we did blog.set_browser. '
                   'We can also do it in "selenium_driver" fixture')
-@blog.info('To run this test you\'ll need to download chromedriver and put it in your python folder')
+@blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 def test_selenium_with_set_browser(selenium_driver):
 
     blog.set_browser(selenium_driver)

@@ -1,3 +1,11 @@
-project_name: "Any Project"
-qase: True
-allure: True
+project_name: "BLogger Project"
+
+integrations:
+  qase: True
+  allure: True
+
+links:
+  link_prefix: ""
+
+html:
+  main_color: ""

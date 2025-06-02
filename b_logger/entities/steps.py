@@ -45,9 +45,9 @@ class Step(BaseDataModel):
         self.expected = expected
         self.parent_id = None
         self.error: StepError | None = None
+        self.info = {}
         self.attachments = []
         self.known_bugs = []
-        self.info = []
         self.steps = []
 
     def set_parent_id(self, parent_id):
@@ -69,7 +69,14 @@ class Step(BaseDataModel):
         self.steps.append(step)
 
     def add_info(self, info):
-        self.info.append(info)
+        for key, value in info.items():
+            if key in self.info:
+                existing = self.info[key]
+                if not isinstance(existing, list):
+                    self.info[key] = [existing]
+                self.info[key].append(value)
+            else:
+                self.info[key] = value
 
     def add_known_bug(self, bug):
         self.known_bugs.append(bug)
@@ -83,7 +90,7 @@ class Step(BaseDataModel):
 
 class StepContainer(BaseDataModel, list):
     def __init__(self):
-        super(list).__init__()
+        super().__init__()
         self.container_id = f'steps_{uuid.uuid4()}'
 
     def add_step(self, step):

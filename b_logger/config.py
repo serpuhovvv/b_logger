@@ -20,8 +20,8 @@ class BLoggerConfig(BaseDataModel):
         config_data = self._load(path)
 
         self.set_project_name(config_data.project_name)
-        self.set_qase(config_data.qase)
-        self.set_allure(config_data.allure)
+        self.set_qase(config_data.integrations.qase)
+        self.set_allure(config_data.integrations.allure)
 
     def _load(self, path: str):
         config_path = Path(path)
@@ -36,9 +36,6 @@ class BLoggerConfig(BaseDataModel):
 
     def set_project_name(self, project_name: str):
         self.project_name = project_name
-
-    def set_jbl(self, jbl):
-        self.jenkins_build_link = jbl
 
     def set_qase(self, qase: bool):
         self.qase = qase
