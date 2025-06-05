@@ -37,10 +37,11 @@ You may just read through this test file and understand common usage.
 
 ```python
 import pytest
+import random
 from pytest_playwright.pytest_playwright import Playwright
 from selenium import webdriver
 
-from b_logger import blog
+from b_logger import blog, PrintStatus
 
 
 blog.set_env('prod')
@@ -62,7 +63,7 @@ blog.set_base_url('https://base-url.url')
     meta={'platform': 'linux', 'python_version': 3.12}
 )
 def test_main_functionality():
-    
+
     blog.description('This description will also be added')
 
     with blog.step('Step 1'):
@@ -72,13 +73,19 @@ def test_main_functionality():
         blog.print(f'Some important data: {data}')
 
         with blog.step('Step 1.1'):
-    
-            blog.info(step_param_1='param', step_param_2=123)
-    
+            
+            step_param_1 = random.randint(1, 100)
+            step_param_2 = random.randint(1, 100)
+
+            blog.info(
+                step_param_1=step_param_1, 
+                step_param_2=step_param_2
+            )
+
             with blog.step('Step 1.1.1'):
-    
+
                 blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
-    
+
             with blog.step('Step 1.1.2'):
                 pass
 
@@ -126,7 +133,7 @@ def test_selenium_with_set_browser(selenium_driver):
                   'based on the following possible browser instance fixture names: '
                   '["driver", "page", "selenium_driver", "driver_init", "playwright_page"]')
 def test_selenium_without_set_browser(selenium_driver): #  <-- Will be detected automatically
-    
+
     blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 
     with blog.step('Open any URL'):
@@ -159,6 +166,7 @@ def test_playwright(playwright_page): #  <-- Will be detected automatically
 
         with blog.step('Raise fake error to check error screenshot'):
             assert 1 == 2
+
 ```
 
 ### Documentation on Methods

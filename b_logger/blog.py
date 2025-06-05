@@ -21,7 +21,7 @@ class BLogger:
             Can also be added in blog.config.yaml:
                 base_url: 'https://base-url.com'
 
-            Or in command line options:
+            Or via command line options:
                 --blog_base_url 'https://base-url.com'
         """
         runtime.set_base_url(base_url)
@@ -32,9 +32,9 @@ class BLogger:
         Set env for the entire Run
 
             Can also be added in blog.config.yaml:
-                    env: 'prod'
+                env: 'prod'
 
-            Or in command line options:
+            Or via command line options:
                 --blog_env 'prod'
         """
         runtime.set_env(env)

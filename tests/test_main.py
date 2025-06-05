@@ -1,8 +1,9 @@
 import pytest
+import random
 from pytest_playwright.pytest_playwright import Playwright
 from selenium import webdriver
 
-from b_logger import blog
+from b_logger import blog, PrintStatus
 
 
 blog.set_env('prod')
@@ -35,7 +36,13 @@ def test_main_functionality():
 
         with blog.step('Step 1.1'):
 
-            blog.info(step_param_1='param', step_param_2=123)
+            step_param_1 = random.randint(1, 100)
+            step_param_2 = random.randint(1, 100)
+
+            blog.info(
+                step_param_1=step_param_1,
+                step_param_2=step_param_2
+            )
 
             with blog.step('Step 1.1.1'):
 
