@@ -37,7 +37,7 @@ class ReportGenerator:
         self._merge_run_results(report)
         self._merge_module_results(report)
 
-    def save(self, filename='combined_report'):
+    def save(self, filename='blog_report'):
         output_path = f'{b_logs_path()}/{filename}'
         with FileLock(f'{output_path}.lock'):
             self.combined.to_json_file(output_path)

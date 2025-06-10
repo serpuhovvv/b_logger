@@ -5,9 +5,7 @@ from selenium import webdriver
 
 from b_logger import blog, PrintStatus
 
-
 blog.set_env('prod')
-
 
 blog.set_base_url('https://base-url.url')
 
@@ -25,17 +23,14 @@ blog.set_base_url('https://base-url.url')
     meta={'platform': 'linux', 'python_version': 3.12}
 )
 def test_main_functionality():
-
     blog.description('This description will also be added')
 
     with blog.step('Step 1'):
-
         data = {"a": 1, "b": 2}
 
         blog.print(f'Some important data: {data}')
 
         with blog.step('Step 1.1'):
-
             step_param_1 = random.randint(1, 100)
             step_param_2 = random.randint(1, 100)
 
@@ -45,17 +40,15 @@ def test_main_functionality():
             )
 
             with blog.step('Step 1.1.1'):
-
                 blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
 
             with blog.step('Step 1.1.2'):
                 pass
 
 
-@pytest.mark.parametrize('py_param', [111, 222]) # <-- These parameters will be added to test automatically
+@pytest.mark.parametrize('py_param', [111, 222])  # <-- These parameters will be added to test automatically
 def test_parametrized(py_param):
     with blog.step('step 1'):
-
         blog.print(py_param)
 
         with blog.step('step 2'):
@@ -79,7 +72,6 @@ def selenium_driver():
                   'We can also do it in "selenium_driver" fixture')
 @blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 def test_selenium_with_set_browser(selenium_driver):
-
     blog.set_browser(selenium_driver)
 
     with blog.step('Open any URL'):
@@ -94,7 +86,7 @@ def test_selenium_with_set_browser(selenium_driver):
                   'found driver automatically '
                   'based on the following possible browser instance fixture names: '
                   '["driver", "page", "selenium_driver", "driver_init", "playwright_page"]')
-def test_selenium_without_set_browser(selenium_driver): #  <-- Will be detected automatically
+def test_selenium_without_set_browser(selenium_driver):  #  <-- Will be detected automatically
 
     blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 
@@ -122,7 +114,7 @@ def playwright_page(playwright: Playwright):
 
 
 @pytest.mark.xfail
-def test_playwright(playwright_page): #  <-- Will be detected automatically
+def test_playwright(playwright_page):  #  <-- Will be detected automatically
     with blog.step('Open any URL'):
         playwright_page.goto(f'https://google.com')
 
