@@ -62,9 +62,11 @@ class RunTime:
             self.test_report.set_stacktrace(report.longreprtext)
 
         if report.failed:
+            # self.make_screenshot(is_error=True)
             self._handle_failed_test(call, report, item)
 
         elif report.skipped:
+            # self.make_screenshot(is_error=True)
             self._handle_skipped_test(call, report, item)
 
         else:
@@ -199,10 +201,21 @@ class RunTime:
                 index += 1
 
         if isinstance(self.browser, (RemoteWebDriver, WebDriver)):
-            self.attach(self.browser.get_screenshot_as_png(), scr_name)
+            try:
+                self.attach(self.browser.get_screenshot_as_png(), scr_name)
+            except Exception as e:
+                raise RuntimeError(f'Unable to make screenshot: {e}')
 
         elif isinstance(self.browser, Page):
-            self.attach(self.browser.screenshot(), scr_name)
+            pages = self.browser.context.pages
+            for page in pages:
+                try:
+                    self.attach(page.screenshot(), scr_name)
+                    return
+                except Exception as e:
+                    pass
+
+            raise RuntimeError(f'Unable to make screenshot! There is no valid playwright page: {pages}')
 
         else:
             raise RuntimeError(f'Browser is incorrect, unable to make screenshot!!! '

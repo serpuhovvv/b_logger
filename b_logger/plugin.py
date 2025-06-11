@@ -88,7 +88,10 @@ def pytest_runtest_teardown(item):
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(call, item):
 
-    report = (yield).get_result()
+    # report = (yield).get_result()
+
+    outcome = yield
+    report = outcome.get_result()
 
     if call.when not in ["setup", "call"]:
         return
