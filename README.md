@@ -1,4 +1,4 @@
-# BLogger — Pytest Logging Plugin
+# BLogger — Pytest Logging Plugin (Development)
 
 ---
 
