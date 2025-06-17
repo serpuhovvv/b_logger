@@ -88,17 +88,18 @@ class ReportGenerator:
             # self.combined.run_results[status] += count
 
     def _merge_module_results(self, report: RunReport):
-        for module_name, module_data in report.modules.items():
-            mod_results = module_data['module_results']
-            mod_tests = module_data['module_tests']
-
-            mod_combined = self.combined.modules[module_name]
-
-            for status, count in mod_results.items():
-                mod_combined['module_results'][status] += count
-
-            for test_name, test_data in mod_tests.items():
-                mod_combined['module_tests'][test_name] = test_data
+        self.combined.combine_modules(report)
+        # for module_name, module_data in report.modules.items():
+        #     mod_results = module_data["results"]
+        #     mod_tests: dict = module_data["tests"]
+        #
+        #     mod_combined = self.combined.modules[module_name]
+        #
+        #     for status, count in mod_results.items():
+        #         mod_combined['results'].increase(status, count)
+        #
+        #     for test_name, test_reports in mod_tests.items():
+        #         mod_combined["tests"][test_name].extend(test_reports)
 
 
 # class ReportGenerator:

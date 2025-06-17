@@ -39,15 +39,18 @@ class RunTime:
         self.browser = browser
 
     def start_test(self, item):
+        module = item.location[0]
         test_name = item.name
-        # test_name = item.originalname
+        test_originalname = item.originalname
 
         self.step_container = StepContainer()
-        self.test_report = TestReport(test_name)
+        self.test_report = TestReport(module, test_name, test_originalname)
 
-    def finish_test(self):
+    def finish_test(self, item):
         self.step_container.save_json()
         self.test_report.set_steps(self.step_container.container_id)
+
+        self.run_report.add_result(self.test_report)
 
         del self.step_container, self.test_report
         if self.browser:
@@ -62,37 +65,39 @@ class RunTime:
             self.test_report.set_stacktrace(report.longreprtext)
 
         if report.failed:
-            self.make_screenshot(is_error=True)
             self._handle_failed_test(call, report, item)
 
         elif report.skipped:
-            self.make_screenshot(is_error=True)
             self._handle_skipped_test(call, report, item)
 
         else:
             self._handle_passed_test(call, report, item)
 
     def _handle_failed_test(self, call, report, item):
-        # is_assertion_error = call.excinfo.typename == "AssertionError"
-        # status = py_outcome_to_tstatus('failed') if is_assertion_error else py_outcome_to_tstatus('broken')
+        self.make_screenshot(is_error=True)
         self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_skipped_test(self, call, report, item):
+        self.make_screenshot(is_error=True)
         self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_passed_test(self, call, report, item):
         pass
 
-    def process_test_status(self, report):
+    def process_test_status(self, report, call, item):
         if hasattr(report, 'wasxfail'):
             if report.outcome == 'skipped':
                 status = TestStatus.PASSED
-            elif report.outcome in ['passed', 'failed']:
+            else:
                 status = TestStatus.FAILED
+        else:
+            if call.excinfo:
+                if call.excinfo.typename == "AssertionError":
+                    status = TestStatus.FAILED
+                else:
+                    status = TestStatus.BROKEN
             else:
                 status = py_outcome_to_tstatus(report.outcome)
-        else:
-            status = py_outcome_to_tstatus(report.outcome)
 
         self.test_report.set_status(status)
 
@@ -147,7 +152,7 @@ class RunTime:
         info = {}
 
         for k, v in kwargs.items():
-            key = k.replace('_', ' ').capitalize()
+            key = k.replace('_', ' ').capitalize().upper()
 
             info[key] = v
 

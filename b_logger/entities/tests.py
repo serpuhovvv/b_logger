@@ -27,8 +27,10 @@ class TestError(BaseDataModel):
 
 class TestReport(BaseDataModel):
 
-    def __init__(self, name: str = None):
+    def __init__(self, module: str = None, name: str = None, originalname: str = None):
+        self.module: str = module
         self.name: str = name
+        self.originalname: str = originalname
         self.status: TestStatus = TestStatus.NONE
         self.duration: float | None = None
         self.description: str | None = None

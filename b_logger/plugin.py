@@ -77,14 +77,12 @@ def pytest_runtest_setup(item):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_call(item):
-    # _apply_markers(item)
-
     _apply_browser(item)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_teardown(item):
-    runtime.finish_test()
+    runtime.finish_test(item)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -97,22 +95,28 @@ def pytest_runtest_makereport(call, item):
 
     runtime.process_test_result(report, call, item)
 
-
-@pytest.hookimpl(tryfirst=True)
-def pytest_runtest_logreport(report):
-    if report.when not in ["setup", "call"]:
-        return
-
     if report.when == 'setup':
         if report.outcome == 'passed':
-            return
+                    return
 
-    valid_outcome = runtime.process_test_status(report)
+    runtime.process_test_status(report, call, item)
 
-    module = report.location[0]
-    runtime.run_report.add_run_result(valid_outcome)
-    runtime.run_report.add_module_result(module, valid_outcome)
-    runtime.run_report.add_test_report(module, runtime.test_report)
+
+# @pytest.hookimpl(tryfirst=True)
+# def pytest_runtest_logreport(report):
+#     if report.when not in ["setup", "call"]:
+#         return
+#
+#     if report.when == 'setup':
+#         if report.outcome == 'passed':
+#             return
+#
+#     valid_outcome = runtime.process_test_status(report)
+#
+#     module = report.location[0]
+#     runtime.run_report.add_run_result(valid_outcome)
+#     runtime.run_report.add_module_result(module, valid_outcome)
+#     runtime.run_report.add_test_report(module, runtime.test_report)
 
 
 def _apply_py_params(item):

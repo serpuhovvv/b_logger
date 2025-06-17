@@ -39,21 +39,11 @@ class RunReport(BaseDataModel):
         self.end_time = None
         self.duration = None
         self.report_ids = {}
-        # self.run_results = {TestStatus.PASSED: 0,
-        #                     TestStatus.FAILED: 0,
-        #                     TestStatus.BROKEN: 0,
-        #                     TestStatus.SKIPPED: 0
-        #                     }
         self.run_results = RunResults()
-        self.modules = defaultdict(
+        self.modules: dict[str, dict] = defaultdict(
             lambda: {
-                "module_results": {
-                    TestStatus.PASSED: 0,
-                    TestStatus.FAILED: 0,
-                    TestStatus.BROKEN: 0,
-                    TestStatus.SKIPPED: 0
-                },
-                "module_tests": {}
+                "results": RunResults(),
+                "tests": defaultdict(list)
             }
         )
 
@@ -83,66 +73,44 @@ class RunReport(BaseDataModel):
             self.end_time = parser.parse(self.end_time)
         return self.end_time
 
-    def add_run_result(self, result):
-        self.run_results.increase(result)
+    def add_result(self, test_report: TestReport):
+        module = test_report.module
+        test_name = test_report.originalname
+        status = test_report.status
 
-    def add_module_result(self, module, result):
-        self.modules[module]['module_results'][result] += 1
+        self.modules[module]['tests'][test_name].append(test_report)
 
-    # def add_test_report(self, module: str, test_report: TestReport):
-    #     test_name = test_report.name
-    #     test_storage = self.modules[module]['module_tests']
-    #
-    #     if test_name not in test_storage:
-    #         test_storage[test_name] = test_report
-    #     else:
-    #         existing = test_storage[test_name]
-    #         if isinstance(existing, list):
-    #             existing.append(test_report)
-    #         else:
-    #             test_storage[test_name] = [existing, test_report]
+        self.modules[module]['results'].increase(status)
+        self.run_results.increase(status)
 
-    def add_test_report(self, module: str, test_report: TestReport):
-        test_name = test_report.name
-
-        # test_exists = self.modules[module]['module_tests'].get(test_name, {})
-        #
-        # if test_exists:
-        #     self.modules[module]['module_tests'][test_name] = [self.modules[module]['module_tests'][test_name]]
-        #     self.modules[module]['module_tests'][test_name].append(test_report)
-        # else:
-        self.modules[module]['module_tests'][test_name] = test_report
-
-    def get_steps_by_test(self):
+    def get_steps_by_test(self) -> dict:
         steps_by_test = {}
-        for module_tests in self._get_module_tests().values():
-            for test_name, test_data in module_tests.items():
-                steps_id = test_data.get('steps')
-                if steps_id:
-                    steps_path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
-                    try:
-                        steps_by_test[test_name] = StepContainer.from_json(steps_path)
-                    except FileNotFoundError:
-                        pass
-
-        # if test_name:
-        #     return steps_by_test.get(test_name, {})
-
+        for module_data in self.modules.values():
+            for test_name, test_reports in module_data["tests"].items():
+                for report in test_reports:
+                    steps_id = report.get('steps')
+                    if steps_id:
+                        path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
+                        try:
+                            steps_by_test[test_name] = StepContainer.from_json(path)
+                        except FileNotFoundError:
+                            continue
+        from pprint import pprint
+        pprint(steps_by_test)
         return steps_by_test
 
-    def _get_module_tests(self):
-        module_tests = {}
-        for module_name, module_data in self.modules.items():
-            tests = dict(module_data['module_tests'])
-            module_tests[module_name] = tests
+    def combine_modules(self, run_report):
+        for module_name, module_data in run_report.modules.items():
+            mod_results = module_data["results"]
+            mod_tests: dict = module_data["tests"]
 
-        # if module_name:
-        #     return module_tests.get(module_name, {})
+            module = self.modules[module_name]
 
-        return module_tests
+            for status, count in mod_results.items():
+                module['results'].increase(status, count)
 
-    def combine(self):
-        pass
+            for test_name, test_reports in mod_tests.items():
+                module['tests'][test_name].extend(test_reports)
 
     def save_json(self, file_name=None):
         root = f'{b_logs_tmp_reports_path()}'
