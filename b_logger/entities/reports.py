@@ -89,6 +89,19 @@ class RunReport(BaseDataModel):
     def add_module_result(self, module, result):
         self.modules[module]['module_results'][result] += 1
 
+    # def add_test_report(self, module: str, test_report: TestReport):
+    #     test_name = test_report.name
+    #     test_storage = self.modules[module]['module_tests']
+    #
+    #     if test_name not in test_storage:
+    #         test_storage[test_name] = test_report
+    #     else:
+    #         existing = test_storage[test_name]
+    #         if isinstance(existing, list):
+    #             existing.append(test_report)
+    #         else:
+    #             test_storage[test_name] = [existing, test_report]
+
     def add_test_report(self, module: str, test_report: TestReport):
         test_name = test_report.name
 

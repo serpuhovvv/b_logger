@@ -60,7 +60,7 @@ def selenium_driver():
     driver = webdriver.Chrome()
     driver.set_window_size(1920, 1080)
 
-    # blog.set_browser(driver) can be also added here
+    # blog.set_browser(driver) can be also added here, which is preferred
 
     yield driver
 
@@ -106,7 +106,7 @@ def playwright_page(playwright: Playwright):
     page = context.new_page()
     page.set_viewport_size({"width": 1920, "height": 1080})
 
-    # blog.set_browser(page) can also be added here
+    # blog.set_browser(page) can also be added here, which is preferred
 
     yield page
 

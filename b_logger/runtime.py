@@ -62,17 +62,19 @@ class RunTime:
             self.test_report.set_stacktrace(report.longreprtext)
 
         if report.failed:
-            # self.make_screenshot(is_error=True)
+            self.make_screenshot(is_error=True)
             self._handle_failed_test(call, report, item)
 
         elif report.skipped:
-            # self.make_screenshot(is_error=True)
+            self.make_screenshot(is_error=True)
             self._handle_skipped_test(call, report, item)
 
         else:
             self._handle_passed_test(call, report, item)
 
     def _handle_failed_test(self, call, report, item):
+        # is_assertion_error = call.excinfo.typename == "AssertionError"
+        # status = py_outcome_to_tstatus('failed') if is_assertion_error else py_outcome_to_tstatus('broken')
         self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_skipped_test(self, call, report, item):
@@ -112,7 +114,7 @@ class RunTime:
     def handle_step_result(self, step: Step, exc=None):
         if exc:
             if not self.step_container.failed:
-                self.make_screenshot(is_error=True)
+                # self.make_screenshot(is_error=True)
 
                 step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
 

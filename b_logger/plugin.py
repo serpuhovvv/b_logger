@@ -61,21 +61,23 @@ def _is_main_worker(session):
     return is_xdist_controller(session) or get_xdist_worker_id(session) == 'master'
 
 
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_runtest_protocol(item, nextitem):
-#     runtime.start_test(item)
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_protocol(item, nextitem):
+    runtime.start_test(item)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item):
-    runtime.start_test(item)
-
     _apply_py_params(item)
+
+    _apply_fixtures(item)
+
+    _apply_markers(item)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_call(item):
-    _apply_markers(item)
+    # _apply_markers(item)
 
     _apply_browser(item)
 
@@ -88,10 +90,7 @@ def pytest_runtest_teardown(item):
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(call, item):
 
-    # report = (yield).get_result()
-
-    outcome = yield
-    report = outcome.get_result()
+    report = (yield).get_result()
 
     if call.when not in ["setup", "call"]:
         return
@@ -121,6 +120,11 @@ def _apply_py_params(item):
         params = item.callspec.params
         for param_name, param_value in params.items():
             runtime.apply_param(param_name, param_value)
+
+
+def _apply_fixtures(item):
+    fixtures = item.fixturenames
+    runtime.apply_info(fixtures=fixtures)
 
 
 _possible_browser_names = ['driver', 'page', 'selenium_driver', 'driver_init', 'playwright_page']
