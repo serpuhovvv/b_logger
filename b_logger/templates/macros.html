@@ -1,0 +1,547 @@
+{% macro render_search_filter(report) %}
+    <div class="search-filter-section">
+        <div class="search-filter-grid">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search tests...">
+            </div>
+<!--            <select id="statusFilter" class="filter-select">-->
+<!--                <option value="all">All Statuses</option>-->
+<!--                <option value="PASSED">Passed</option>-->
+<!--                <option value="FAILED">Failed</option>-->
+<!--                <option value="BROKEN">Broken</option>-->
+<!--                <option value="SKIPPED">Skipped</option>-->
+<!--            </select>-->
+            <select id="moduleFilter" class="filter-select">
+                <option value="all">All Modules</option>
+                {% for module_path in report.modules.keys() %}
+                <option value="{{ module_path }}">{{ module_path }}</option>
+                {% endfor %}
+            </select>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="passed">Passed</button>
+                <button class="filter-btn" data-filter="failed">Failed</button>
+                <button class="filter-btn" data-filter="broken">Broken</button>
+                <button class="filter-btn" data-filter="skipped">Skipped</button>
+            </div>
+        </div>
+    </div>
+    {% endmacro %}
+
+
+
+
+{% macro render_report_header(report) %}
+<div class="card">
+    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h1>
+            <i class="fas fa-chart-line" style="margin-right: 0.5rem;"></i>
+            {{ report.proj_name }}
+        </h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="fas fa-chevron-down expand-icon"></i>
+        </div>
+    </div>
+    <div class="collapsible-content">
+        <div class="card-body">
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Environment</div>
+                    <div class="meta-value">{{ report.env }}</div>
+                </div>
+<!--                <div class="meta-item">-->
+<!--                    <div class="meta-label">Report ID</div>-->
+<!--                    <div class="meta-value">{{ report.report_id }}</div>-->
+<!--                </div>-->
+                <div class="meta-item">
+                    <div class="meta-label">Base URL</div>
+                    <div class="meta-value">{{ report.base_url }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Duration</div>
+                    <div class="meta-value">{{ report.duration }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Start Time</div>
+                    <div class="meta-value">{{ report.start_time }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">End Time</div>
+                    <div class="meta-value">{{ report.end_time }}</div>
+                </div>
+
+<!--                {% if report.worker %}-->
+<!--                <div class="meta-item">-->
+<!--                    <div class="meta-label">Worker</div>-->
+<!--                    <div class="meta-value">{{ report.worker }}</div>-->
+<!--                </div>-->
+<!--                {% endif %}-->
+
+<!--                {% if report.report_ids %}-->
+<!--                <div class="meta-item">-->
+<!--                    <div class="meta-label">Related Reports</div>-->
+<!--                    <div class="meta-value">-->
+<!--                        {% for key, value in report.report_ids.items() %}-->
+<!--                        <div><strong>{{ key }}:</strong> {{ value }}</div>-->
+<!--                        {% endfor %}-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                {% endif %}-->
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_summary(report) %}
+<div class="card">
+    <div class="card-body">
+        <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-chart-pie"></i> Test Results Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-card passed">
+                <div class="summary-number">{{ report.run_results.PASSED }}</div>
+                <div class="summary-label">
+                    <i class="fas fa-check-circle"></i> Passed
+                </div>
+            </div>
+            <div class="summary-card failed">
+                <div class="summary-number">{{ report.run_results.FAILED }}</div>
+                <div class="summary-label">
+                    <i class="fas fa-times-circle"></i> Failed
+                </div>
+            </div>
+            <div class="summary-card broken">
+                <div class="summary-number">{{ report.run_results.BROKEN }}</div>
+                <div class="summary-label">
+                    <i class="fas fa-exclamation-triangle"></i> Broken
+                </div>
+            </div>
+            <div class="summary-card skipped">
+                <div class="summary-number">{{ report.run_results.SKIPPED }}</div>
+                <div class="summary-label">
+                    <i class="fas fa-forward"></i> Skipped
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_modules(modules, steps) %}
+{% for module_name, module_data in modules.items() %}
+<div class="card" data-module="" data-module-name="{{ module_name }}">
+    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2><i class="fas fa-file-code"></i> {{ module_name }}</h2>
+        <div style="display: flex; align-items: left; gap: 1rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                {% if module_data.results.PASSED %}
+                <span class="badge passed">
+                    <i class="fas fa-check"></i> {{ module_data.results.PASSED }}
+                </span>
+                {% endif %}
+                {% if module_data.results.FAILED > 0 %}
+                <span class="badge failed">
+                    <i class="fas fa-times"></i> {{ module_data.results.FAILED }}
+                </span>
+                {% endif %}
+                {% if module_data.results.BROKEN > 0 %}
+                <span class="badge broken">
+                    <i class="fas fa-exclamation-triangle"></i> {{ module_data.results.BROKEN }}
+                </span>
+                {% endif %}
+                {% if module_data.results.SKIPPED > 0 %}
+                <span class="badge skipped">
+                    <i class="fas fa-forward"></i> {{ module_data.results.SKIPPED }}
+                </span>
+                {% endif %}
+            </div>
+            <i class="fas fa-chevron-down expand-icon"></i>
+        </div>
+    </div>
+    <div class="collapsible-content">
+        <div class="card-body">
+            {% for test_name, test_runs in module_data.tests.items() %}
+                {{ render_test_item(test_name, test_runs, steps) }}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endmacro %}
+
+
+
+
+{% macro render_test_item(test_name, test_runs, steps) %}
+{% set first_test = test_runs[0] %}
+<div class="test-item {{ first_test.status }}" data-test="" data-test-name="{{ test_name }}" data-test-status="{{ first_test.status }}">
+    <div class="test-header" onclick="toggleTestContent(this)">
+        <div class="test-info">
+            <span class="badge {{ first_test.status }}">
+                {% if first_test.status == 'PASSED' %}
+                <i class="fas fa-check"></i> {{ first_test.status }}
+                {% elif first_test.status == 'FAILED' %}
+                <i class="fas fa-times"></i> {{ first_test.status }}
+                {% elif first_test.status == 'BROKEN' %}
+                <i class="fas fa-exclamation-triangle"></i> {{ first_test.status }}
+                {% elif first_test.status == 'SKIPPED' %}
+                <i class="fas fa-forward"></i> {{ first_test.status }}
+                {% endif %}
+            </span>
+            <span class="test-name">{{ test_name|upper }}</span>
+<!--            {% if first_test.duration %}-->
+            <span class="test-duration">
+                <i class="fas fa-clock"></i> {{ first_test.duration }} s
+            </span>
+<!--            {% endif %}-->
+            {% if test_runs|length > 1 %}
+            <span style="font-size: 0.875rem; color: var(--text-3);">{{ test_runs|length }} runs</span>
+            {% endif %}
+        </div>
+        <i class="fas fa-chevron-down expand-icon"></i>
+    </div>
+
+    <div class="test-content">
+        {% if test_runs|length == 1 %}
+            {{ render_test_tabs(first_test, steps) }}
+        {% else %}
+            <div class="test-results-section">
+                {% for test in test_runs %}
+                <div class="test-results-header" onclick="toggleTestResults(this)">
+                    <div>
+                        <strong>{{ test.name }}</strong>
+                    </div>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="test-results-content">
+                    {{ render_test_tabs(test, steps) }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_tabs(test, steps) %}
+<div class="tab-container">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(this, 'overview')">
+            <i class="fas fa-info-circle"></i> Overview
+        </div>
+        {% if test.steps %}
+        <div class="tab" onclick="switchTab(this, 'steps')">
+            <i class="fas fa-list-ol"></i> Steps
+        </div>
+        {% endif %}
+        {% if test.attachments %}
+        <div class="tab" onclick="switchTab(this, 'attachments')">
+            <i class="fas fa-paperclip"></i> Attachments
+        </div>
+        {% endif %}
+        {% if test.error %}
+        <div class="tab" onclick="switchTab(this, 'error')">
+            <i class="fas fa-bug"></i> Error
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-content active" data-tab="overview">
+        {{ render_test_overview(test) }}
+    </div>
+
+    {% if test.steps %}
+    <div class="tab-content" data-tab="steps">
+        {{ render_test_steps(test.steps, steps) }}
+    </div>
+    {% endif %}
+
+    {% if test.attachments %}
+    <div class="tab-content" data-tab="attachments">
+        {{ render_test_attachments(test.attachments) }}
+    </div>
+    {% endif %}
+
+    {% if test.error %}
+    <div class="tab-content" data-tab="error">
+        {{ render_test_error(test.error, test.stacktrace) }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_overview(test) %}
+    {% if test.description %}
+        <div class="section-title">
+            <i class="fas fa-align-left"></i> Description
+        </div>
+        <p style="background: var(--bg-2); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap;">{{ test.description }}</p>
+    {% endif %}
+
+    {% if test.parameters %}
+        <div class="section-title">
+            <i class="fas fa-cogs"></i> Parameters
+        </div>
+        <table class="info-table">
+            <tbody>
+            {% for key, value in test.parameters.items() %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if test.info %}
+        <div class="section-title">
+            <i class="fas fa-info"></i> Info
+        </div>
+        {{ render_info_block(test.info) }}
+    {% endif %}
+
+    {% if test.known_bugs %}
+        <div class="section-title">
+            <i class="fas fa-bug"></i> Known Bugs
+        </div>
+        <div>
+            {% for bug in test.known_bugs %}
+            <div class="bug-item">
+                <div class="bug-title">{{ bug.description }}</div>
+                {% if bug.url %}
+                <a href="{{ bug.url }}" target="_blank" class="bug-link">
+                    <i class="fas fa-external-link-alt"></i> View Bug Report
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+
+
+{% macro render_info_block(info) %}
+<div class="info-block">
+    {% for key, value in info.items() %}
+    <div class="info-section">
+        <div class="info-section-header">{{ key }}</div>
+        <div class="info-section-content">
+            {% if value is sequence and value is not string %}
+                <ul class="info-list">
+                    {% for item in value %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            {% elif value is mapping %}
+<!--                <ul class="info-table">-->
+<!--                    {% for sub_key, sub_value in value.items() %}-->
+<!--                    <li>{{ sub_key }}: {{ sub_value }}</li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                        {% for sub_key, sub_value in value.items() %}
+                            <th>{{ sub_key }}</th>
+                            <td>
+                                {% if sub_value is sequence and sub_value is not string %}
+                                    {% for item in sub_value %}
+                                    <span class="info-value">{{ item }}</span>{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% elif sub_value is mapping %}
+                                    <pre style="margin: 0; font-family: monospace; font-size: 0.875rem;">{{ sub_value|tojson(indent=2) }}</pre>
+                                {% else %}
+                                    <span class="info-value">{{ sub_value }}</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="info-value">{{ value }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_steps(steps_id, steps) %}
+<div class="section-title">
+    <i class="fas fa-route"></i> Test Execution Steps
+</div>
+<div class="steps-container">
+    {% set steps_data = steps[steps_id] %}
+    {% if steps_data %}
+        {% for step in steps_data %}
+            {{ render_step(step, loop.index, 0, true) }}
+        {% endfor %}
+    {% else %}
+        <div style="background: var(--bg-2); padding: 1rem; border-radius: var(--radius-sm); font-style: italic;">
+            Step details not available (ID: {{ steps_id }})
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_attachments(attachments) %}
+<div class="section-title">
+    <i class="fas fa-images"></i> Attachments
+</div>
+<div class="attachments-grid">
+    {% for attachment in attachments %}
+    <div class="attachment-item" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
+        {% if attachment.type_.startswith('image/') %}
+        <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}" class="attachment-thumb">
+        {% else %}
+        <i class="fas fa-file attachment-icon"></i>
+        {% endif %}
+        <div class="attachment-name">{{ attachment.name }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_error(error, stacktrace) %}
+<div class="error-section">
+    <div class="error-title">
+        <i class="fas fa-exclamation-circle"></i> Test Error
+    </div>
+    <div style="font-weight: 500; margin-bottom: 1rem;">{{ error }}</div>
+    {% if stacktrace %}
+    <div class="section-title">
+        <i class="fas fa-code"></i> Stack Trace
+    </div>
+    <pre class="stacktrace">{{ stacktrace }}</pre>
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_step(step, index=1, level=0, show_first_level=false) %}
+<div class="step-item" style="margin-left: {{ level * 1.5 }}rem;">
+    <div class="step-header {{ step.status }}" onclick="toggleStepDetails(this)">
+        <div class="step-title-container">
+            <span class="badge {{ step.status }}">
+                {% if step.status == 'passed' %}
+                <i class="fas fa-check"></i> PASSED
+                {% elif step.status == 'failed' %}
+                <i class="fas fa-times"></i> FAILED
+                {% elif step.status == 'broken' %}
+                <i class="fas fa-exclamation-triangle"></i> BROKEN
+                {% elif step.status == 'skipped' %}
+                <i class="fas fa-forward"></i> SKIPPED
+                {% elif step.status == 'none' %}
+                <i class="fas fa-info"></i> INFO
+                {% endif %}
+            </span>
+            <span class="step-title">{{ step.title }}</span>
+        </div>
+        <div>
+            {% if step.steps or step.error or step.info or step.known_bugs or step.attachments %}
+            <i class="fas fa-chevron-down expand-icon"></i>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if step.steps or step.error or step.info or step.known_bugs or step.attachments %}
+    <div class="step-content{% if show_first_level and level == 0 %} active{% endif %}">
+        {% if step.info %}
+        <div style="margin-bottom: 1rem;">
+            <div class="section-title">
+                <i class="fas fa-info-circle"></i> Step Information
+            </div>
+            {{ render_info_block(step.info) }}
+        </div>
+        {% endif %}
+
+        {% if step.error %}
+        <div class="step-error">
+            <div class="step-error-title">
+                <i class="fas fa-exclamation-triangle"></i> Step Error
+            </div>
+            <div>{{ step.error.exc }}</div>
+            {% if step.error.tb %}
+            <div class="step-error-message">{{ step.error.tb|safe }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if step.known_bugs %}
+        <div style="margin: 1rem 0;">
+            <div class="section-title">
+                <i class="fas fa-bug"></i> Known Issues
+            </div>
+            {% for bug in step.known_bugs %}
+            <div class="bug-item">
+                <div class="bug-title">{{ bug.description }}</div>
+                {% if bug.url %}
+                <a href="{{ bug.url }}" target="_blank" class="bug-link">
+                    <i class="fas fa-external-link-alt"></i> View Bug Report
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if step.attachments %}
+        <div style="margin: 1rem 0;">
+            <div class="section-title">
+                <i class="fas fa-paperclip"></i> Step Attachments
+            </div>
+            <div class="attachments-grid">
+                {% for attachment in step.attachments %}
+                <div class="attachment-item" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
+                    {% if attachment.type_.startswith('image/') %}
+                    <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}" class="attachment-thumb">
+                    {% else %}
+                    <i class="fas fa-file attachment-icon"></i>
+                    {% endif %}
+                    <div class="attachment-name">{{ attachment.name }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if step.steps %}
+        <div class="step-children">
+            {% for child_step in step.steps %}
+                {{ render_step(child_step, loop.index, level + 1, true) }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}

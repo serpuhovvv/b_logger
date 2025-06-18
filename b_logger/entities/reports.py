@@ -83,8 +83,8 @@ class RunReport(BaseDataModel):
         self.modules[module]['results'].increase(status)
         self.run_results.increase(status)
 
-    def get_steps_by_test(self) -> dict:
-        steps_by_test = {}
+    def get_steps(self) -> dict:
+        steps_by_id = {}
         for module_data in self.modules.values():
             for test_name, test_reports in module_data["tests"].items():
                 for report in test_reports:
@@ -92,12 +92,10 @@ class RunReport(BaseDataModel):
                     if steps_id:
                         path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
                         try:
-                            steps_by_test[test_name] = StepContainer.from_json(path)
+                            steps_by_id[steps_id] = StepContainer.from_json(path)
                         except FileNotFoundError:
                             continue
-        from pprint import pprint
-        pprint(steps_by_test)
-        return steps_by_test
+        return steps_by_id
 
     def combine_modules(self, run_report):
         for module_name, module_data in run_report.modules.items():
