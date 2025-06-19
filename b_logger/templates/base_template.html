@@ -1,507 +1,7 @@
-{% macro render_report_header(report) %}
-<div class="card">
-    <div class="collapsible-header" onclick="toggleCollapsible(this)">
-        <h1>
-            <i class="fas fa-chart-line" style="margin-right: 0.5rem;"></i>
-            {{ report.proj_name }}
-        </h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div class="meta-item">
-                <div class="meta-label">Environment</div>
-                <div class="meta-value">{{ report.env }}</div>
-            </div>
-            <i class="fas fa-chevron-down expand-icon"></i>
-        </div>
-    </div>
-    <div class="collapsible-content">
-        <div class="card-body">
-            <div class="meta-grid">
-                <div class="meta-item">
-                    <div class="meta-label">Report ID</div>
-                    <div class="meta-value">{{ report.report_id }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Base URL</div>
-                    <div class="meta-value">{{ report.base_url }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Start Time</div>
-                    <div class="meta-value">{{ report.start_time }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">End Time</div>
-                    <div class="meta-value">{{ report.end_time }}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Duration</div>
-                    <div class="meta-value">{{ report.duration }}</div>
-                </div>
-                {% if report.worker %}
-                <div class="meta-item">
-                    <div class="meta-label">Worker</div>
-                    <div class="meta-value">{{ report.worker }}</div>
-                </div>
-                {% endif %}
-                {% if report.report_ids %}
-                <div class="meta-item">
-                    <div class="meta-label">Related Reports</div>
-                    <div class="meta-value">
-                        {% for key, value in report.report_ids.items() %}
-                        <div><strong>{{ key }}:</strong> {{ value }}</div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-{% endmacro %}
+{% import 'macros.html' as macros %}
 
-
-
-{% macro render_summary(report) %}
-<div class="card">
-    <div class="card-body">
-        <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-chart-pie"></i> Test Results Summary</h2>
-        <div class="summary-grid">
-            <div class="summary-card passed">
-                <div class="summary-number">{{ report.run_results.PASSED }}</div>
-                <div class="summary-label">
-                    <i class="fas fa-check-circle"></i> Passed
-                </div>
-            </div>
-            <div class="summary-card failed">
-                <div class="summary-number">{{ report.run_results.FAILED }}</div>
-                <div class="summary-label">
-                    <i class="fas fa-times-circle"></i> Failed
-                </div>
-            </div>
-            <div class="summary-card broken">
-                <div class="summary-number">{{ report.run_results.BROKEN }}</div>
-                <div class="summary-label">
-                    <i class="fas fa-exclamation-triangle"></i> Broken
-                </div>
-            </div>
-            <div class="summary-card skipped">
-                <div class="summary-number">{{ report.run_results.SKIPPED }}</div>
-                <div class="summary-label">
-                    <i class="fas fa-forward"></i> Skipped
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endmacro %}
-
-
-
-{% macro render_modules(modules) %}
-{% for module_path, module_data in modules.items() %}
-<div class="card">
-    <div class="collapsible-header" onclick="toggleCollapsible(this)">
-        <h3><i class="fas fa-file-code"></i> {{ module_path }}</h3>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                {% if module_data.results.PASSED %}
-                <span class="badge passed">
-                    <i class="fas fa-check"></i> {{ module_data.results.PASSED }}
-                </span>
-                {% endif %}
-                {% if module_data.results.FAILED %}
-                <span class="badge failed">
-                    <i class="fas fa-times"></i> {{ module_data.results.FAILED }}
-                </span>
-                {% endif %}
-                {% if module_data.results.BROKEN %}
-                <span class="badge broken">
-                    <i class="fas fa-exclamation-triangle"></i> {{ module_data.results.BROKEN }}
-                </span>
-                {% endif %}
-                {% if module_data.results.SKIPPED %}
-                <span class="badge skipped">
-                    <i class="fas fa-forward"></i> {{ module_data.results.SKIPPED }}
-                </span>
-                {% endif %}
-            </div>
-            <i class="fas fa-chevron-down expand-icon"></i>
-        </div>
-    </div>
-    <div class="collapsible-content">
-        <div class="card-body">
-            {% for test_name, test_runs in module_data.tests.items() %}
-                {{ render_test_group(test_name, test_runs) }}
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endfor %}
-{% endmacro %}
-
-
-
-{% macro render_test_group(test_name, test_runs) %}
-<div class="test-group">
-    <div class="test-group-header" onclick="toggleTestGroup(this)">
-        <h4><i class="fas fa-vial"></i> {{ test_name }}</h4>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span style="color: var(--text-3); font-size: 0.875rem;">{{ test_runs|length }} result(s)</span>
-            <i class="fas fa-chevron-down expand-icon"></i>
-        </div>
-    </div>
-    <div class="test-group-content">
-        {% if test_runs|length == 1 %}
-            {{ render_test(test_runs[0]) }}
-        {% else %}
-            {% for test in test_runs %}
-            <div style="margin-bottom: 1rem;">
-                <div style="background: var(--bg-3); padding: 0.5rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;">
-                    Run {{ loop.index }}
-                    {% if test.parameters %}
-                    - Parameters:
-                    {% for key, value in test.parameters.items() %}
-                    {{ key }}={{ value }}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                {{ render_test(test) }}
-            </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-</div>
-{% endmacro %}
-
-
-
-{% macro render_test(test) %}
-<div class="test-card">
-    <div class="test-header {{ test.status }}" onclick="toggleTestDetails(this)">
-        <div class="test-info">
-            <span class="badge {{ test.status }}">
-                {% if test.status == 'PASSED' %}
-                <i class="fas fa-check"></i> {{ test.status }}
-                {% elif test.status == 'FAILED' %}
-                <i class="fas fa-times"></i> {{ test.status }}
-                {% elif test.status == 'BROKEN' %}
-                <i class="fas fa-exclamation-triangle"></i> {{ test.status }}
-                {% elif test.status == 'SKIPPED' %}
-                <i class="fas fa-forward"></i> {{ test.status }}
-                {% endif %}
-            </span>
-            <span class="test-name">{{ test.name }}</span>
-            {% if test.duration %}
-            <span class="test-duration">
-                <i class="fas fa-clock"></i> {{ test.duration }}s
-            </span>
-            {% endif %}
-        </div>
-        <i class="fas fa-chevron-down expand-icon"></i>
-    </div>
-    <div class="test-content">
-        {{ render_test_tabs(test) }}
-    </div>
-</div>
-{% endmacro %}
-
-
-
-{% macro render_test_tabs(test) %}
-<div class="tab-container">
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab(this, 'overview')">
-            <i class="fas fa-info-circle"></i> Overview
-        </div>
-        {% if test.steps %}
-        <div class="tab" onclick="switchTab(this, 'steps')">
-            <i class="fas fa-list-ol"></i> Steps
-        </div>
-        {% endif %}
-        {% if test.attachments %}
-        <div class="tab" onclick="switchTab(this, 'attachments')">
-            <i class="fas fa-paperclip"></i> Attachments
-        </div>
-        {% endif %}
-        {% if test.error %}
-        <div class="tab" onclick="switchTab(this, 'error')">
-            <i class="fas fa-bug"></i> Error
-        </div>
-        {% endif %}
-    </div>
-
-    <div class="tab-content active" data-tab="overview">
-        {{ render_test_overview(test) }}
-    </div>
-
-    {% if test.steps %}
-    <div class="tab-content" data-tab="steps">
-        {{ render_test_steps(test.steps) }}
-    </div>
-    {% endif %}
-
-    {% if test.attachments %}
-    <div class="tab-content" data-tab="attachments">
-        {{ render_test_attachments(test.attachments) }}
-    </div>
-    {% endif %}
-
-    {% if test.error %}
-    <div class="tab-content" data-tab="error">
-        {{ render_test_error(test.error, test.stacktrace) }}
-    </div>
-    {% endif %}
-</div>
-{% endmacro %}
-
-
-
-{% macro render_test_overview(test) %}
-    {% if test.description %}
-    <div class="section-title">
-        <i class="fas fa-align-left"></i> Description
-    </div>
-    <p style="background: var(--bg-2); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap;">{{ test.description }}</p>
-    {% endif %}
-
-    {% if test.parameters %}
-    <div class="section-title">
-        <i class="fas fa-cogs"></i> Parameters
-    </div>
-
-        {% for key, value in test.parameters.items() %}
-
-        {% endfor %}
-    <table class="info-table"><tbody><tr>
-            <th>{{ key }}</th>
-            <td>{{ value }}</td>
-        </tr></tbody></table>
-    {% endif %}
-
-    {% if test.info %}
-    <div class="section-title">
-        <i class="fas fa-info"></i> Additional Information
-    </div>
-    {{ render_info_block(test.info) }}
-    {% endif %}
-
-    {% if test.known_bugs %}
-    <div class="section-title">
-        <i class="fas fa-bug"></i> Known Bugs
-    </div>
-    <div>
-        {% for bug in test.known_bugs %}
-        <div class="bug-item">
-            <div class="bug-title">{{ bug.description }}</div>
-            {% if bug.url %}
-            <a href="{{ bug.url }}" target="_blank" class="bug-link">
-                <i class="fas fa-external-link-alt"></i> View Bug Report
-            </a>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endmacro %}
-
-
-
-{% macro render_info_block(info) %}
-<div class="info-block">
-    {% for key, value in info.items() %}
-    <div class="info-section">
-        <div class="info-section-header">{{ key }}</div>
-        <div class="info-section-content">
-            {% if value is sequence and value is not string %}
-            <ul class="info-list">
-                {% for item in value %}
-                <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-            {% elif value is mapping %}
-
-                {% for sub_key, sub_value in value.items() %}
-
-                {% endfor %}
-            <table class="info-table"><tbody><tr>
-                    <th>{{ sub_key }}</th>
-                    <td>
-                        {% if sub_value is sequence and sub_value is not string %}
-                            {% for item in sub_value %}
-                            <span class="info-value">{{ item }}</span>{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        {% elif sub_value is mapping %}
-                            <pre style="margin: 0; font-family: monospace; font-size: 0.875rem;">{{ sub_value|tojson(indent=2) }}</pre>
-                        {% else %}
-                            <span class="info-value">{{ sub_value }}</span>
-                        {% endif %}
-                    </td>
-                </tr></tbody></table>
-            {% else %}
-            <div class="info-value">{{ value }}</div>
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endmacro %}
-
-
-
-{% macro render_test_steps(steps_id) %}
-<div class="section-title">
-    <i class="fas fa-route"></i> Test Execution Steps
-</div>
-<div class="steps-container">
-    {% set steps_data = steps[steps_id] %}
-    {% if steps_data %}
-        {% for step in steps_data %}
-            {{ render_step(step, loop.index) }}
-        {% endfor %}
-    {% else %}
-        <div style="background: var(--bg-2); padding: 1rem; border-radius: var(--radius-sm); font-style: italic;">
-            Step details not available (ID: {{ steps_id }})
-        </div>
-    {% endif %}
-</div>
-{% endmacro %}
-
-{% macro render_test_attachments(attachments) %}
-<div class="section-title">
-    <i class="fas fa-images"></i> Attachments
-</div>
-<div class="attachments-grid">
-    {% for attachment in attachments %}
-    <div class="attachment-item">
-        <div style="font-weight: 500; margin-bottom: 0.5rem;">{{ attachment.name }}</div>
-        {% if attachment.type_.startswith('image/') %}
-        <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
-        {% else %}
-        <a href="./attachments/{{ attachment.name }}" target="_blank" class="bug-link">
-            <i class="fas fa-download"></i> Download
-        </a>
-        {% endif %}
-    </div>
-    {% endfor %}
-</div>
-{% endmacro %}
-
-
-
-{% macro render_test_error(error, stacktrace) %}
-<div class="error-section">
-    <div class="error-title">
-        <i class="fas fa-exclamation-circle"></i> Test Error
-    </div>
-    <div style="font-weight: 500; margin-bottom: 1rem;">{{ error }}</div>
-    {% if stacktrace %}
-    <div class="section-title">
-        <i class="fas fa-code"></i> Stack Trace
-    </div>
-    <pre class="stacktrace">{{ stacktrace }}</pre>
-    {% endif %}
-</div>
-{% endmacro %}
-
-
-
-{% macro render_step(step, index=1, level=0) %}
-<div class="step-item" style="margin-left: {{ level * 1.5 }}rem;">
-    <div class="step-header {{ step.status }}" onclick="toggleStepDetails(this)">
-        <div class="step-title-container">
-            <span class="badge {{ step.status }}">
-                {% if step.status == 'passed' %}
-                <i class="fas fa-check"></i> PASSED
-                {% elif step.status == 'failed' %}
-                <i class="fas fa-times"></i> FAILED
-                {% elif step.status == 'broken' %}
-                <i class="fas fa-exclamation-triangle"></i> BROKEN
-                {% elif step.status == 'skipped' %}
-                <i class="fas fa-forward"></i> SKIPPED
-                {% elif step.status == 'none' %}
-                <i class="fas fa-info"></i> INFO
-                {% endif %}
-            </span>
-            <span class="step-title">{{ step.title }}</span>
-        </div>
-        <div>
-            {% if step.steps or step.error or step.info or step.known_bugs or step.attachments %}
-            <i class="fas fa-chevron-down expand-icon"></i>
-            {% endif %}
-        </div>
-    </div>
-
-    {% if step.steps or step.error or step.info or step.known_bugs or step.attachments %}
-    <div class="step-content">
-        {% if step.info %}
-        <div style="margin-bottom: 1rem;">
-            <div class="section-title">
-                <i class="fas fa-info-circle"></i> Step Information
-            </div>
-            {{ render_info_block(step.info) }}
-        </div>
-        {% endif %}
-
-        {% if step.error %}
-        <div class="step-error">
-            <div class="step-error-title">
-                <i class="fas fa-exclamation-triangle"></i> Step Error
-            </div>
-            <div>{{ step.error.exc }}</div>
-            {% if step.error.tb %}
-            <div class="step-error-message">{{ step.error.tb|safe }}</div>
-            {% endif %}
-        </div>
-        {% endif %}
-
-        {% if step.known_bugs %}
-        <div style="margin: 1rem 0;">
-            <div class="section-title">
-                <i class="fas fa-bug"></i> Known Issues
-            </div>
-            {% for bug in step.known_bugs %}
-            <div class="bug-item">
-                <div class="bug-title">{{ bug.description }}</div>
-                {% if bug.url %}
-                <a href="{{ bug.url }}" target="_blank" class="bug-link">
-                    <i class="fas fa-external-link-alt"></i> View Bug Report
-                </a>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if step.attachments %}
-        <div class="attachments-grid">
-            {% for attachment in step.attachments %}
-            <div class="attachment-item">
-                <div>{{ attachment.name }}</div>
-                {% if attachment.type_.startswith('image/') %}
-                <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
-                {% else %}
-                <a href="./attachments/{{ attachment.name }}" target="_blank">
-                    <i class="fas fa-download"></i> Download
-                </a>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if step.steps %}
-        <div class="step-children">
-            {% for child_step in step.steps %}
-                {{ render_step(child_step, loop.index, level + 1) }}
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-</div>
-{% endmacro %}
-
-
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ report.proj_name }} - Test Report</title>
@@ -532,6 +32,16 @@
 
         .container { width: 100%; height: 100%; padding: 1.5rem; }
         .card { background: var(--bg-1); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid var(--border); overflow: hidden; }
+
+        .search-filter-section { background: var(--bg-1); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid var(--border); padding: 1.5rem; }
+        .search-filter-grid { display: grid; grid-template-columns: 1fr auto auto auto; gap: 1rem; align-items: center; }
+        .search-input { padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 1rem; width: 100%; position: relative; }
+        .search-container { position: relative; }
+        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-3); z-index: 1; }
+        .filter-select { padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.875rem; background: var(--bg-1); }
+        .filter-buttons { display: flex; gap: 0.5rem; }
+        .filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-2); cursor: pointer; font-size: 0.875rem; transition: all 0.2s; }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         .collapsible-header {
             padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--bg-2);
@@ -573,24 +83,19 @@
         .badge.skipped, .badge.SKIPPED { background: var(--skipped-bg); color: var(--skipped); }
         .badge.none { background: var(--none-bg); color: var(--none); }
 
-        .test-group { margin-bottom: 1.5rem; }
-        .test-group-header {
-            cursor: pointer; padding: 1rem 1.5rem; background: var(--bg-2); border-radius: var(--radius);
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border: 1px solid var(--border);
+        .test-item {
+            background: var(--bg-2); border-radius: var(--radius); margin-bottom: 1rem; border: 1px solid var(--border);
+            border-left: 4px solid; overflow: hidden;
         }
-        .test-group-header:hover { background: var(--bg-1); }
-        .test-group-content { display: none; }
-        .test-group-content.active { display: block; }
+        .test-item.PASSED, .test-item.passed { border-left-color: var(--passed); }
+        .test-item.FAILED, .test-item.failed { border-left-color: var(--failed); }
+        .test-item.BROKEN, .test-item.broken { border-left-color: var(--broken); }
+        .test-item.SKIPPED, .test-item.skipped { border-left-color: var(--skipped); }
 
-        .test-card { background: var(--bg-2); border-radius: var(--radius); margin-bottom: 1rem; border: 1px solid var(--border); overflow: hidden; }
         .test-header {
-            cursor: pointer; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
-            transition: background-color 0.2s; border-left: 4px solid;
+            padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: background-color 0.2s;
         }
-        .test-header.PASSED, .test-header.passed { border-left-color: var(--passed); }
-        .test-header.FAILED, .test-header.failed { border-left-color: var(--failed); }
-        .test-header.BROKEN, .test-header.broken { border-left-color: var(--broken); }
-        .test-header.SKIPPED, .test-header.skipped { border-left-color: var(--skipped); }
         .test-header:hover { background: var(--bg-1); }
 
         .test-info { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -599,6 +104,14 @@
 
         .test-content { display: none; border-top: 1px solid var(--border); background: var(--bg-1); }
         .test-content.active { display: block; }
+
+        .test-results-section { padding: 1rem 1.5rem; }
+        .test-results-header {
+            background: var(--bg-3); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        }
+        .test-results-content { display: none; }
+        .test-results-content.active { display: block; }
 
         .tab-container { border-bottom: 1px solid var(--border); }
         .tabs { display: flex; background: var(--bg-3); flex-wrap: wrap; }
@@ -616,46 +129,122 @@
         .info-table th { background: var(--bg-3); font-weight: 600; width: 30%; }
         .info-table tr:last-child td { border-bottom: none; }
 
-        .info-block { margin: 1rem 0; }
-        .info-section { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+
+        .info-block {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 0.5rem;
+        }
+
+        .info-section {
+            flex: 1 1 300px;
+            min-width: 250px;
+            max-width: 100%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-1);
+        }
+
+<!--        .info-block { margin: 1rem 0; }-->
+<!--        .info-section { background: var(&#45;&#45;bg-1); border: 1px solid var(&#45;&#45;border); border-radius: var(&#45;&#45;radius); margin-bottom: 1rem; overflow: hidden; }-->
         .info-section-header { padding: 0.75rem 1rem; background: var(--bg-2); font-weight: 600; border-bottom: 1px solid var(--border); }
         .info-section-content { padding: 1rem; }
         .info-list { list-style: none; }
-        .info-list li { padding: 0.25rem 0; }
+        .info-list li { padding: 0.1rem 0; }
         .info-list li::before { content: '•'; color: var(--primary); font-weight: bold; margin-right: 0.5rem; }
-        .info-value { font-family: monospace; background: var(--bg-2); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); }
+        .info-value { font-family: monospace; background: var(--bg-2); border-radius: var(--radius-sm); }
 
         .steps-container { margin: 1rem 0; }
-        .step-item { background: var(--bg-1); border-radius: var(--radius); margin-bottom: 0.75rem; border: 1px solid var(--border); overflow: hidden; }
+        .step-item { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-size: 0.875rem; }
         .step-header {
-            padding: 0.875rem 1rem; display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; border-left: 4px solid; transition: background-color 0.2s;
+            padding: 0.5rem 0.75rem;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer;
+            border-left: 4px solid;
         }
         .step-header.passed { border-left-color: var(--passed); background: var(--passed-bg); }
         .step-header.failed { border-left-color: var(--failed); background: var(--failed-bg); }
         .step-header.broken { border-left-color: var(--broken); background: var(--broken-bg); }
         .step-header.skipped { border-left-color: var(--skipped); background: var(--skipped-bg); }
         .step-header.none { border-left-color: var(--none); background: var(--none-bg); }
-        .step-header:hover { opacity: 0.9; }
 
-        .step-title-container { display: flex; align-items: center; gap: 0.75rem; }
+        .step-title-container { display: flex; align-items: center; gap: 0.5rem; }
         .step-title { font-weight: 500; }
-        .step-content { display: none; padding: 1.25rem; border-top: 1px solid var(--border); background: var(--bg-2); }
+        .step-icons i { margin-left: 0.5rem; color: var(--text-3); }
+
+        .step-content { display: none; padding: 0.75rem 1rem; border-top: 1px solid var(--border); background: var(--bg-2); }
         .step-content.active { display: block; }
-        .step-children { margin-left: 1.5rem; border-left: 2px solid var(--border-light); padding-left: 1rem; }
+        .step-children { margin-left: 1rem; border-left: 2px dashed var(--border-light); padding-left: 0.75rem; margin-top: 0.5rem; }
 
-        .step-error { background: var(--failed-bg); border: 1px solid var(--failed); border-radius: var(--radius); padding: 1.25rem; margin: 1rem 0; }
-        .step-error-title { font-weight: 600; color: var(--failed); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-        .step-error-message { font-family: monospace; background: var(--bg-1); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 1rem; overflow-x: auto; }
+        .step-error { background: var(--failed-bg); border: 1px solid var(--failed); border-radius: var(--radius-sm); padding: 0.75rem; margin-top: 0.5rem; }
+        .step-error-title { font-weight: 600; color: var(--failed); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.25rem; }
+        .step-error-message { font-family: monospace; background: var(--bg-1); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border); overflow-x: auto; }
 
-        .bug-item { background: var(--failed-bg); border: 1px solid var(--failed); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; }
-        .bug-title { font-weight: 500; color: var(--failed); margin-bottom: 0.5rem; }
-        .bug-link { color: var(--failed); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
-        .bug-link:hover { text-decoration: underline; }
+        .step-block {
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--border);
+            padding-left: 1rem;
+        }
 
-        .attachments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
-        .attachment-item { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; }
-        .attachment-item img { max-width: 100%; border-radius: var(--radius-sm); margin-bottom: 0.5rem; }
+        .step-block .step-header {
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-1);
+            border-radius: var(--radius-sm);
+        }
+
+        .step-block .step-content {
+            padding: 0.5rem 0 0 0.5rem;
+            display: none;
+            background: var(--bg-2);
+        }
+
+        .step-block .step-content.active {
+            display: block;
+        }
+
+        .step-children {
+            margin-left: 1rem;
+            border-left: 2px dashed var(--border-light);
+            padding-left: 1rem;
+        }
+
+        .step-print {
+            padding: 0.25rem 0.5rem;
+            margin: 0.5rem 0 0.5rem 1.5rem;
+            font-family: monospace;
+            color: var(--text-3);
+            background: var(--bg-2);
+            border-left: 3px solid var(--none);
+        }
+        .bug-item { background: var(--failed-bg); border: 1px solid var(--failed); border-radius: var(--radius-sm); padding: 0.75rem; margin-top: 0.5rem; }
+        .bug-title { font-weight: 500; color: var(--failed); }
+        .bug-link { color: var(--failed); font-size: 0.85rem; }
+
+        .attachments-grid { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
+        .attachment-item {
+            background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 0.5rem; text-align: center; width: 70px; height: 70px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer;
+        }
+        .attachment-thumb { max-width: 40px; max-height: 40px; border-radius: var(--radius-xs); }
+        .attachment-name { font-size: 0.7rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; width: 100%; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
+        .modal-content {
+            background-color: var(--bg-1); margin: 5% auto; padding: 0; border-radius: var(--radius);
+            max-width: 90%; max-height: 90%; position: relative; overflow: hidden;
+        }
+        .modal-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1rem; text-align: center; }
+        .modal-image { max-width: 100%; max-height: 70vh; border-radius: var(--radius-sm); }
+        .close { color: var(--text-3); font-size: 2rem; font-weight: bold; cursor: pointer; }
+        .close:hover { color: var(--text-1); }
 
         .error-section { background: var(--failed-bg); border: 1px solid var(--failed); border-radius: var(--radius); padding: 1.25rem; margin: 1rem 0; }
         .error-title { font-weight: 600; color: var(--failed); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -664,29 +253,137 @@
         .section-title { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0.75rem 0; display: flex; align-items: center; gap: 0.5rem; }
         .section-title:first-child { margin-top: 0; }
 
+        .hidden { display: none !important; }
+        .no-results { text-align: center; padding: 2rem; color: var(--text-3); font-style: italic; }
+
         @media (max-width: 768px) {
             .container { padding: 1rem; }
+            .search-filter-grid { grid-template-columns: 1fr; }
+            .filter-buttons { flex-wrap: wrap; }
             .meta-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
             .summary-grid { grid-template-columns: repeat(2, 1fr); }
             .tab { flex: 1; min-width: 100px; text-align: center; }
-            .step-children { margin-left: 1rem; padding-left: 0.75rem; }
+            .attachments-grid { justify-content: center; }
         }
 
         @media (max-width: 480px) {
             .summary-grid { grid-template-columns: 1fr; }
         }
     </style>
-<script src="https://lib.youware.com/youware-lib.1747145198.js" id="yourware-lib"></script></head>
+
 <body>
     <div class="container">
         {% block content %}
-            {{ render_report_header(report) }}
-            {{ render_summary(report) }}
-            {{ render_modules(report.modules) }}
+            {{ macros.render_search_filter(report) }}
+            {{ macros.render_report_header(report) }}
+            {{ macros.render_summary(report) }}
+            {{ macros.render_modules(report.modules, steps) }}
         {% endblock %}
     </div>
 
+    <!-- Attachment Modal -->
+    <div id="attachmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Attachment</h3>
+                <span class="close" onclick="closeModal()">×</span>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" class="modal-image" style="display: none;">
+                <div id="modalDownload" style="display: none;">
+                    <i class="fas fa-download" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-3);"></i>
+                    <p>Click to download this file</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Search and Filter functionality
+        function initializeSearchFilter() {
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const moduleFilter = document.getElementById('moduleFilter');
+
+            searchInput.addEventListener('input', filterTests);
+            statusFilter.addEventListener('change', filterTests);
+            moduleFilter.addEventListener('change', filterTests);
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterTests();
+                });
+            });
+        }
+
+        function filterTests() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const moduleFilter = document.getElementById('moduleFilter').value;
+            const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+
+            const modules = document.querySelectorAll('[data-module]');
+            let visibleCount = 0;
+
+            modules.forEach(module => {
+                const moduleData = module.dataset;
+                const tests = module.querySelectorAll('[data-test]');
+                let moduleHasVisible = false;
+
+                tests.forEach(test => {
+                    const testData = test.dataset;
+                    let visible = true;
+
+                    // Search filter
+                    if (searchTerm && !testData.testName.toLowerCase().includes(searchTerm)) {
+                        visible = false;
+                    }
+
+                    // Status filter
+                    if (statusFilter && statusFilter !== 'all' && testData.testStatus !== statusFilter) {
+                        visible = false;
+                    }
+
+                    // Module filter
+                    if (moduleFilter && moduleFilter !== 'all' && moduleData.moduleName !== moduleFilter) {
+                        visible = false;
+                    }
+
+                    // Quick filter
+                    if (activeFilter !== 'all' && testData.testStatus.toLowerCase() !== activeFilter.toLowerCase()) {
+                        visible = false;
+                    }
+
+                    test.style.display = visible ? 'block' : 'none';
+                    if (visible) {
+                        moduleHasVisible = true;
+                        visibleCount++;
+                    }
+                });
+
+                module.style.display = moduleHasVisible ? 'block' : 'none';
+            });
+
+            // Show/hide no results message
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0) {
+                if (!noResults) {
+                    const container = document.querySelector('.container');
+                    const noResultsDiv = document.createElement('div');
+                    noResultsDiv.id = 'noResults';
+                    noResultsDiv.className = 'no-results';
+                    noResultsDiv.innerHTML = '<i class="fas fa-search"></i><br>No tests match your search criteria';
+                    container.appendChild(noResultsDiv);
+                }
+                noResults.style.display = 'block';
+            } else if (noResults) {
+                noResults.style.display = 'none';
+            }
+        }
+
         function toggleCollapsible(element) {
             const content = element.nextElementSibling;
             const expandIcon = element.querySelector('.expand-icon');
@@ -704,7 +401,7 @@
             }
         }
 
-        function toggleTestDetails(element) {
+        function toggleTestContent(element) {
             const content = element.nextElementSibling;
             const expandIcon = element.querySelector('.expand-icon');
 
@@ -719,11 +416,9 @@
             }
         }
 
-        function toggleStepDetails(element) {
+        function toggleTestResults(element) {
             const content = element.nextElementSibling;
             const expandIcon = element.querySelector('.expand-icon');
-
-            if (!content) return;
 
             if (content.classList.contains('active')) {
                 content.classList.remove('active');
@@ -736,9 +431,11 @@
             }
         }
 
-        function toggleTestGroup(element) {
+        function toggleStepDetails(element) {
             const content = element.nextElementSibling;
             const expandIcon = element.querySelector('.expand-icon');
+
+            if (!content) return;
 
             if (content.classList.contains('active')) {
                 content.classList.remove('active');
@@ -766,6 +463,65 @@
                 activeContent.classList.add('active');
             }
         }
+
+        // Attachment modal functionality
+        function openAttachment(name, type) {
+            const modal = document.getElementById('attachmentModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalImage = document.getElementById('modalImage');
+            const modalDownload = document.getElementById('modalDownload');
+
+            modalTitle.textContent = name;
+
+            if (type.startsWith('image/')) {
+                modalImage.src = './attachments/' + name;
+                modalImage.style.display = 'block';
+                modalDownload.style.display = 'none';
+            } else {
+                modalImage.style.display = 'none';
+                modalDownload.style.display = 'block';
+                modalDownload.onclick = () => {
+                    window.open('./attachments/' + name, '_blank');
+                };
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('attachmentModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('attachmentModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSearchFilter();
+
+            // Show first level steps by default
+            document.querySelectorAll('.step-children').forEach(children => {
+                const parentSteps = children.querySelectorAll('.step-item');
+                parentSteps.forEach(step => {
+                    const content = step.querySelector('.step-content');
+                    if (content && content.children.length > 0) {
+                        // Only expand if it has substeps
+                        const hasSubsteps = content.querySelector('.step-children');
+                        if (!hasSubsteps) {
+                            content.classList.add('active');
+                            step.querySelector('.step-header').classList.add('expanded');
+                            const icon = step.querySelector('.expand-icon');
+                            if (icon) icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
