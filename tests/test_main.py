@@ -39,11 +39,11 @@ def test_main_functionality():
                 step_param_2=step_param_2
             )
 
-            with blog.step('Step 1.1.1'):
-                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+    with blog.step('Step 2'):
+        blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
 
-            with blog.step('Step 1.1.2'):
-                pass
+        with blog.step('Step 2.1'):
+            pass
 
 
 @pytest.mark.parametrize('py_param', [111, 222])  # <-- These parameters will be added to test automatically
