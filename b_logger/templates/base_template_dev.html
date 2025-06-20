@@ -33,7 +33,7 @@
         /* ============================================ */
         /* LAYOUT */
         /* ============================================ */
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .container { max-width: 80vw; margin: 0 auto; padding: 2rem; }
         .card { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
         .header { background: var(--bg-light); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
         .header:hover { background: var(--border-light); }
@@ -110,6 +110,15 @@
         .test-run-header { padding: 0.75rem; background: var(--bg-light); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: var(--radius-sm); }
         .test-run-content { display: none; margin-top: 0.5rem; }
         .test-run-content.active { display: block; }
+
+        .test.test-multi {
+            border-left: 4px solid var(--primary);
+        }
+
+        .test.test-sub {
+            margin-left: 1rem;
+            margin-top: 0.75rem;
+        }
 
         /* ============================================ */
         /* TABS */
@@ -277,7 +286,6 @@
             const status = document.getElementById('statusFilter')?.value || 'all';
             const module = document.getElementById('moduleFilter')?.value || 'all';
             const filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-
             let visibleCount = 0;
 
             document.querySelectorAll('.module').forEach(moduleEl => {
@@ -286,20 +294,40 @@
                 let moduleVisible = false;
 
                 tests.forEach(test => {
-                    const testName = test.dataset.test.toLowerCase();
-                    const testStatus = test.dataset.status;
+                    const isGroup = test.classList.contains('test-multi');
+                    const testName = test.dataset.test?.toLowerCase() || '';
+                    let visible = false;
 
-                    let visible = true;
-                    if (search && !testName.includes(search)) visible = false;
-                    if (status !== 'all' && testStatus !== status) visible = false;
-                    if (module !== 'all' && moduleName !== module) visible = false;
-                    if (filter !== 'all' && testStatus.toLowerCase() !== filter) visible = false;
+                    if (isGroup) {
+                        const subtests = test.querySelectorAll('.test-sub');
+                        let subVisible = 0;
+                        subtests.forEach(sub => {
+                            const subStatus = sub.dataset.status;
+                            const subName = sub.dataset.test?.toLowerCase() || '';
+                            let show = true;
+                            if (search && !subName.includes(search)) show = false;
+                            if (status !== 'all' && subStatus !== status) show = false;
+                            if (module !== 'all' && moduleName !== module) show = false;
+                            if (filter !== 'all' && subStatus.toLowerCase() !== filter) show = false;
+                            sub.style.display = show ? 'block' : 'none';
+                            if (show) subVisible++;
+                        });
+                        visible = subVisible > 0;
+                    } else {
+                        const testStatus = test.dataset.status;
+                        visible = true;
+                        if (search && !testName.includes(search)) visible = false;
+                        if (status !== 'all' && testStatus !== status) visible = false;
+                        if (module !== 'all' && moduleName !== module) visible = false;
+                        if (filter !== 'all' && testStatus.toLowerCase() !== filter) visible = false;
+                    }
 
                     test.style.display = visible ? 'block' : 'none';
-                    if (visible) { moduleVisible = true; visibleCount++; }
+                    if (visible) moduleVisible = true;
                 });
 
                 moduleEl.style.display = moduleVisible ? 'block' : 'none';
+                if (moduleVisible) visibleCount++;
             });
 
             let noResults = document.getElementById('noResults');
@@ -311,7 +339,9 @@
                     noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
                     document.querySelector('.container').appendChild(noResults);
                 }
-            } else if (noResults) { noResults.remove(); }
+            } else if (noResults) {
+                noResults.remove();
+            }
         }
 
         function toggleCard(header) {
@@ -405,12 +435,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initFilters();
-            const reportHeader = document.querySelector('.card .header');
-            const summaryCard = document.querySelectorAll('.card')[1];
-            if (reportHeader) toggleCard(reportHeader);
-            if (summaryCard && summaryCard.querySelector('.content')) {
-                summaryCard.querySelector('.content').classList.add('active');
-            }
         });
     </script>
 

@@ -89,7 +89,7 @@
             <i class="fas fa-chevron-down toggle-icon"></i>
         </div>
     </div>
-    <div class="content active">
+    <div class="content">
         {% for test_name, test_runs in module_data.tests.items() %}
             {{ render_test(test_name, test_runs, steps) }}
         {% endfor %}
@@ -101,37 +101,146 @@
 
 
 {% macro render_test(test_name, test_runs, steps) %}
-{% set first_test = test_runs[0] %}
-<div class="test {{ first_test.status.lower() }}" data-test="{{ test_name }}" data-status="{{ first_test.status }}">
-    <div class="test-header{% if test_runs|length == 1 %} expanded{% endif %}" onclick="toggleTest(this)">
-        <div class="test-info">
-            <span class="badge {{ first_test.status.lower() }}">{{ first_test.status }}</span>
-            <span class="test-name">{{ test_name }}</span>
-            <span class="test-duration">{{ first_test.duration or 0 }}s</span>
-            {% if test_runs|length > 1 %}
-                <span class="test-count">({{ test_runs|length }} runs)</span>
-            {% endif %}
+    {% set is_multi = test_runs|length > 1 %}
+    {% if not is_multi %}
+        {{ render_test_panel(
+            test_runs[0].status,
+            test_name,
+            test_runs[0].duration,
+            render_test_tabs(test_runs[0], steps)
+        ) }}
+    {% else %}
+    <div class="test test-multi" data-test="{{ test_name }}" data-status="group">
+        <div class="test-header" onclick="toggleTest(this)">
+            <div class="test-info">
+                {{ render_status_summary(test_runs) }}
+                <span class="test-name">{{ test_name }}</span>
+            </div>
+            <i class="fas fa-chevron-down toggle-icon"></i>
         </div>
-        <i class="fas fa-chevron-down toggle-icon"></i>
+        <div class="test-content">
+            {% for test_run in test_runs %}
+                {{ render_subtest(test_run, test_name, steps) }}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+{% endmacro %}
+
+
+
+
+{% macro render_test_panel(status, name, duration, content, onclick="toggleTest(this)") %}
+<div class="test {{ status.lower() }}" data-test="{{ name }}" data-status="{{ status }}">
+    <div class="test-header" onclick="{{ onclick }}">
+        {{ render_test_header(status, name, duration) }}
+    </div>
+    <div class="test-content">
+        {{ content }}
+    </div>
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_header(status, name, duration) %}
+<div class="test-info">
+    <span class="badge {{ status.lower() }}">{{ status }}</span>
+    <span class="test-name">{{ name }}</span>
+    <span class="test-duration">{{ duration or 0 }}s</span>
+</div>
+<i class="fas fa-chevron-down toggle-icon"></i>
+{% endmacro %}
+
+
+
+
+{% macro render_status_summary(test_runs) %}
+    {% set status_counter = {} %}
+    {% for run in test_runs %}
+        {% set count = status_counter.get(run.status, 0) + 1 %}
+        {% set _ = status_counter.update({run.status: count}) %}
+    {% endfor %}
+    {% for status, count in status_counter.items() %}
+        <span class="badge {{ status.lower() }}">{{ count }} {{ status|lower }}</span>
+    {% endfor %}
+{% endmacro %}
+
+
+
+
+{% macro render_subtest(test_run, test_name, steps) %}
+<div class="test test-sub {{ test_run.status.lower() }}" data-test="{{ test_name }}" data-status="{{ test_run.status }}">
+    <div class="test-header" onclick="toggleTestRun(this)">
+        {{ render_test_header(test_run.status, test_run.name, test_run.duration) }}
+    </div>
+    <div class="test-content">
+        {{ render_test_tabs(test_run, steps) }}
+    </div>
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_tabs(test, steps) %}
+<div class="tabs">
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(this, 'overview')">Overview</button>
+        {% if test.steps %}<button class="tab-btn" onclick="switchTab(this, 'steps')">Steps</button>{% endif %}
+        {% if test.attachments %}<button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>{% endif %}
+        {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}
     </div>
 
-    <div class="test-content{% if test_runs|length == 1 %} active{% endif %}">
-        {% if test_runs|length == 1 %}
-            {{ render_test_tabs(first_test, steps) }}
-        {% else %}
-            {% for run in test_runs %}
-            <div class="test-run">
-                <div class="test-run-header" onclick="toggleTestRun(this)">
-                    <strong>{{ run.name }}</strong>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
-                </div>
-                <div class="test-run-content">
-                    {{ render_test_tabs(run, steps) }}
-                </div>
-            </div>
-            {% endfor %}
+    {# ============ OVERVIEW TAB ============ #}
+
+    <div class="tab-content active" data-tab="overview">
+        {% if test.description %}
+            {{ render_description(test.description) }}
+        {% endif %}
+
+        {% if test.info %}
+            {{ render_info(test.info) }}
+        {% endif %}
+
+        {% if test.known_bugs %}
+            {{ render_known_bugs(test.known_bugs) }}
         {% endif %}
     </div>
+
+    {# ============ STEPS TAB ============ #}
+
+    {% if test.steps %}
+    <div class="tab-content" data-tab="steps">
+        <div class="steps">
+            {% set step_data = steps[test.steps] %}
+            {% if step_data %}
+                {% for step in step_data %}
+                    {{ render_step(step, 0) }}
+                {% endfor %}
+            {% else %}
+                <div class="no-steps">No step details available</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ============ ATTACHMENTS TAB ============ #}
+
+    {% if test.attachments %}
+    <div class="tab-content" data-tab="attachments">
+        {{ render_attachments(test.attachments) }}
+    </div>
+    {% endif %}
+
+    {# ============ ERROR TAB ============ #}
+
+    {% if test.error %}
+    <div class="tab-content" data-tab="error">
+        {{ render_error(test.error, test.stacktrace) }}
+    </div>
+    {% endif %}
 </div>
 {% endmacro %}
 
@@ -222,69 +331,6 @@
         <span>{{ attachment.name }}</span>
     </div>
     {% endfor %}
-</div>
-{% endmacro %}
-
-
-
-
-{% macro render_test_tabs(test, steps) %}
-<div class="tabs">
-    <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab(this, 'overview')">Overview</button>
-        {% if test.steps %}<button class="tab-btn" onclick="switchTab(this, 'steps')">Steps</button>{% endif %}
-        {% if test.attachments %}<button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>{% endif %}
-        {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}
-    </div>
-
-    {# ============ OVERVIEW TAB ============ #}
-
-    <div class="tab-content active" data-tab="overview">
-        {% if test.description %}
-            {{ render_description(test.description) }}
-        {% endif %}
-
-        {% if test.info %}
-            {{ render_info(test.info) }}
-        {% endif %}
-
-        {% if test.known_bugs %}
-            {{ render_known_bugs(test.known_bugs) }}
-        {% endif %}
-    </div>
-
-    {# ============ STEPS TAB ============ #}
-
-    {% if test.steps %}
-    <div class="tab-content" data-tab="steps">
-        <div class="steps">
-            {% set step_data = steps[test.steps] %}
-            {% if step_data %}
-                {% for step in step_data %}
-                    {{ render_step(step, 0) }}
-                {% endfor %}
-            {% else %}
-                <div class="no-steps">No step details available</div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    {# ============ ATTACHMENTS TAB ============ #}
-
-    {% if test.attachments %}
-    <div class="tab-content" data-tab="attachments">
-        {{ render_attachments(test.attachments) }}
-    </div>
-    {% endif %}
-
-    {# ============ ERROR TAB ============ #}
-
-    {% if test.error %}
-    <div class="tab-content" data-tab="error">
-        {{ render_error(test.error, test.stacktrace) }}
-    </div>
-    {% endif %}
 </div>
 {% endmacro %}
 
