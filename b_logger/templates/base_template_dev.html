@@ -1,1382 +1,260 @@
-<html lang="en"><head>
+{% import 'macros.html' as macros %}
+
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLogger Project - Test Report</title>
+    <title>{{ report.proj_name }} - Test Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    ;
-            --none: #8B5CF6;
-            --none-bg: #F3F4F6;
-            --primary: #3B82F6;<style>
+
+<style>
+        /* ============================================ */
+        /* CSS VARIABLES AND RESET */
+        /* ============================================ */
         :root {
-            --passed: #10B981;
-            --passed-bg: #ECFDF5;
-            --failed: #EF4444;
-            --failed-bg: #FEF2F2;
-            --broken: #F59E0B;
-            --broken-bg: #FFFBEB;
-            --skipped: #6B7280;
-            --skipped-bg: #F9FAFB
-            --primary-dark: #1D4ED8;
-            --secondary: #64748B;
-            --accent: #8B5CF6;
-            --bg-1: #FFFFFF;
-            --bg-2: #F8FAFC;
-            --bg-3: #F1F5F9;
-            --text-1: #0F172A;
-            --text-2: #475569;
-            --text-3: #64748B;
-            --border: #E2E8F0;
-            --border-light: #F1F5F9;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 0.5rem;
-            --radius-sm: 0.375rem;
-            --radius-xs: 0.25rem;
-            --transition: all 0.2s ease;
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--text-1);
-            background: var(--bg-3);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-
-        .card {
-            background: var(--bg-1);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .collapsible-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .collapsible-header:hover {
-            background: var(--bg-1);
-        }
-
-        .collapsible-header h1,
-        .collapsible-header h2,
-        .collapsible-header h3 {
-            margin: 0;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .collapsible-content {
-            display: none;
-        }
-
-        .collapsible-content.active {
-            display: block;
-        }
-
-        .expand-icon {
-            font-size: 1.25rem;
-            color: var(--text-3);
-            transition: transform 0.2s ease;
-        }
-
-        .collapsible-header.expanded .expand-icon {
-            transform: rotate(180deg);
-        }
-
-        .search-filter-section {
-            background: var(--bg-1);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-        }
-
-        .search-filter-grid {
-            display: grid;
-            grid-template-columns: 2fr auto auto 1fr;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .search-container {
-            position: relative;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-3);
-            z-index: 1;
-        }
-
-        .search-input,
-        .filter-select {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            background: var(--bg-1);
-            transition: var(--transition);
-        }
-
-        .search-input {
-            padding-left: 2.5rem;
-            width: 100%;
-        }
-
-        .search-input:focus,
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: var(--bg-2);
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .badge.passed {
-            background: var(--passed-bg);
-            color: var(--passed);
-        }
-
-        .badge.failed {
-            background: var(--failed-bg);
-            color: var(--failed);
-        }
-
-        .badge.broken {
-            background: var(--broken-bg);
-            color: var(--broken);
-        }
-
-        .badge.skipped {
-            background: var(--skipped-bg);
-            color: var(--skipped);
-        }
-
-        .badge.none {
-            background: var(--none-bg);
-            color: var(--none);
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-        }
-
-        .summary-card {
-            background: var(--bg-1);
-            border-radius: var(--radius);
-            padding: 1.25rem;
-            text-align: center;
-            border: 2px solid;
-            position: relative;
-            transition: var(--transition);
-        }
-
-        .summary-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: currentColor;
-            border-radius: var(--radius) var(--radius) 0 0;
-        }
-
-        .summary-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .summary-card.passed {
-            border-color: var(--passed);
-            color: var(--passed);
-        }
-
-        .summary-card.failed {
-            border-color: var(--failed);
-            color: var(--failed);
-        }
-
-        .summary-card.broken {
-            border-color: var(--broken);
-            color: var(--broken);
-        }
-
-        .summary-card.skipped {
-            border-color: var(--skipped);
-            color: var(--skipped);
-        }
-
-        .summary-number {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .summary-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 0.5rem;
-            opacity: 0.8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.25rem;
-        }
-
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .meta-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .meta-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-3);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .meta-value {
-            font-size: 1rem;
-            font-weight: 600;
-            word-break: break-all;
-        }
-
-        .test-item {
-            background: var(--bg-2);
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-            border-left: 4px solid;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .test-item:hover {
-            box-shadow: var(--shadow);
-        }
-
-        .test-item.passed {
-            border-left-color: var(--passed);
-        }
-
-        .test-item.failed {
-            border-left-color: var(--failed);
-        }
-
-        .test-item.broken {
-            border-left-color: var(--broken);
-        }
-
-        .test-item.skipped {
-            border-left-color: var(--skipped);
-        }
-
-        .test-header {
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .test-header:hover {
-            background: var(--bg-1);
-        }
-
-        .test-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .test-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .test-duration {
-            font-size: 0.875rem;
-            color: var(--text-3);
-            background: var(--bg-3);
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .test-content {
-            display: none;
-            border-top: 1px solid var(--border);
-            background: var(--bg-1);
-        }
-
-        .test-content.active {
-            display: block;
-        }
-
-        .test-results-section {
-            padding: 1rem 1.5rem;
-        }
-
-        .test-results-header {
-            background: var(--bg-3);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: 1rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        .test-results-header:hover {
-            background: var(--bg-2);
-        }
-
-        .test-results-content {
-            display: none;
-        }
-
-        .test-results-content.active {
-            display: block;
-        }
-
-        .tab-container {
-            border-bottom: 1px solid var(--border);
-        }
-
-        .tabs {
-            display: flex;
-            background: var(--bg-3);
-            flex-wrap: wrap;
-        }
-
-        .tab {
-            padding: 0.875rem 1.25rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-            color: var(--text-2);
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tab:hover {
-            background: var(--bg-2);
-            color: var(--text-1);
-        }
-
-        .tab.active {
-            border-bottom-color: var(--primary);
-            background: var(--bg-1);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 1.5rem;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-            background: var(--bg-1);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .info-table th,
-        .info-table td {
-            padding: 0.875rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .info-table th {
-            background: var(--bg-3);
-            font-weight: 600;
-            width: 30%;
-        }
-
-        .info-table tr:last-child th,
-        .info-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .steps-container {
-            margin: 1rem 0;
-        }
-
-        .step-block {
-            margin-bottom: 0.75rem;
-            border-left: 3px solid var(--border);
-            padding-left: 1rem;
-        }
-
-        .step-block.passed {
-            border-left-color: var(--passed);
-        }
-
-        .step-block.failed {
-            border-left-color: var(--failed);
-        }
-
-        .step-block.broken {
-            border-left-color: var(--broken);
-        }
-
-        .step-block.skipped {
-            border-left-color: var(--skipped);
-        }
-
-        .step-block.none {
-            border-left-color: var(--none);
-        }
-
-        .step-header {
-            cursor: pointer;
-            padding: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-1);
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-        }
-
-        .step-header:hover {
-            background: var(--bg-2);
-        }
-
-        .step-title-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .step-title {
-            font-weight: 500;
-        }
-
-        .step-icons {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .step-icons i {
-            color: var(--text-3);
-        }
-
-        .step-content {
-            padding: 0.5rem 0 0 0.5rem;
-            display: none;
-            background: var(--bg-2);
-            border-radius: var(--radius-sm);
-            margin-top: 0.5rem;
-        }
-
-        .step-content.active {
-            display: block;
-        }
-
-        .step-children {
-            margin-left: 1rem;
-            border-left: 2px dashed var(--border-light);
-            padding-left: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .step-print {
-            padding: 0.25rem 0.5rem;
-            margin: 0.5rem 0 0.5rem 1.5rem;
-            font-family: 'Courier New', monospace;
-            color: var(--text-3);
-            background: var(--bg-2);
-            border-left: 3px solid var(--none);
-            border-radius: var(--radius-sm);
-        }
-
-        .step-missing {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-3);
-            font-style: italic;
-            background: var(--bg-2);
-            border-radius: var(--radius-sm);
-        }
-
-        .info-block {
-            display: grid;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .info-section {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: var(--bg-1);
-            overflow: hidden;
-        }
-
-        .info-section-header {
-            padding: 0.75rem 1rem;
-            background: var(--bg-2);
-            font-weight: 600;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .info-section-content {
-            padding: 1rem;
-        }
-
-        .info-list {
-            list-style: none;
-        }
-
-        .info-list li {
-            padding: 0.25rem 0;
-        }
-
-        .info-list li::before {
-            content: '•';
-            color: var(--primary);
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-
-        .info-value {
-            font-family: 'Courier New', monospace;
-            background: var(--bg-2);
-            padding: 0.125rem 0.25rem;
-            border-radius: var(--radius-xs);
-        }
-
-        .error-section,
-        .step-error {
-            background: var(--failed-bg);
-            border: 1px solid var(--failed);
-            border-radius: var(--radius);
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-
-        .error-title,
-        .step-error-title {
-            font-weight: 600;
-            color: var(--failed);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .stacktrace,
-        .step-error-message {
-            font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
-            background: var(--bg-1);
-            padding: 1rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            overflow-x: auto;
-            white-space: pre-wrap;
-            line-height: 1.4;
-        }
-
-        .bug-item {
-            background: var(--failed-bg);
-            border: 1px solid var(--failed);
-            border-radius: var(--radius-sm);
-            padding: 0.75rem;
-            margin-top: 0.5rem;
-        }
-
-        .bug-title {
-            font-weight: 500;
-            color: var(--failed);
-            margin-bottom: 0.25rem;
-        }
-
-        .bug-link {
-            color: var(--failed);
-            font-size: 0.875rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .bug-link:hover {
-            text-decoration: underline;
-        }
-
-        .attachments-grid {
-            display: flex;
-            gap: 0.5rem;
-            margin: 0.5rem 0;
-            flex-wrap: wrap;
-        }
-
-        .attachment-item {
-            background: var(--bg-1);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 0.5rem;
-            text-align: center;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .attachment-item:hover {
-            background: var(--bg-2);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .attachment-thumb {
-            max-width: 50px;
-            max-height: 50px;
-            border-radius: var(--radius-xs);
-        }
-
-        .attachment-icon {
-            font-size: 1.5rem;
-            color: var(--text-3);
-        }
-
-        .attachment-name {
-            font-size: 0.7rem;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 100%;
-            margin-top: 0.25rem;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 1.25rem 0 0.75rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .section-title:first-child {
-            margin-top: 0;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-3);
-            font-style: italic;
-        }
-
-        .no-results i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
+            --passed: #10B981; --passed-bg: #ECFDF5; --passed-light: #D1FAE5;
+            --failed: #EF4444; --failed-bg: #FEF2F2; --failed-light: #FECACA;
+            --broken: #F59E0B; --broken-bg: #FFFBEB; --broken-light: #FEF3C7;
+            --skipped: #6B7280; --skipped-bg: #F9FAFB; --skipped-light: #F3F4F6;
+            --print: #8B5CF6; --print-bg: #F5F3FF; --print-light: #E0E7FF;
+
+            --primary: #3B82F6; --primary-dark: #1D4ED8;
+            --bg: #F8FAFC; --bg-card: #FFFFFF; --bg-light: #F1F5F9;
+            --text: #0F172A; --text-light: #475569; --text-muted: #64748B;
+            --border: #E2E8F0; --border-light: #F1F5F9;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --radius: 8px; --radius-sm: 4px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        /* ============================================ */
+        /* LAYOUT */
+        /* ============================================ */
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .card { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+        .header { background: var(--bg-light); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .header:hover { background: var(--border-light); }
+        .content { padding: 1.5rem; display: none; }
+        .content.active { display: block; }
+        .toggle-icon { transition: transform 0.2s; }
+        .header.expanded .toggle-icon { transform: rotate(180deg); }
+
+        h1, h2, h3, h4 { font-weight: 600; margin-bottom: 0.5rem; }
+        h1 { font-size: 1.875rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+        h4 { font-size: 1rem; margin-top: 1rem; }
+
+        /* ============================================ */
+        /* SEARCH AND FILTERS */
+        /* ============================================ */
+        .search-filter { background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; display: grid; grid-template-columns: 2fr auto auto 3fr; gap: 1rem; align-items: center; }
+        .search-container { position: relative; }
+        .search-container i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-container input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; }
+        .search-filter select { padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); }
+        .filter-buttons { display: flex; gap: 0.5rem; }
+        .filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-light); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* ============================================ */
+        /* COMPONENTS */
+        /* ============================================ */
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .meta-item span { font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
+        .meta-item strong { font-size: 1rem; font-weight: 600; }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .summary-card { text-align: center; padding: 1.5rem; border-radius: var(--radius); border: 2px solid; position: relative; }
+        .summary-card.passed { border-color: var(--passed); background: var(--passed-bg); }
+        .summary-card.failed { border-color: var(--failed); background: var(--failed-bg); }
+        .summary-card.broken { border-color: var(--broken); background: var(--broken-bg); }
+        .summary-card.skipped { border-color: var(--skipped); background: var(--skipped-bg); }
+        .summary-card .number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+        .summary-card .label { font-weight: 600; margin: 0.5rem 0; }
+        .summary-card .percentage { font-size: 0.875rem; opacity: 0.8; }
+
+        .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge.passed { background: var(--passed-light); color: var(--passed); }
+        .badge.failed { background: var(--failed-light); color: var(--failed); }
+        .badge.broken { background: var(--broken-light); color: var(--broken); }
+        .badge.skipped { background: var(--skipped-light); color: var(--skipped); }
+        .badge.print { background: var(--print-light); color: var(--print); }
+
+        /* ============================================ */
+        /* TESTS */
+        /* ============================================ */
+        .module { border-left: 4px solid var(--primary); }
+        .module-stats { display: flex; align-items: center; gap: 0.5rem; }
+
+        .test { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 1rem; border-left: 4px solid; }
+        .test.passed { border-left-color: var(--passed); }
+        .test.failed { border-left-color: var(--failed); }
+        .test.broken { border-left-color: var(--broken); }
+        .test.skipped { border-left-color: var(--skipped); }
+
+        .test-header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-light); transition: background 0.2s; }
+        .test-header:hover { background: var(--border-light); }
+        .test-info { display: flex; align-items: center; gap: 1rem; }
+        .test-name { font-weight: 600; }
+        .test-duration { font-size: 0.875rem; color: var(--text-muted); background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); }
+        .test-count { font-size: 0.875rem; color: var(--text-muted); }
+        .test-content { display: none; border-top: 1px solid var(--border); }
+        .test-content.active { display: block; }
+
+        .test-run { margin-bottom: 1rem; }
+        .test-run-header { padding: 0.75rem; background: var(--bg-light); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: var(--radius-sm); }
+        .test-run-content { display: none; margin-top: 0.5rem; }
+        .test-run-content.active { display: block; }
+
+        /* ============================================ */
+        /* TABS */
+        /* ============================================ */
+        .tabs { }
+        .tab-nav { display: flex; background: var(--bg-light); border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--text-light); border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab-btn:hover { background: var(--border-light); color: var(--text); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg-card); }
+        .tab-btn.error { color: var(--failed); }
+        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content.active { display: block; }
+
+        /* ============================================ */
+        /* CONTENT SECTIONS */
+        /* ============================================ */
+        .section { margin-bottom: 1.5rem; }
+        .description { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap; }
+        .params { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .param { background: var(--bg-light); padding: 0.5rem; border-radius: var(--radius-sm); }
+        .param span { font-weight: 600; }
+        .param code { background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-family: monospace; }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .info-item { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); }
+        .info-key { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; }
+        .info-value { font-family: monospace; font-size: 0.875rem; }
+
+        .bug { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 0.5rem; }
+        .bug-desc { font-weight: 600; color: var(--failed); }
+        .bug a { color: var(--failed); text-decoration: none; font-size: 0.875rem; }
+
+        /* ============================================ */
+        /* STEPS */
+        /* ============================================ */
+        .steps { margin: 1rem 0; }
+        .step { margin-bottom: 0.5rem; }
+        .step.print { padding: 0.5rem; background: var(--print-bg); border-radius: var(--radius-sm); border-left: 3px solid var(--print); margin-left: calc(var(--level, 0) * 1rem); }
+        .step:not(.print) { border-left: 3px solid; padding-left: 1rem; margin-left: calc(var(--level, 0) * 1rem); }
+        .step.passed { border-left-color: var(--passed); }
+        .step.failed { border-left-color: var(--failed); }
+        .step.broken { border-left-color: var(--broken); }
+        .step.skipped { border-left-color: var(--skipped); }
+
+        .step-header { padding: 0.5rem; background: var(--bg-light); border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .step-info { display: flex; align-items: center; gap: 0.5rem; }
+        .step-badge { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+        .step-title { font-weight: 500; }
+        .error-icon, .attach-icon { color: var(--failed); font-size: 0.875rem; }
+        .step-content { display: none; padding: 0.75rem; background: var(--bg-card); margin-top: 0.5rem; border-radius: var(--radius-sm); }
+        .step-content.active { display: block; }
+        .step-children { margin-top: 0.5rem; }
+        .step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
+        .step-error pre { background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.875rem; overflow-x: auto; }
+
+        .level-0 { --level: 0; }
+        .level-1 { --level: 1; }
+        .level-2 { --level: 2; }
+        .level-3 { --level: 3; }
+
+        /* ============================================ */
+        /* ATTACHMENTS */
+        /* ============================================ */
+        .attachments { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+        .attachment { display: flex; flex-direction: column; align-items: center; padding: 1rem; background: var(--bg-light); border-radius: var(--radius-sm); cursor: pointer; text-align: center; width: 100px; transition: background 0.2s; }
+        .attachment:hover { background: var(--border-light); }
+        .attachment img { max-width: 60px; max-height: 60px; border-radius: var(--radius-sm); }
+        .attachment i { font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .attachment span { font-size: 0.75rem; margin-top: 0.5rem; word-break: break-all; }
+
+        /* ============================================ */
+        /* ERROR SECTIONS */
+        /* ============================================ */
+        .error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1.5rem; border-radius: var(--radius); }
+        .error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; }
+        .stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.875rem; overflow-x: auto; white-space: pre-wrap; }
+
+        /* ============================================ */
+        /* MODAL */
+        /* ============================================ */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: var(--bg-card); margin: 5% auto; padding: 0; border-radius: var(--radius); max-width: 90%; max-height: 90%; position: relative; }
+        .modal-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1rem; text-align: center; }
+        .modal img { max-width: 100%; max-height: 70vh; border-radius: var(--radius-sm); }
+        .close { font-size: 2rem; cursor: pointer; color: var(--text-muted); }
+        .close:hover { color: var(--text); }
+
+        /* ============================================ */
+        /* UTILITIES */
+        /* ============================================ */
+        .hidden { display: none !important; }
+        .no-results { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .no-steps { text-align: center; padding: 2rem; color: var(--text-muted); font-style: italic; }
+
+        /* ============================================ */
+        /* RESPONSIVE */
+        /* ============================================ */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .search-filter-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-buttons {
-                flex-wrap: wrap;
-            }
-
-            .meta-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .tab {
-                flex: 1;
-                min-width: 100px;
-                text-align: center;
-                padding: 0.75rem 1rem;
-            }
-
-            .info-block {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 1rem; }
+            .search-filter { grid-template-columns: 1fr; }
+            .filter-buttons { flex-wrap: wrap; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .meta-grid { grid-template-columns: 1fr; }
+            .info-grid { grid-template-columns: 1fr; }
+            .tab-nav { flex-wrap: wrap; }
+            .tab-btn { flex: 1; min-width: 100px; }
         }
 
         @media (max-width: 480px) {
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .test-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
+            .summary-grid { grid-template-columns: 1fr; }
+            .test-info { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
         }
     </style>
-<script src="https://lib.youware.com/youware-lib.1747145198.js" id="yourware-lib"></script></head>
+</head>
 
 <body>
     <div class="container">
-        <!-- Search & Filter Section -->
-        <div class="search-filter-section">
-            <div class="search-filter-grid">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search tests...">
-                </div>
-                <select id="statusFilter" class="filter-select">
-                    <option value="all">All Statuses</option>
-                    <option value="PASSED">Passed</option>
-                    <option value="FAILED">Failed</option>
-                    <option value="BROKEN">Broken</option>
-                    <option value="SKIPPED">Skipped</option>
-                </select>
-                <select id="moduleFilter" class="filter-select">
-                    <option value="all">All Modules</option>
-                    <option value="tests\test_main.py">tests\test_main.py</option>
-                <option value="tests\test_main.py">tests\test_main.py</option></select>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="passed">Passed</button>
-                    <button class="filter-btn" data-filter="failed">Failed</button>
-                    <button class="filter-btn" data-filter="broken">Broken</button>
-                    <button class="filter-btn" data-filter="skipped">Skipped</button>
-                </div>
+        {{ macros.render_search_filter(report) }}
+        {{ macros.render_report_header(report) }}
+        {{ macros.render_summary(report) }}
+        {% for module_name, module_data in report.modules.items() %}
+          {{ macros.render_module(module_name, module_data, steps) }}
+        {% endfor %}
+    </div>
+
+    <div id="attachmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Attachment</h3>
+                <span class="close" onclick="closeModal()">×</span>
             </div>
-        </div>
-
-        <!-- Report Header -->
-        <div class="card">
-            <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                <h1>
-                    <i class="fas fa-chart-line"></i>
-                    BLogger Project
-                </h1>
-                <i class="fas fa-chevron-down expand-icon"></i>
-            </div>
-            <div class="collapsible-content">
-                <div class="card-body">
-                    <div class="meta-grid">
-                        <div class="meta-item">
-                            <div class="meta-label">Environment</div>
-                            <div class="meta-value">prod</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Report ID</div>
-                            <div class="meta-value">report_058b3476-dc65-40fd-a28e-b312e9bb2710</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Base URL</div>
-                            <div class="meta-value">https://base-url.url</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Duration</div>
-                            <div class="meta-value">0:00:31.343992</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Start Time</div>
-                            <div class="meta-value">2025-06-19 09:57:23.521309</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">End Time</div>
-                            <div class="meta-value">2025-06-19 09:57:54.865301</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Related Reports</div>
-                            <div class="meta-value">
-                                <div><strong>master:</strong> report_389bdc28-a436-45ac-8e8d-601687a95143</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Test Summary -->
-        <div class="card">
-            <div class="card-body">
-                <h2 class="section-title">
-                    <i class="fas fa-chart-pie"></i>
-                    Test Results Summary
-                </h2>
-                <div class="summary-grid">
-                    <div class="summary-card passed">
-                        <div class="summary-number">6 / 6</div>
-                        <div class="summary-label">
-                            <i class="fas fa-check-circle"></i>
-                            100.0%
-                        </div>
-                    </div>
-                    <div class="summary-card failed">
-                        <div class="summary-number">0 / 6</div>
-                        <div class="summary-label">
-                            <i class="fas fa-times-circle"></i>
-                            0.0%
-                        </div>
-                    </div>
-                    <div class="summary-card broken">
-                        <div class="summary-number">0 / 6</div>
-                        <div class="summary-label">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            0.0%
-                        </div>
-                    </div>
-                    <div class="summary-card skipped">
-                        <div class="summary-number">0 / 6</div>
-                        <div class="summary-label">
-                            <i class="fas fa-forward"></i>
-                            0.0%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Test Modules -->
-        <div class="card" data-module="" data-module-name="tests\test_main.py">
-            <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                <h2>
-                    <i class="fas fa-file-code"></i>
-                    tests\test_main.py
-                </h2>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <span class="badge passed">
-                            <i class="fas fa-check"></i> 6
-                        </span>
-                    </div>
-                    <i class="fas fa-chevron-down expand-icon" style="transform: rotate(0deg);"></i>
-                </div>
-            </div>
-            <div class="collapsible-content">
-                <div class="card-body">
-
-                    <!-- Test 1: test_main_functionality -->
-                    <div class="test-item passed" data-test="" data-test-name="test_main_functionality" data-test-status="PASSED">
-                        <div class="test-header" onclick="toggleTestContent(this)">
-                            <div class="test-info">
-                                <span class="badge passed">
-                                    <i class="fas fa-check"></i> PASSED
-                                </span>
-                                <span class="test-name">TEST_MAIN_FUNCTIONALITY</span>
-                                <span class="test-duration">
-                                    <i class="fas fa-clock"></i>
-                                    0.01s
-                                </span>
-                            </div>
-                            <i class="fas fa-chevron-down expand-icon"></i>
-                        </div>
-                        <div class="test-content">
-                            <div class="tab-container">
-                                <div class="tabs">
-                                    <div class="tab active" onclick="switchTab(this, 'overview')">
-                                        <i class="fas fa-info-circle"></i> Overview
-                                    </div>
-                                    <div class="tab" onclick="switchTab(this, 'steps')">
-                                        <i class="fas fa-list-ol"></i> Steps
-                                    </div>
-                                </div>
-
-                                <div class="tab-content active" data-tab="overview">
-                                    <div class="section-title">
-                                        <i class="fas fa-align-left"></i> Description
-                                    </div>
-                                    <p style="background: var(--bg-2); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap;">Test with base functionality, this description can be modified inside the test
-
-This description will also be added</p>
-
-                                    <div class="section-title">
-                                        <i class="fas fa-info"></i> Info
-                                    </div>
-                                    <div class="info-block">
-                                        <div class="info-section">
-                                            <div class="info-section-header">FIXTURES</div>
-                                            <div class="info-section-content">
-                                                <ul class="info-list">
-                                                    <li>_verify_url</li>
-                                                    <li>delete_output_dir</li>
-                                                    <li>base_url</li>
-                                                    <li>pytestconfig</li>
-                                                    <li>request</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="info-section">
-                                            <div class="info-section-header">INFO EXPLANATION</div>
-                                            <div class="info-section-content">
-                                                <span class="info-value">You can leave any useful information by using blog.info()</span>
-                                            </div>
-                                        </div>
-                                        <div class="info-section">
-                                            <div class="info-section-header">META</div>
-                                            <div class="info-section-content">
-                                                <table class="info-table">
-                                                    <tbody>
-                                                        <tr>
-                                                            <th>platform</th>
-                                                            <td><span class="info-value">linux</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>python_version</th>
-                                                            <td><span class="info-value">3.12</span></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-title">
-                                        <i class="fas fa-bug"></i> Known Bugs
-                                    </div>
-                                    <div>
-                                        <div class="bug-item">
-                                            <div class="bug-title">Fake Bug Description or Name</div>
-                                            <a href="https://link-to-your-bug/1.com" target="_blank" class="bug-link">
-                                                <i class="fas fa-external-link-alt"></i> View Bug Report
-                                            </a>
-                                        </div>
-                                        <div class="bug-item">
-                                            <div class="bug-title">Fake Bug for a step</div>
-                                            <a href="https://link-to-your-bug/2.com" target="_blank" class="bug-link">
-                                                <i class="fas fa-external-link-alt"></i> View Bug Report
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="tab-content" data-tab="steps">
-                                    <div class="section-title">
-                                        <i class="fas fa-route"></i> Test Execution Steps
-                                    </div>
-                                    <div class="steps-container">
-                                        <div class="step-block passed">
-                                            <div class="step-header" onclick="toggleStepContent(this)">
-                                                <div class="step-title-container">
-                                                    <span class="badge passed">PASSED</span>
-                                                    <span class="step-title">Step 1</span>
-                                                    <i class="fas fa-chevron-down expand-icon" title="Has substeps"></i>
-                                                </div>
-                                                <div class="step-icons"></div>
-                                            </div>
-                                            <div class="step-content active">
-                                                <div class="step-children">
-                                                    <div class="step-print level-1">
-                                                        <span class="badge none">PRINT</span>
-                                                        <span class="step-title">Some important data: {'a': 1, 'b': 2}</span>
-                                                    </div>
-
-                                                    <div class="step-block passed level-1">
-                                                        <div class="step-header expanded" onclick="toggleStepContent(this)">
-                                                            <div class="step-title-container">
-                                                                <span class="badge passed">PASSED</span>
-                                                                <span class="step-title">Step 1.1</span>
-                                                            </div>
-                                                            <div class="step-icons">
-                                                                <i class="fas fa-info-circle" title="Info"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="step-content active">
-                                                            <div class="info-block">
-                                                                <div class="info-section">
-                                                                    <div class="info-section-header">STEP PARAM 1</div>
-                                                                    <div class="info-section-content">
-                                                                        <span class="info-value">88</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="info-section">
-                                                                    <div class="info-section-header">STEP PARAM 2</div>
-                                                                    <div class="info-section-content">
-                                                                        <span class="info-value">29</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="step-block passed">
-                                            <div class="step-header" onclick="toggleStepContent(this)">
-                                                <div class="step-title-container">
-                                                    <span class="badge passed">PASSED</span>
-                                                    <span class="step-title">Step 2</span>
-                                                    <i class="fas fa-chevron-down expand-icon" title="Has substeps"></i>
-                                                </div>
-                                                <div class="step-icons">
-                                                    <i class="fas fa-exclamation-triangle" title="Known Bugs"></i>
-                                                </div>
-                                            </div>
-                                            <div class="step-content active">
-                                                <div class="section-title">
-                                                    <i class="fas fa-bug"></i> Known Bugs
-                                                </div>
-                                                <div class="bug-item">
-                                                    <div class="bug-title">Fake Bug for a step</div>
-                                                    <a href="https://link-to-your-bug/2.com" target="_blank" class="bug-link">
-                                                        <i class="fas fa-external-link-alt"></i> View
-                                                    </a>
-                                                </div>
-
-                                                <div class="step-children">
-                                                    <div class="step-block passed level-1">
-                                                        <div class="step-header expanded" onclick="toggleStepContent(this)">
-                                                            <div class="step-title-container">
-                                                                <span class="badge passed">PASSED</span>
-                                                                <span class="step-title">Step 2.1</span>
-                                                            </div>
-                                                            <div class="step-icons"></div>
-                                                        </div>
-                                                        <div class="step-content active"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Test 2: test_parametrized (Multiple runs) -->
-                    <div class="test-item passed" data-test="" data-test-name="test_parametrized" data-test-status="PASSED">
-                        <div class="test-header" onclick="toggleTestContent(this)">
-                            <div class="test-info">
-                                <span class="badge passed">
-                                    <i class="fas fa-check"></i> PASSED
-                                </span>
-                                <span class="test-name">TEST_PARAMETRIZED</span>
-                                <span class="test-duration">
-                                    <i class="fas fa-clock"></i>
-                                    0.00s
-                                </span>
-                                <span style="font-size: 0.875rem; color: var(--text-3);">2 runs</span>
-                            </div>
-                            <i class="fas fa-chevron-down expand-icon"></i>
-                        </div>
-                        <div class="test-content">
-                            <div class="test-results-section">
-                                <div class="test-results-header" onclick="toggleTestResults(this)">
-                                    <div>
-                                        <strong>TEST_PARAMETRIZED[111]</strong>
-                                        <span style="color: var(--text-3); font-weight: normal;">
-                                            (py_param)
-                                        </span>
-                                    </div>
-                                    <i class="fas fa-chevron-down expand-icon"></i>
-                                </div>
-                                <div class="test-results-content">
-                                    <div class="tab-container">
-                                        <div class="tabs">
-                                            <div class="tab active" onclick="switchTab(this, 'overview')">
-                                                <i class="fas fa-info-circle"></i> Overview
-                                            </div>
-                                            <div class="tab" onclick="switchTab(this, 'steps')">
-                                                <i class="fas fa-list-ol"></i> Steps
-                                            </div>
-                                        </div>
-
-                                        <div class="tab-content active" data-tab="overview">
-                                            <div class="section-title">
-                                                <i class="fas fa-cogs"></i> Parameters
-                                            </div>
-                                            <table class="info-table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>py_param</th>
-                                                        <td>111</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <div class="tab-content" data-tab="steps">
-                                            <div class="section-title">
-                                                <i class="fas fa-route"></i> Test Execution Steps
-                                            </div>
-                                            <div class="steps-container">
-                                                <div class="step-missing">Step details not available (ID: steps_c845326a-b635-4e5e-aa6a-a858b3329595)</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="test-results-header" onclick="toggleTestResults(this)">
-                                    <div>
-                                        <strong>TEST_PARAMETRIZED[222]</strong>
-                                        <span style="color: var(--text-3); font-weight: normal;">
-                                            (py_param)
-                                        </span>
-                                    </div>
-                                    <i class="fas fa-chevron-down expand-icon"></i>
-                                </div>
-                                <div class="test-results-content">
-                                    <div class="tab-container">
-                                        <div class="tabs">
-                                            <div class="tab active" onclick="switchTab(this, 'overview')">
-                                                <i class="fas fa-info-circle"></i> Overview
-                                            </div>
-                                            <div class="tab" onclick="switchTab(this, 'steps')">
-                                                <i class="fas fa-list-ol"></i> Steps
-                                            </div>
-                                        </div>
-
-                                        <div class="tab-content active" data-tab="overview">
-                                            <div class="section-title">
-                                                <i class="fas fa-cogs"></i> Parameters
-                                            </div>
-                                            <table class="info-table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>py_param</th>
-                                                        <td>222</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <div class="tab-content" data-tab="steps">
-                                            <div class="section-title">
-                                                <i class="fas fa-route"></i> Test Execution Steps
-                                            </div>
-                                            <div class="steps-container">
-                                                <div class="step-missing">Step details not available (ID: steps_17d08737-42b6-4a6d-bd2b-ee2605daa244)</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Test 3: test_selenium_with_set_browser (with attachments and error) -->
-                    <div class="test-item passed" data-test="" data-test-name="test_selenium_with_set_browser" data-test-status="PASSED">
-                        <div class="test-header" onclick="toggleTestContent(this)">
-                            <div class="test-info">
-                                <span class="badge passed">
-                                    <i class="fas fa-check"></i> PASSED
-                                </span>
-                                <span class="test-name">TEST_SELENIUM_WITH_SET_BROWSER</span>
-                                <span class="test-duration">
-                                    <i class="fas fa-clock"></i>
-                                    4.46s
-                                </span>
-                            </div>
-                            <i class="fas fa-chevron-down expand-icon"></i>
-                        </div>
-                        <div class="test-content">
-                            <div class="tab-container">
-                                <div class="tabs">
-                                    <div class="tab active" onclick="switchTab(this, 'overview')">
-                                        <i class="fas fa-info-circle"></i> Overview
-                                    </div>
-                                    <div class="tab" onclick="switchTab(this, 'steps')">
-                                        <i class="fas fa-list-ol"></i> Steps
-                                    </div>
-                                    <div class="tab" onclick="switchTab(this, 'attachments')">
-                                        <i class="fas fa-paperclip"></i> Attachments
-                                    </div>
-                                    <div class="tab" onclick="switchTab(this, 'error')">
-                                        <i class="fas fa-bug"></i> Error
-                                    </div>
-                                </div>
-
-                                <div class="tab-content active" data-tab="overview">
-                                    <div class="section-title">
-                                        <i class="fas fa-align-left"></i> Description
-                                    </div>
-                                    <p style="background: var(--bg-2); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap;">This test will make browser screenshot as we did blog.set_browser. We can also do it in "selenium_driver" fixture</p>
-
-                                    <div class="section-title">
-                                        <i class="fas fa-info"></i> Info
-                                    </div>
-                                    <div class="info-block">
-                                        <div class="info-section">
-                                            <div class="info-section-header">RUN REQUIREMENT</div>
-                                            <div class="info-section-content">
-                                                <span class="info-value">To run this test you'll need to download chromedriver and put it in your python folder</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="tab-content" data-tab="steps">
-                                    <div class="section-title">
-                                        <i class="fas fa-route"></i> Test Execution Steps
-                                    </div>
-                                    <div class="steps-container">
-                                        <div class="step-missing">Step details not available (ID: steps_235e4176-29c9-4438-bdb0-947119c9b39c)</div>
-                                    </div>
-                                </div>
-
-                                <div class="tab-content" data-tab="attachments">
-                                    <div class="section-title">
-                                        <i class="fas fa-images"></i> Attachments
-                                    </div>
-                                    <div class="attachments-grid">
-                                        <div class="attachment-item">
-                                            <i class="fas fa-image attachment-icon"></i>
-                                            <div class="attachment-name">err_scr_test_selenium_with_set_browser_1.png</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="tab-content" data-tab="error">
-                                    <div class="error-section">
-                                        <div class="error-title">
-                                            <i class="fas fa-exclamation-circle"></i> Test Error
-                                        </div>
-                                        <div style="font-weight: 500; margin-bottom: 1rem;">AssertionError: assert 1 == 2</div>
-
-                                        <div class="section-title">
-                                            <i class="fas fa-code"></i> Stack Trace
-                                        </div>
-                                        <pre class="stacktrace">selenium_driver = <selenium.webdriver.chrome.webdriver.webdriver (session="5b19bbf3fe40651a30f25acf48498865" )="">
-
-    @pytest.mark.xfail
-    @blog.description('This test will make browser screenshot as we did blog.set_browser. '
-                      'We can also do it in "selenium_driver" fixture')
-    @blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
-    def test_selenium_with_set_browser(selenium_driver):
-        blog.set_browser(selenium_driver)
-
-        with blog.step('Open any URL'):
-            selenium_driver.get(f'https://google.com')
-
-            with blog.step('Raise fake error to check error screenshot'):
-&gt;               assert 1 == 2
-E               assert 1 == 2
-
-test_main.py:81: AssertionError</selenium.webdriver.chrome.webdriver.webdriver></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="modal-body">
+                <img id="modalImage" style="display: none;">
+                <div id="modalDownload" style="display: none;">
+                    <i class="fas fa-download" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted);"></i>
+                    <p>Click to download this file</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeSearchFilter();
-            populateModuleFilter();
-            expandFirstLevel();
-        });
 
-        function initializeSearchFilter() {
+        function initFilters() {
             const searchInput = document.getElementById('searchInput');
             const statusFilter = document.getElementById('statusFilter');
             const moduleFilter = document.getElementById('moduleFilter');
@@ -1394,179 +272,147 @@ test_main.py:81: AssertionError</selenium.webdriver.chrome.webdriver.webdriver><
             });
         }
 
-        function populateModuleFilter() {
-            const moduleFilter = document.getElementById('moduleFilter');
-            const modules = document.querySelectorAll('[data-module-name]');
-
-            modules.forEach(module => {
-                const moduleName = module.dataset.moduleName;
-                if (moduleName && !document.querySelector(`option[value="${moduleName}"]`)) {
-                    const option = document.createElement('option');
-                    option.value = moduleName;
-                    option.textContent = moduleName;
-                    moduleFilter?.appendChild(option);
-                }
-            });
-        }
-
         function filterTests() {
-            const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
-            const statusFilter = document.getElementById('statusFilter')?.value || 'all';
-            const moduleFilter = document.getElementById('moduleFilter')?.value || 'all';
-            const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+            const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const status = document.getElementById('statusFilter')?.value || 'all';
+            const module = document.getElementById('moduleFilter')?.value || 'all';
+            const filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
 
-            const modules = document.querySelectorAll('[data-module]');
             let visibleCount = 0;
 
-            modules.forEach(module => {
-                const moduleData = module.dataset;
-                const tests = module.querySelectorAll('[data-test]');
-                let moduleHasVisible = false;
+            document.querySelectorAll('.module').forEach(moduleEl => {
+                const moduleName = moduleEl.dataset.module;
+                const tests = moduleEl.querySelectorAll('.test');
+                let moduleVisible = false;
 
                 tests.forEach(test => {
-                    const testData = test.dataset;
+                    const testName = test.dataset.test.toLowerCase();
+                    const testStatus = test.dataset.status;
+
                     let visible = true;
-
-                    if (searchTerm && !testData.testName?.toLowerCase().includes(searchTerm)) {
-                        visible = false;
-                    }
-
-                    if (statusFilter !== 'all' && testData.testStatus !== statusFilter) {
-                        visible = false;
-                    }
-
-                    if (moduleFilter !== 'all' && moduleData.moduleName !== moduleFilter) {
-                        visible = false;
-                    }
-
-                    if (activeFilter !== 'all' && testData.testStatus?.toLowerCase() !== activeFilter.toLowerCase()) {
-                        visible = false;
-                    }
+                    if (search && !testName.includes(search)) visible = false;
+                    if (status !== 'all' && testStatus !== status) visible = false;
+                    if (module !== 'all' && moduleName !== module) visible = false;
+                    if (filter !== 'all' && testStatus.toLowerCase() !== filter) visible = false;
 
                     test.style.display = visible ? 'block' : 'none';
-                    if (visible) {
-                        moduleHasVisible = true;
-                        visibleCount++;
-                    }
+                    if (visible) { moduleVisible = true; visibleCount++; }
                 });
 
-                module.style.display = moduleHasVisible ? 'block' : 'none';
+                moduleEl.style.display = moduleVisible ? 'block' : 'none';
             });
 
-            showNoResults(visibleCount === 0);
-        }
-
-        function showNoResults(show) {
             let noResults = document.getElementById('noResults');
-
-            if (show) {
+            if (visibleCount === 0) {
                 if (!noResults) {
-                    const container = document.querySelector('.container');
                     noResults = document.createElement('div');
                     noResults.id = 'noResults';
                     noResults.className = 'no-results';
-                    noResults.innerHTML = '<i class="fas fa-search"></i>No tests match your search criteria';
-                    container?.appendChild(noResults);
+                    noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
+                    document.querySelector('.container').appendChild(noResults);
                 }
-                noResults.style.display = 'block';
-            } else if (noResults) {
-                noResults.style.display = 'none';
+            } else if (noResults) { noResults.remove(); }
+        }
+
+        function toggleCard(header) {
+            const content = header.nextElementSibling;
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                header.classList.remove('expanded');
+            } else {
+                content.classList.add('active');
+                header.classList.add('expanded');
             }
         }
 
-        function toggleCollapsible(element) {
-            const content = element.nextElementSibling;
-            const expandIcon = element.querySelector('.expand-icon');
-
-            if (content?.classList.contains('collapsible-content')) {
-                const isActive = content.classList.contains('active');
-
-                content.classList.toggle('active', !isActive);
-                element.classList.toggle('expanded', !isActive);
-
-                if (expandIcon) {
-                    expandIcon.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
-                }
+        function toggleTest(header) {
+            const content = header.nextElementSibling;
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                header.classList.remove('expanded');
+            } else {
+                content.classList.add('active');
+                header.classList.add('expanded');
             }
         }
 
-        function toggleTestContent(element) {
-            const content = element.nextElementSibling;
-            const expandIcon = element.querySelector('.expand-icon');
-
-            if (content) {
-                const isActive = content.classList.contains('active');
-
-                content.classList.toggle('active', !isActive);
-                element.classList.toggle('expanded', !isActive);
-
-                if (expandIcon) {
-                    expandIcon.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
-                }
+        function toggleTestRun(header) {
+            const content = header.nextElementSibling;
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                header.classList.remove('expanded');
+            } else {
+                content.classList.add('active');
+                header.classList.add('expanded');
             }
         }
 
-        function toggleTestResults(element) {
-            const content = element.nextElementSibling;
-            const expandIcon = element.querySelector('.expand-icon');
-
-            if (content) {
-                const isActive = content.classList.contains('active');
-
-                content.classList.toggle('active', !isActive);
-                element.classList.toggle('expanded', !isActive);
-
-                if (expandIcon) {
-                    expandIcon.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
+        function toggleStep(header) {
+            const content = header.nextElementSibling;
+            if (content && content.classList.contains('step-content')) {
+                if (content.classList.contains('active')) {
+                    content.classList.remove('active');
+                    header.classList.remove('expanded');
+                } else {
+                    content.classList.add('active');
+                    header.classList.add('expanded');
                 }
             }
         }
 
-        function toggleStepContent(element) {
-            const content = element.nextElementSibling;
-            const expandIcon = element.querySelector('.expand-icon');
-
-            if (content) {
-                const isActive = content.classList.contains('active');
-
-                content.classList.toggle('active', !isActive);
-                element.classList.toggle('expanded', !isActive);
-
-                if (expandIcon) {
-                    expandIcon.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
-                }
-            }
-        }
-
-        function switchTab(tabElement, tabName) {
-            const tabContainer = tabElement.closest('.tab-container');
-            if (!tabContainer) return;
-
-            const tabs = tabContainer.querySelectorAll('.tab');
-            const tabContents = tabContainer.querySelectorAll('.tab-content');
+        function switchTab(btn, tabName) {
+            const tabsContainer = btn.closest('.tabs');
+            const tabs = tabsContainer.querySelectorAll('.tab-btn');
+            const contents = tabsContainer.querySelectorAll('.tab-content');
 
             tabs.forEach(tab => tab.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
 
-            tabElement.classList.add('active');
-            const activeContent = tabContainer.querySelector(`.tab-content[data-tab="${tabName}"]`);
-            activeContent?.classList.add('active');
+            btn.classList.add('active');
+            const targetContent = tabsContainer.querySelector(`[data-tab="${tabName}"]`);
+            if (targetContent) targetContent.classList.add('active');
         }
 
-        function expandFirstLevel() {
-            document.querySelectorAll('.step-content').forEach(content => {
-                const hasSubsteps = content.querySelector('.step-children');
-                if (!hasSubsteps) {
-                    content.classList.add('active');
-                    const header = content.previousElementSibling;
-                    if (header) {
-                        header.classList.add('expanded');
-                        const icon = header.querySelector('.expand-icon');
-                        if (icon) icon.style.transform = 'rotate(180deg)';
-                    }
-                }
-            });
+        function openAttachment(name, type) {
+            const modal = document.getElementById('attachmentModal');
+            const title = document.getElementById('modalTitle');
+            const image = document.getElementById('modalImage');
+            const download = document.getElementById('modalDownload');
+
+            title.textContent = name;
+
+            if (type.startsWith('image/')) {
+                image.src = `./attachments/${name}`;
+                image.style.display = 'block';
+                download.style.display = 'none';
+            } else {
+                image.style.display = 'none';
+                download.style.display = 'block';
+                download.onclick = () => window.open(`./attachments/${name}`, '_blank');
+            }
+
+            modal.style.display = 'block';
         }
+
+        function closeModal() {
+            document.getElementById('attachmentModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('attachmentModal');
+            if (event.target === modal) modal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initFilters();
+            const reportHeader = document.querySelector('.card .header');
+            const summaryCard = document.querySelectorAll('.card')[1];
+            if (reportHeader) toggleCard(reportHeader);
+            if (summaryCard && summaryCard.querySelector('.content')) {
+                summaryCard.querySelector('.content').classList.add('active');
+            }
+        });
     </script>
 
-</body></html>
+</body>
+</html>
