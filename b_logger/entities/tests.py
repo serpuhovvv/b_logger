@@ -34,7 +34,6 @@ class TestReport(BaseDataModel):
         self.status: TestStatus = TestStatus.NONE
         self.duration: float | None = None
         self.description: str | None = None
-        self.parameters = {}
         self.info = {}
         self.attachments = []
         self.known_bugs = []
@@ -66,9 +65,6 @@ class TestReport(BaseDataModel):
 
     def modify_description(self, description: str):
         self.description += f'\n\n{description}'
-
-    def add_parameter(self, name, value):
-        self.parameters[name] = value
 
     def add_known_bug(self, bug):
         self.known_bugs.append(bug)

@@ -138,120 +138,72 @@
 
 
 
-{% macro render_test_tabs(test, steps) %}
-<div class="tabs">
-    <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab(this, 'overview')">Overview</button>
-        {% if test.steps %}<button class="tab-btn" onclick="switchTab(this, 'steps')">Steps</button>{% endif %}
-        {% if test.attachments %}<button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>{% endif %}
-        {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}
+{% macro render_description(description) %}
+<div class="section">
+    <h4><i class="fas fa-align-left"></i> Description</h4>
+    <div class="description">{{ description }}</div>
+</div>
+{% endmacro %}
+
+
+
+{% macro render_info(info) %}
+<div class="section">
+    <h4><i class="fas fa-info-circle"></i> Information</h4>
+    <div class="info-grid">
+        {% for key, value in info.items() %}
+        <div class="info-item">
+            <div class="info-key">{{ key }}</div>
+            <div class="info-value">{{ render_info_value(value) }}</div>
+        </div>
+        {% endfor %}
     </div>
+</div>
+{% endmacro %}
 
-    {# ============ OVERVIEW TAB ============ #}
-    <div class="tab-content active" data-tab="overview">
-        {% if test.description %}
-        <div class="section">
-            <h4><i class="fas fa-align-left"></i> Description</h4>
-            <div class="description">{{ test.description }}</div>
-        </div>
-        {% endif %}
 
-        {% if test.info %}
-        <div class="section">
-            <h4><i class="fas fa-info-circle"></i> Information</h4>
-            <div class="info-grid">
-                {% for key, value in test.info.items() %}
-                <div class="info-item">
-                    <div class="info-key">{{ key }}</div>
-                    <div class="info-value">
-                        {% if value is mapping %}
-                            {% for sub_key, sub_value in value.items() %}
-                                <div><span>{{ sub_key }}:</span> {{ sub_value }}</div>
-                            {% endfor %}
-                        {% elif value is sequence and value is not string %}
-                            {{ value | join(', ') }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
 
-        {% if test.known_bugs %}
-        <div class="section">
-            <h4><i class="fas fa-bug"></i> Known Bugs</h4>
-            {% for bug in test.known_bugs %}
-            <div class="bug">
-                <div class="bug-desc">{{ bug.description }}</div>
-                {% if bug.url %}
-                <a href="{{ bug.url }}" target="_blank">View Bug Report</a>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
+{% macro render_info_value(value) %}
+{% if value is mapping %}
+    {% for sub_key, sub_value in value.items() %}
+        <div><span>{{ sub_key }}:</span> {{ render_info_value(sub_value) }}</div>
+    {% endfor %}
+{% elif value is sequence and value is not string %}
+    {% for sub_value in value %}
+        {{ render_info_value(sub_value) }}
+    {% endfor %}
+{% else %}
+    {{ value }}
+{% endif %}
+{% endmacro %}
+
+
+
+
+{% macro render_known_bugs(known_bugs) %}
+<div class="section">
+    <h4><i class="fas fa-bug"></i> Known Bugs</h4>
+    {% for bug in known_bugs %}
+    <div class="bug">
+        <div class="bug-desc">{{ bug.description }}</div>
+        {% if bug.url %}
+        <a href="{{ bug.url }}" target="_blank">View Bug Report</a>
         {% endif %}
     </div>
-
-    {# ============ STEPS TAB ============ #}
-    {% if test.steps %}
-    <div class="tab-content" data-tab="steps">
-        <div class="steps">
-            {% set step_data = steps[test.steps] %}
-            {% if step_data %}
-                {% for step in step_data %}
-                    {{ render_step(step, 0) }}
-                {% endfor %}
-            {% else %}
-                <div class="no-steps">No step details available</div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    {# ============ ATTACHMENTS TAB ============ #}
-    {% if test.attachments %}
-    <div class="tab-content" data-tab="attachments">
-        {{ render_attachments(test.attachments) }}
-    </div>
-    {% endif %}
-
-    {# ============ ERROR TAB ============ #}
-    {% if test.error %}
-    <div class="tab-content" data-tab="error">
-        <div class="error-section">
-            <div class="error-message">{{ test.error }}</div>
-            {% if test.stacktrace %}
-            <h4>Stacktrace:</h4>
-            <pre class="stacktrace">{{ test.stacktrace }}</pre>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
+    {% endfor %}
 </div>
 {% endmacro %}
 
 
 
 
-{% macro render_info_grid(info) %}
-<div class="info-grid">
-    {% for key, value in info.items() %}
-    <div class="info-item">
-        <div class="info-key">{{ key }}</div>
-        <div class="info-value">
-            {% if value is mapping %}
-                {% for sub_key, sub_value in value.items() %}<div><span>{{ sub_key }}:</span> {{ sub_value }}</div>{% endfor %}
-            {% elif value is sequence and value is not string %}
-                {% for item in value %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
-            {% else %}
-                {{ value }}
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
+{% macro render_error(exc, stacktrace) %}
+<div class="error-section">
+    <div class="error-message">{{ exc }}</div>
+    {% if stacktrace %}
+    <h4>Stacktrace:</h4>
+    <pre class="stacktrace">{{ stacktrace }}</pre>
+    {% endif %}
 </div>
 {% endmacro %}
 
@@ -276,10 +228,63 @@
 
 
 
-{% macro render_error(error) %}
-<div class="step-error">
-    <strong>Error:</strong> {{ error.exc }}
-    {% if error.tb %}<pre>{{ error.tb|safe }}</pre>{% endif %}
+{% macro render_test_tabs(test, steps) %}
+<div class="tabs">
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(this, 'overview')">Overview</button>
+        {% if test.steps %}<button class="tab-btn" onclick="switchTab(this, 'steps')">Steps</button>{% endif %}
+        {% if test.attachments %}<button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>{% endif %}
+        {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}
+    </div>
+
+    {# ============ OVERVIEW TAB ============ #}
+
+    <div class="tab-content active" data-tab="overview">
+        {% if test.description %}
+            {{ render_description(test.description) }}
+        {% endif %}
+
+        {% if test.info %}
+            {{ render_info(test.info) }}
+        {% endif %}
+
+        {% if test.known_bugs %}
+            {{ render_known_bugs(test.known_bugs) }}
+        {% endif %}
+    </div>
+
+    {# ============ STEPS TAB ============ #}
+
+    {% if test.steps %}
+    <div class="tab-content" data-tab="steps">
+        <div class="steps">
+            {% set step_data = steps[test.steps] %}
+            {% if step_data %}
+                {% for step in step_data %}
+                    {{ render_step(step, 0) }}
+                {% endfor %}
+            {% else %}
+                <div class="no-steps">No step details available</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ============ ATTACHMENTS TAB ============ #}
+
+    {% if test.attachments %}
+    <div class="tab-content" data-tab="attachments">
+        {{ render_attachments(test.attachments) }}
+    </div>
+    {% endif %}
+
+    {# ============ ERROR TAB ============ #}
+
+    {% if test.error %}
+    <div class="tab-content" data-tab="error">
+        {{ render_error(test.error, test.stacktrace) }}
+    </div>
+    {% endif %}
 </div>
 {% endmacro %}
 
@@ -308,14 +313,10 @@
         {% if step.expected or step.info or step.error or step.attachments or step.known_bugs %}
         <div class="step-content">
             {% if step.expected %}<div><strong>Expected:</strong> {{ step.expected }}</div>{% endif %}
-            {% if step.info %}{{ render_info_grid(step.info) }}{% endif %}
-            {% if step.error %}{{ render_error(step.error) }}{% endif %}
+            {% if step.info %}{{ render_info(step.info) }}{% endif %}
+            {% if step.error %}{{ render_error(step.error.exc, step.error.tb) }}{% endif %}
             {% if step.attachments %}{{ render_attachments(step.attachments) }}{% endif %}
-            {% if step.known_bugs %}
-                {% for bug in step.known_bugs %}
-                    <div class="bug">{{ bug.description }} {% if bug.url %}<a href="{{ bug.url }}" target="_blank">Link</a>{% endif %}</div>
-                {% endfor %}
-            {% endif %}
+            {% if step.known_bugs %}{{ render_known_bugs(step.known_bugs) }}{% endif %}
         </div>
         {% endif %}
         {% if step.steps %}

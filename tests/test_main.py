@@ -55,10 +55,11 @@ def test_main_functionality():
                         pass
 
 
-@pytest.mark.parametrize('py_param', [111, 222])  # <-- These parameters will be added to test automatically
-def test_parametrized(py_param):
+@pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (333, 444)])  # <-- These parameters will be added to test automatically
+def test_parametrized(py_param_1, py_param_2):
     with blog.step('step 1'):
-        blog.print(py_param)
+        blog.print(py_param_1)
+        blog.print(py_param_2)
 
         with blog.step('step 2'):
             pass

@@ -141,9 +141,6 @@ class RunTime:
         else:
             self.test_report.modify_description(description)
 
-    def apply_param(self, name, value):
-        self.test_report.add_parameter(name, value)
-
     def apply_info(self, **kwargs):
 
         if not kwargs:

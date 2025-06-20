@@ -123,7 +123,7 @@ def _apply_py_params(item):
     if hasattr(item, "callspec"):
         params = item.callspec.params
         for param_name, param_value in params.items():
-            runtime.apply_param(param_name, param_value)
+            runtime.apply_info(parameters={param_name: param_value})
 
 
 def _apply_fixtures(item):

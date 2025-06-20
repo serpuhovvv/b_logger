@@ -9,4 +9,4 @@ def format_tb(tb):
           .partition('Stacktrace')[0]
           # .partition('Other element would receive the click:')[0]
           + '\n')
-    return str(f'<pre class="error-code">{tb}</pre>')
+    return tb
