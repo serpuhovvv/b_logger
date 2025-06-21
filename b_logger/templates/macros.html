@@ -100,69 +100,13 @@
 
 
 
-{% macro render_test(test_name, test_runs, steps) %}
-    {% set is_multi = test_runs|length > 1 %}
-    {% if not is_multi %}
-        {{ render_test_panel(
-            test_runs[0].status,
-            test_name,
-            test_runs[0].duration,
-            render_test_tabs(test_runs[0], steps)
-        ) }}
-    {% else %}
-    <div class="test test-multi" data-test="{{ test_name }}" data-status="group">
-        <div class="test-header" onclick="toggleTest(this)">
-            <div class="test-info">
-                {{ render_status_summary(test_runs) }}
-                <span class="test-name">{{ test_name }}</span>
-            </div>
-            <i class="fas fa-chevron-down toggle-icon"></i>
-        </div>
-        <div class="test-content">
-            {% for test_run in test_runs %}
-                {{ render_subtest(test_run, test_name, steps) }}
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-{% endmacro %}
-
-
-
-
-{% macro render_test_panel(status, name, duration, content, onclick="toggleTest(this)") %}
-<div class="test {{ status.lower() }}" data-test="{{ name }}" data-status="{{ status }}">
-    <div class="test-header" onclick="{{ onclick }}">
-        {{ render_test_header(status, name, duration) }}
-    </div>
-    <div class="test-content">
-        {{ content }}
-    </div>
-</div>
-{% endmacro %}
-
-
-
-
-{% macro render_test_header(status, name, duration) %}
-<div class="test-info">
-    <span class="badge {{ status.lower() }}">{{ status }}</span>
-    <span class="test-name">{{ name }}</span>
-    <span class="test-duration">{{ duration or 0 }}s</span>
-</div>
-<i class="fas fa-chevron-down toggle-icon"></i>
-{% endmacro %}
-
-
-
-
 {% macro render_status_summary(test_runs) %}
-    {% set status_counter = {} %}
+    {% set counter = {} %}
     {% for run in test_runs %}
-        {% set count = status_counter.get(run.status, 0) + 1 %}
-        {% set _ = status_counter.update({run.status: count}) %}
+        {% set count = counter.get(run.status, 0) + 1 %}
+        {% set _ = counter.update({run.status: count}) %}
     {% endfor %}
-    {% for status, count in status_counter.items() %}
+    {% for status, count in counter.items() %}
         <span class="badge {{ status.lower() }}">{{ count }} {{ status|lower }}</span>
     {% endfor %}
 {% endmacro %}
@@ -170,15 +114,51 @@
 
 
 
-{% macro render_subtest(test_run, test_name, steps) %}
-<div class="test test-sub {{ test_run.status.lower() }}" data-test="{{ test_name }}" data-status="{{ test_run.status }}">
-    <div class="test-header" onclick="toggleTestRun(this)">
-        {{ render_test_header(test_run.status, test_run.name, test_run.duration) }}
+{% macro render_test(test_name, test_runs, steps) %}
+    {% if test_runs|length == 1 %}
+        {{ render_test_block(test_runs[0], steps) }}
+    {% else %}
+        <div class="test test-multi" data-test="{{ test_name }}" data-status="group">
+            <div class="test-header" onclick="toggleTest(this)">
+                <div class="test-info">
+                    {{ render_status_summary(test_runs) }}
+                    <span class="test-name">{{ test_name }}</span>
+                </div>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="test-content">
+                {% for run in test_runs %}
+                    {{ render_test_block(run, steps, is_sub=True) }}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+
+{% macro render_test_block(test_run, steps, is_sub=False, onclick="toggleTest(this)") %}
+{% set sub_class = "test-sub" if is_sub else "" %}
+<div class="test {{ sub_class }} {{ test_run.status.lower() }}" data-test="{{ test_run.name }}" data-status="{{ test_run.status }}">
+    <div class="test-header" onclick="{{ onclick }}">
+        {{ render_test_header(test_run) }}
     </div>
     <div class="test-content">
         {{ render_test_tabs(test_run, steps) }}
     </div>
 </div>
+{% endmacro %}
+
+
+
+
+{% macro render_test_header(test_run) %}
+<div class="test-info">
+    <span class="badge {{ test_run.status.lower() }}">{{ test_run.status }}</span>
+    <span class="test-name">{{ test_run.name }}</span>
+    <span class="test-duration">{{ test_run.duration or 0 }}s</span>
+</div>
+<i class="fas fa-chevron-down toggle-icon"></i>
 {% endmacro %}
 
 
@@ -193,23 +173,11 @@
         {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}
     </div>
 
-    {# ============ OVERVIEW TAB ============ #}
-
     <div class="tab-content active" data-tab="overview">
-        {% if test.description %}
-            {{ render_description(test.description) }}
-        {% endif %}
-
-        {% if test.info %}
-            {{ render_info(test.info) }}
-        {% endif %}
-
-        {% if test.known_bugs %}
-            {{ render_known_bugs(test.known_bugs) }}
-        {% endif %}
+        {% if test.description %}{{ render_description(test.description) }}{% endif %}
+        {% if test.info %}{{ render_info(test.info) }}{% endif %}
+        {% if test.known_bugs %}{{ render_known_bugs(test.known_bugs) }}{% endif %}
     </div>
-
-    {# ============ STEPS TAB ============ #}
 
     {% if test.steps %}
     <div class="tab-content" data-tab="steps">
@@ -226,15 +194,11 @@
     </div>
     {% endif %}
 
-    {# ============ ATTACHMENTS TAB ============ #}
-
     {% if test.attachments %}
     <div class="tab-content" data-tab="attachments">
         {{ render_attachments(test.attachments) }}
     </div>
     {% endif %}
-
-    {# ============ ERROR TAB ============ #}
 
     {% if test.error %}
     <div class="tab-content" data-tab="error">
@@ -243,7 +207,6 @@
     {% endif %}
 </div>
 {% endmacro %}
-
 
 
 
@@ -306,37 +269,6 @@
 
 
 
-{% macro render_error(exc, stacktrace) %}
-<div class="error-section">
-    <div class="error-message">{{ exc }}</div>
-    {% if stacktrace %}
-    <h4>Stacktrace:</h4>
-    <pre class="stacktrace">{{ stacktrace }}</pre>
-    {% endif %}
-</div>
-{% endmacro %}
-
-
-
-
-{% macro render_attachments(attachments) %}
-<div class="attachments">
-    {% for attachment in attachments %}
-    <div class="attachment" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
-        {% if attachment.type_.startswith('image/') %}
-        <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
-        {% else %}
-        <i class="fas fa-file"></i>
-        {% endif %}
-        <span>{{ attachment.name }}</span>
-    </div>
-    {% endfor %}
-</div>
-{% endmacro %}
-
-
-
-
 {% macro render_step(step, level=0) %}
 {% if step.id.startswith('print_') %}
     <div class="step print level-{{ level }}">
@@ -374,4 +306,35 @@
         {% endif %}
     </div>
 {% endif %}
+{% endmacro %}
+
+
+
+
+{% macro render_attachments(attachments) %}
+<div class="attachments">
+    {% for attachment in attachments %}
+    <div class="attachment" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
+        {% if attachment.type_.startswith('image/') %}
+        <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
+        {% else %}
+        <i class="fas fa-file"></i>
+        {% endif %}
+        <span>{{ attachment.name }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_error(exc, stacktrace) %}
+<div class="error-section">
+    <div class="error-message">{{ exc }}</div>
+    {% if stacktrace %}
+    <h4>Stacktrace:</h4>
+    <pre class="stacktrace">{{ stacktrace }}</pre>
+    {% endif %}
+</div>
 {% endmacro %}

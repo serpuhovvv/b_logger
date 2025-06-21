@@ -170,13 +170,13 @@ class RunTime:
 
         self.test_report.add_known_bug(bug)
 
-    def print_message(self, message, status: PrintStatus = PrintStatus.NONE):
+    def print_message(self, message):
         if isinstance(message, (dict, list)):
             data = json.dumps(message, indent=2, ensure_ascii=False)
         else:
             data = str(message)
 
-        print_ = Print(data, status)
+        print_ = Print(data)
 
         current_step = self.step_container.get_current_step()
 

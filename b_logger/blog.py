@@ -92,8 +92,8 @@ class BLogger:
 
         Usage:
             @blog.info(
-                first_parameter='param 1',
-                second_parameter='param 2'
+                parameters=['param 1', 'param 2'],
+                some_info='some info',
                 meta={'platform': 'linux', 'python_version': 3.12}
             )
 
@@ -101,8 +101,10 @@ class BLogger:
 
             with blog.step('Step 1'):
                 blog.info(
-                    step_param_1='param',
-                    step_param_2=123
+                    step_info={
+                        step_info_1: 'string',
+                        step_info_2: 123
+                        }
                 )
         """
         runtime.apply_info(**kwargs)

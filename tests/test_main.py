@@ -3,7 +3,7 @@ import random
 from pytest_playwright.pytest_playwright import Playwright
 from selenium import webdriver
 
-from b_logger import blog, PrintStatus
+from b_logger import blog
 
 blog.set_env('prod')
 
@@ -66,7 +66,11 @@ def test_parametrized(py_param_1, py_param_2):
 
 @pytest.fixture()
 def selenium_driver():
-    driver = webdriver.Chrome()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless=new')
+
+    driver = webdriver.Chrome(options=chrome_options)
+
     driver.set_window_size(1920, 1080)
 
     # blog.set_browser(driver) can be also added here, which is preferred
@@ -108,7 +112,7 @@ def test_selenium_without_set_browser(selenium_driver):  #  <-- Will be detected
 
 @pytest.fixture()
 def playwright_page(playwright: Playwright):
-    browser = playwright.chromium.launch()
+    browser = playwright.chromium.launch(headless=True)
 
     context = browser.new_context()
 
