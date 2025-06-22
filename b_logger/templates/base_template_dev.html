@@ -125,7 +125,7 @@
         /* ============================================ */
         .tabs { }
         .tab-nav { display: flex; background: var(--bg-light); border-bottom: 1px solid var(--border); }
-        .tab-btn { padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--text-light); border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab-btn { padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; font-weight: 550; font-size: 0.875rem; color: var(--text-light); border-bottom: 3px solid transparent; transition: all 0.2s; }
         .tab-btn:hover { background: var(--border-light); color: var(--text); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg-card); }
         .tab-btn.error { color: var(--failed); }
@@ -136,26 +136,24 @@
         /* CONTENT SECTIONS */
         /* ============================================ */
         .section { margin-bottom: 1.5rem; }
-        .description { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap; }
-        .params { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .param { background: var(--bg-light); padding: 0.5rem; border-radius: var(--radius-sm); }
-        .param span { font-weight: 600; }
-        .param code { background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-family: monospace; }
+
+        .description { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap; font-size: 0.875rem;}
 
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
         .info-item { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); }
         .info-key { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; }
-        .info-value { font-family: monospace; font-size: 0.875rem; }
+        .info-value { font-size: 0.875rem; }
 
-        .bug { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 0.5rem; }
+        .bug-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .bug-item { background: var(--failed-bg); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 0.5rem; }
         .bug-desc { font-weight: 600; color: var(--failed); }
-        .bug a { color: var(--failed); text-decoration: none; font-size: 0.875rem; }
+        .bug-item a { color: var(--failed); text-decoration: none; font-size: 0.875rem; }
 
         /* ============================================ */
         /* STEPS */
         /* ============================================ */
         .steps { margin: 1rem 0; }
-        .step { margin-bottom: 0.5rem; }
+        .step { margin-bottom: 1rem; }
         .step.print { padding: 0.5rem; background: var(--print-bg); border-radius: var(--radius-sm); border-left: 3px solid var(--print); margin-left: calc(var(--level, 0) * 1rem); }
         .step:not(.print) { border-left: 3px solid; padding-left: 1rem; margin-left: calc(var(--level, 0) * 1rem); }
         .step.passed { border-left-color: var(--passed); }
@@ -165,10 +163,10 @@
 
         .step-header { padding: 0.5rem; background: var(--bg-light); border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .step-info { display: flex; align-items: center; gap: 0.5rem; }
-        .step-badge { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
-        .step-title { font-weight: 500; }
-        .error-icon, .attach-icon { color: var(--failed); font-size: 0.875rem; }
-        .step-content { display: none; padding: 0.75rem; background: var(--bg-card); margin-top: 0.5rem; border-radius: var(--radius-sm); }
+        .step-badge { font-size: 0.875rem; padding: 0.5rem; align-items: center; display: flex; gap: 0.5rem;}
+        .step-title { font-weight: 500; white-space: pre-wrap;}
+        .error-icon { color: var(--failed); font-size: 0.875rem; }
+        .step-content { display: none; padding: 0.5rem; background: var(--bg-card); border-radius: var(--radius-sm); }
         .step-content.active { display: block; }
         .step-children { margin-top: 0.5rem; }
         .step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
@@ -194,12 +192,12 @@
         /* ============================================ */
         .error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1.5rem; border-radius: var(--radius); }
         .error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; }
-        .stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.875rem; overflow-x: auto; white-space: pre-wrap; }
+        .stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem; font-weight: 550; overflow-x: auto; white-space: pre-wrap; }
 
         /* ============================================ */
         /* MODAL */
         /* ============================================ */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal { display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
         .modal-content { background: var(--bg-card); margin: 5% auto; padding: 0; border-radius: var(--radius); max-width: 90%; max-height: 90%; position: relative; }
         .modal-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 1rem; text-align: center; }
@@ -253,10 +251,10 @@
             </div>
             <div class="modal-body">
                 <img id="modalImage" style="display: none;">
-                <div id="modalDownload" style="display: none;">
-                    <i class="fas fa-download" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted);"></i>
+                <a id="modalDownload" href="#" download class="download-block" style="display: none;">
+                    <i class="fas fa-download"></i>
                     <p>Click to download this file</p>
-                </div>
+                </a>
             </div>
         </div>
     </div>
@@ -378,16 +376,23 @@
         }
 
         function toggleStep(header) {
-            const content = header.nextElementSibling;
-            if (content && content.classList.contains('step-content')) {
-                if (content.classList.contains('active')) {
-                    content.classList.remove('active');
-                    header.classList.remove('expanded');
-                } else {
-                    content.classList.add('active');
-                    header.classList.add('expanded');
-                }
+            const step = header.parentElement; // .step
+            if (!step) return;
+
+            const content = step.querySelector('.step-content');
+            const children = step.querySelector('.step-children');
+
+            const isActive = content ? content.classList.contains('active') : false;
+            const willShow = !isActive;
+
+            if (content) {
+                content.classList.toggle('active', willShow);
             }
+            if (children) {
+                children.classList.toggle('active', willShow);
+            }
+
+            step.classList.toggle('expanded', willShow);
         }
 
         function switchTab(btn, tabName) {

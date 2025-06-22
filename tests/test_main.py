@@ -28,7 +28,7 @@ def test_main_functionality():
     with blog.step('Step 1'):
         data = {"a": 1, "b": 2}
 
-        blog.print(f'Some important data: {data}')
+        blog.print(f'Some important data: \n{data}')
 
         with blog.step('Step 1.1'):
             step_param_1 = random.randint(1, 100)
@@ -58,10 +58,12 @@ def test_main_functionality():
 @pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (333, 444)])  # <-- These parameters will be added to test automatically
 def test_parametrized(py_param_1, py_param_2):
     with blog.step('step 1'):
-
         with blog.step('step 2'):
-            blog.print(py_param_1)
-            assert py_param_1 in [111, 444]
+            with blog.step('step 3'):
+                blog.print(py_param_1)
+                with blog.step('step 4'):
+                    blog.print(py_param_2)
+                assert py_param_1 in [111, 444]
 
 
 @pytest.fixture()

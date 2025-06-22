@@ -152,7 +152,7 @@ class BLogger:
                 runtime.finish_step(step)
 
     @staticmethod
-    def print(data, status: PrintStatus = PrintStatus.NONE):
+    def print(data):
         """
         Print any message (str, dict, list, object, etc.)
             It will be added to a Current Step as SubStep
@@ -165,7 +165,7 @@ class BLogger:
             blog.print(f'Probably too long str\n'
                         'can be newlined like that')
         """
-        runtime.print_message(data, status)
+        runtime.print_message(data)
 
     @staticmethod
     def screenshot(name: str = None, is_error: bool = False):

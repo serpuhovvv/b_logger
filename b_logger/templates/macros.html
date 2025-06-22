@@ -185,7 +185,7 @@
             {% set step_data = steps[test.steps] %}
             {% if step_data %}
                 {% for step in step_data %}
-                    {{ render_step(step, 0) }}
+                    {{ render_step(step) }}
                 {% endfor %}
             {% else %}
                 <div class="no-steps">No step details available</div>
@@ -255,58 +255,91 @@
 {% macro render_known_bugs(known_bugs) %}
 <div class="section">
     <h4><i class="fas fa-bug"></i> Known Bugs</h4>
+    <div class="bug-grid">
     {% for bug in known_bugs %}
-    <div class="bug">
-        <div class="bug-desc">{{ bug.description }}</div>
-        {% if bug.url %}
-        <a href="{{ bug.url }}" target="_blank">View Bug Report</a>
-        {% endif %}
-    </div>
+        <div class="bug-item">
+            <div class="bug-desc">{{ bug.description }}</div>
+            {% if bug.url %}
+            <a href="{{ bug.url }}" target="_blank">View Bug Report</a>
+            {% endif %}
+        </div>
     {% endfor %}
+    </div>
 </div>
 {% endmacro %}
 
 
 
 
-{% macro render_step(step, level=0) %}
+{% macro render_step(step) %}
+{% set has_addons = step.expected or step.info or step.error or step.attachments or step.known_bugs %}
 {% if step.id.startswith('print_') %}
-    <div class="step print level-{{ level }}">
-<!--        <span class="step-badge print">PRINT</span>-->
+    <div class="step print level-1">
         <span class="step-title">{{ step.title }}</span>
     </div>
 {% else %}
-    <div class="step {{ step.status }} level-{{ level }}">
+    <div class="step {{ step.status }} level-1">
         <div class="step-header" onclick="toggleStep(this)">
             <div class="step-info">
-<!--                <span class="step-badge {{ step.status }}">{{ step.status.upper() }}</span>-->
                 <span class="step-title">{{ step.title }}</span>
                 {% if step.error %}<i class="fas fa-exclamation-triangle error-icon"></i>{% endif %}
                 {% if step.attachments %}<i class="fas fa-paperclip attach-icon"></i>{% endif %}
                 {% if step.info %}<i class="fas fa-info-circle"></i>{% endif %}
-                {% if step.known_bugs %}<i class="fas fa-exclamation-triangle error-icon"></i>{% endif %}
+                {% if step.known_bugs %}<i class="fas fa-bug bug-icon"></i>{% endif %}
+                {% if has_addons %}<i class="fas fa-chevron-down toggle-icon"></i>{% endif %}
             </div>
-            {% if step.steps %}<i class="fas fa-chevron-down toggle-icon"></i>{% endif %}
+            {% if step.steps %}
+                {% set count_steps = namespace(count=0) %}
+                {% for s in step.steps %}
+                    {% if s.id.startswith('step_') %}
+                        {% set count_steps.count = count_steps.count + 1 %}
+                    {% endif %}
+                {% endfor %}
+                <div class="step-badge">
+                    <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            {% endif %}
         </div>
-        {% if step.expected or step.info or step.error or step.attachments or step.known_bugs %}
+        {% if has_addons %}
         <div class="step-content">
-            {% if step.expected %}<div><strong>Expected:</strong> {{ step.expected }}</div>{% endif %}
-            {% if step.info %}{{ render_info(step.info) }}{% endif %}
-            {% if step.error %}{{ render_error(step.error.exc, step.error.tb) }}{% endif %}
-            {% if step.attachments %}{{ render_attachments(step.attachments) }}{% endif %}
-            {% if step.known_bugs %}{{ render_known_bugs(step.known_bugs) }}{% endif %}
+            {% if step.expected %}
+            <div class="step-section expected">
+                <h5><i class="fas fa-check-double"></i> Expected</h5>
+                <div class="step-value">{{ step.expected }}</div>
+            </div>
+            {% endif %}
+
+            {% if step.info %}
+                {{ render_info(step.info) }}
+            {% endif %}
+
+            {% if step.error %}
+                {{ render_error(step.error.exc, step.error.tb) }}
+            {% endif %}
+
+            {% if step.attachments %}
+                {{ render_attachments(step.attachments) }}
+            {% endif %}
+
+            {% if step.known_bugs %}
+                {{ render_known_bugs(step.known_bugs) }}
+            {% endif %}
         </div>
         {% endif %}
+
         {% if step.steps %}
         <div class="step-children">
             {% for child_step in step.steps %}
-                {{ render_step(child_step, level + 1) }}
+                {{ render_step(child_step) }}
             {% endfor %}
         </div>
         {% endif %}
+
     </div>
 {% endif %}
 {% endmacro %}
+
 
 
 
@@ -331,10 +364,10 @@
 
 {% macro render_error(exc, stacktrace) %}
 <div class="error-section">
-    <div class="error-message">{{ exc }}</div>
+    <div class="error-message">{{ exc | escape }}</div>
     {% if stacktrace %}
     <h4>Stacktrace:</h4>
-    <pre class="stacktrace">{{ stacktrace }}</pre>
+    <pre class="stacktrace">{{ stacktrace | escape }}</pre>
     {% endif %}
 </div>
 {% endmacro %}
