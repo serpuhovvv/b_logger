@@ -78,7 +78,7 @@
 
 {% macro render_module(module_name, module_data, steps) %}
 <div class="card module" data-module="{{ module_name }}">
-    <div class="header expanded" onclick="toggleCard(this)">
+    <div class="header" onclick="toggleCard(this)">
         <h3><i class="fas fa-file-code"></i> {{ module_name.split('\\')[-1] or module_name }}</h3>
         <div class="module-stats">
             {% for status in ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'] %}
@@ -286,7 +286,9 @@
                 {% if step.attachments %}<i class="fas fa-paperclip attach-icon"></i>{% endif %}
                 {% if step.info %}<i class="fas fa-info-circle"></i>{% endif %}
                 {% if step.known_bugs %}<i class="fas fa-bug bug-icon"></i>{% endif %}
-                {% if has_addons %}<i class="fas fa-chevron-down toggle-icon"></i>{% endif %}
+                {% if has_addons or step.steps %}
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                {% endif %}
             </div>
             {% if step.steps %}
                 {% set count_steps = namespace(count=0) %}
@@ -297,45 +299,47 @@
                 {% endfor %}
                 <div class="step-badge">
                     <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
+<!--                    <i class="fas fa-chevron-down toggle-icon"></i>-->
                 </div>
             {% endif %}
         </div>
-        {% if has_addons %}
-        <div class="step-content">
-            {% if step.expected %}
-            <div class="step-section expected">
-                <h5><i class="fas fa-check-double"></i> Expected</h5>
-                <div class="step-value">{{ step.expected }}</div>
+
+        <div class="step-body">
+            {% if has_addons %}
+            <div class="step-content">
+                {% if step.expected %}
+                <div class="step-section expected">
+                    <h5><i class="fas fa-check-double"></i> Expected</h5>
+                    <div class="step-value">{{ step.expected }}</div>
+                </div>
+                {% endif %}
+
+                {% if step.info %}
+                    {{ render_info(step.info) }}
+                {% endif %}
+
+                {% if step.error %}
+                    {{ render_error(step.error.exc, step.error.tb) }}
+                {% endif %}
+
+                {% if step.attachments %}
+                    {{ render_attachments(step.attachments) }}
+                {% endif %}
+
+                {% if step.known_bugs %}
+                    {{ render_known_bugs(step.known_bugs) }}
+                {% endif %}
             </div>
             {% endif %}
 
-            {% if step.info %}
-                {{ render_info(step.info) }}
-            {% endif %}
-
-            {% if step.error %}
-                {{ render_error(step.error.exc, step.error.tb) }}
-            {% endif %}
-
-            {% if step.attachments %}
-                {{ render_attachments(step.attachments) }}
-            {% endif %}
-
-            {% if step.known_bugs %}
-                {{ render_known_bugs(step.known_bugs) }}
+            {% if step.steps %}
+            <div class="step-children">
+                {% for child_step in step.steps %}
+                    {{ render_step(child_step) }}
+                {% endfor %}
+            </div>
             {% endif %}
         </div>
-        {% endif %}
-
-        {% if step.steps %}
-        <div class="step-children">
-            {% for child_step in step.steps %}
-                {{ render_step(child_step) }}
-            {% endfor %}
-        </div>
-        {% endif %}
-
     </div>
 {% endif %}
 {% endmacro %}

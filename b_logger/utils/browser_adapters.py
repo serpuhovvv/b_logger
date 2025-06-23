@@ -26,11 +26,11 @@ class SeleniumAdapter(BrowserAdapter):
 
 
 class PlaywrightAdapter(BrowserAdapter):
-    def __init__(self, page_or_context):
-        self.page_or_context = page_or_context
+    def __init__(self, page):
+        self.page = page
 
     def make_screenshot(self) -> bytes:
-        pages = self.page_or_context.context.pages
+        pages = self.page.context.pages
         for page in pages:
             try:
                 return page.screenshot()

@@ -2,11 +2,7 @@ import json
 import os
 import traceback
 from pathlib import Path
-from typing import Union, BinaryIO, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from playwright.sync_api import Page
-    from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
+from typing import Union, BinaryIO
 
 from b_logger.entities.reports import RunReport
 from b_logger.entities.tests import TestReport, TestStatus
@@ -27,7 +23,7 @@ class TestRun:
 class RunTime:
     def __init__(self):
         self.run_report: RunReport = RunReport()
-        self.browser: RemoteWebDriver | WebDriver | Page | None = None
+        self.browser: "RemoteWebDriver | WebDriver | Page | None" = None
         self.test_report: TestReport = TestReport()
         self.step_container: StepContainer = StepContainer()
 

@@ -37,9 +37,10 @@
         .card { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
         .header { background: var(--bg-light); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
         .header:hover { background: var(--border-light); }
+
         .content { padding: 1.5rem; display: none; }
         .content.active { display: block; }
-        .toggle-icon { transition: transform 0.2s; }
+        .header .toggle-icon { transition: transform 0.2s; }
         .header.expanded .toggle-icon { transform: rotate(180deg); }
 
         h1, h2, h3, h4 { font-weight: 600; margin-bottom: 0.5rem; }
@@ -99,6 +100,8 @@
 
         .test-header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-light); transition: background 0.2s; }
         .test-header:hover { background: var(--border-light); }
+        .test-header .toggle-icon { transition: transform 0.2s ease; }
+        .test-header.expanded .toggle-icon { transform: rotate(180deg); }
         .test-info { display: flex; align-items: center; gap: 1rem; }
         .test-name { font-weight: 600; }
         .test-duration { font-size: 0.875rem; color: var(--text-muted); background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); }
@@ -172,6 +175,20 @@
         .step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
         .step-error pre { background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.875rem; overflow-x: auto; }
 
+        .step-header .toggle-icon {
+            transition: transform 0.2s ease;
+        }
+        .step-header.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .step-body {
+            display: none;
+        }
+        .step-body.active {
+            display: block;
+        }
+
         .level-0 { --level: 0; }
         .level-1 { --level: 1; }
         .level-2 { --level: 2; }
@@ -197,13 +214,101 @@
         /* ============================================ */
         /* MODAL */
         /* ============================================ */
-        .modal { display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: var(--bg-card); margin: 5% auto; padding: 0; border-radius: var(--radius); max-width: 90%; max-height: 90%; position: relative; }
-        .modal-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 1rem; text-align: center; }
-        .modal img { max-width: 100%; max-height: 70vh; border-radius: var(--radius-sm); }
-        .close { font-size: 2rem; cursor: pointer; color: var(--text-muted); }
-        .close:hover { color: var(--text); }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 5% auto;
+            padding: 1rem 1.5rem;
+            background: var(--bg-card, #fff);
+            border-radius: var(--radius, 8px);
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-title {
+            margin: 0 0 1rem;
+            font-size: 1.25rem;
+            text-align: center;
+        }
+
+        .modal-body {
+            text-align: left;
+            margin-bottom: 1rem;
+            overflow: auto;
+            max-height: 70vh;
+        }
+
+        .image-container {
+            text-align: center;
+            cursor: grab;
+        }
+
+        .image-container img {
+            max-width: none;
+            max-height: none;
+            width: auto;
+            height: auto;
+            transition: transform 0.2s ease;
+            transform-origin: center center;
+        }
+
+        #modalPDF {
+            width: 100%;
+            height: 70vh;
+        }
+
+        #modalText {
+            font-family: monospace;
+            background: #f8f9fa;
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #333;
+        }
+
+        .modal-download {
+            display: inline-block;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background: #007bff;
+            color: white;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+        }
+
+        .modal-download:hover {
+            background: #0056b3;
+        }
+
+        .close {
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            font-size: 1.75rem;
+            color: #aaa;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
 
         /* ============================================ */
         /* UTILITIES */
@@ -243,19 +348,20 @@
         {% endfor %}
     </div>
 
-    <div id="attachmentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Attachment</h3>
-                <span class="close" onclick="closeModal()">×</span>
+    <div id="attachmentModal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close" onclick="closeModal(event)">×</button>
+            <h2 id="modalTitle" class="modal-title"></h2>
+
+            <div id="imageContainer" class="modal-body image-container">
+                <img id="modalImage" src="" alt="Image preview" />
             </div>
-            <div class="modal-body">
-                <img id="modalImage" style="display: none;">
-                <a id="modalDownload" href="#" download class="download-block" style="display: none;">
-                    <i class="fas fa-download"></i>
-                    <p>Click to download this file</p>
-                </a>
-            </div>
+
+            <iframe id="modalPDF" class="modal-body" style="display:none;" frameborder="0"></iframe>
+
+            <pre id="modalText" class="modal-body" style="display:none;"></pre>
+
+            <a id="modalDownload" class="modal-download" target="_blank">Download file</a>
         </div>
     </div>
 
@@ -376,23 +482,20 @@
         }
 
         function toggleStep(header) {
-            const step = header.parentElement; // .step
+            const step = header.closest('.step');
             if (!step) return;
 
+            const body = step.querySelector('.step-body');
+            if (!body) return;
+
             const content = step.querySelector('.step-content');
-            const children = step.querySelector('.step-children');
+<!--            const children = step.querySelector('.step-children');-->
 
-            const isActive = content ? content.classList.contains('active') : false;
-            const willShow = !isActive;
-
-            if (content) {
-                content.classList.toggle('active', willShow);
-            }
-            if (children) {
-                children.classList.toggle('active', willShow);
-            }
-
-            step.classList.toggle('expanded', willShow);
+            const isActive = header.classList.contains('expanded');
+            body.classList.toggle('active', !isActive);
+            header.classList.toggle('expanded', !isActive);
+            content.classList.toggle('expanded', !isActive);
+            content.classList.toggle('active', !isActive);
         }
 
         function switchTab(btn, tabName) {
@@ -412,25 +515,60 @@
             const modal = document.getElementById('attachmentModal');
             const title = document.getElementById('modalTitle');
             const image = document.getElementById('modalImage');
+            const imageContainer = document.getElementById('imageContainer');
+            const textPreview = document.getElementById('modalText');
             const download = document.getElementById('modalDownload');
+            const pdfFrame = document.getElementById('modalPDF');
+
+            // Очистка состояния
+            image.src = '';
+            pdfFrame.src = '';
+            textPreview.textContent = '';
+            imageContainer.style.display = 'none';
+            image.style.display = 'none';
+            textPreview.style.display = 'none';
+            pdfFrame.style.display = 'none';
+            download.style.display = 'none';
 
             title.textContent = name;
+            const filePath = `./attachments/${name}`;
 
             if (type.startsWith('image/')) {
-                image.src = `./attachments/${name}`;
+                image.src = filePath;
+                imageContainer.style.display = 'block';
                 image.style.display = 'block';
-                download.style.display = 'none';
+
+            } else if (type === 'application/pdf') {
+                pdfFrame.src = filePath;
+                pdfFrame.style.display = 'block';
+
+            } else if (
+                type.startsWith('text/') ||
+                /\.(json|log|txt|py|csv|md)$/i.test(name)
+            ) {
+                fetch(filePath)
+                    .then(response => response.text())
+                    .then(text => {
+                        textPreview.textContent = text;
+                        textPreview.style.display = 'block';
+                    })
+                    .catch(() => {
+                        textPreview.textContent = '[Ошибка загрузки текста]';
+                        textPreview.style.display = 'block';
+                    });
+
             } else {
-                image.style.display = 'none';
-                download.style.display = 'block';
-                download.onclick = () => window.open(`./attachments/${name}`, '_blank');
+                download.href = filePath;
+                download.style.display = 'inline-block';
             }
 
             modal.style.display = 'block';
         }
 
-        function closeModal() {
-            document.getElementById('attachmentModal').style.display = 'none';
+        function closeModal(event) {
+            if (event.target.id === 'attachmentModal' || event.target.classList.contains('close')) {
+                document.getElementById('attachmentModal').style.display = 'none';
+            }
         }
 
         window.onclick = function(event) {

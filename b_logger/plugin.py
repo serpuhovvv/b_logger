@@ -1,12 +1,19 @@
 import pytest
 
-from xdist import is_xdist_controller, get_xdist_worker_id
-
 from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.generators.report_gen import ReportGenerator
 from b_logger.utils.py_addons import BLoggerOptions, BLoggerMarkers
 from b_logger.utils.paths import *
 from b_logger.runtime import RunTime
+
+try:
+    from xdist import is_xdist_controller, get_xdist_worker_id
+except ImportError:
+    def is_xdist_controller(*args, **kwargs):
+        return False
+
+    def get_xdist_worker_id(*args, **kwargs):
+        return 'master'
 
 
 runtime = RunTime()

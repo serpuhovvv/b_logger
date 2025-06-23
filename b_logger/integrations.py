@@ -8,6 +8,23 @@ from b_logger.config import blog_config
 from b_logger.entities.attachments import Attachment
 
 
+# try:
+#     from qase.pytest import qase
+# except Exception as e:
+#     qase = None
+#     blog_config.qase = False
+#     print(f'[WARN] Qase import error: {e}')
+#
+# try:
+#     import allure
+#     from allure_commons.types import AttachmentType
+# except Exception as e:
+#     allure = None
+#     AttachmentType = None
+#     blog_config.allure = False
+#     print(f'[WARN] Allure import error: {e}')
+
+
 class IntegrationBase(ABC):
     @abstractmethod
     def is_enabled(self) -> bool: ...
@@ -109,6 +126,13 @@ class Integrations:
     @staticmethod
     @contextmanager
     def step(title, expected=None):
+        # for adapter in adapters:
+            # if adapter.is_enabled():
+            #     with adapter.step(title, expected):
+            #         yield
+            # else:
+            #     yield
+
         with ExitStack() as stack:
             for adapter in adapters:
                 if adapter.is_enabled():

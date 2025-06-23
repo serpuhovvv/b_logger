@@ -1,6 +1,7 @@
 import shutil
 import uuid
 import mimetypes
+import json
 import os
 from pathlib import Path
 from typing import Union, Optional, BinaryIO
@@ -14,14 +15,16 @@ class Attachment(BaseDataModel):
 
     def __init__(
         self,
-        source: Union[str, Path, bytes, BinaryIO],
+        source: Union[str, Path, bytes, BinaryIO, dict, list, int, float, None] = None,
         name: Optional[str] = None,
-        type_: Optional[str] = None
+        type_: Optional[str] = None,
+        _skip_processing: bool = False,  # внутренний флаг для from_dict
     ):
         self.name = name or f'attachment_{uuid.uuid4()}'
         self.type_ = type_
 
-        self._process_attachment(source)
+        if not _skip_processing:
+            self._process_attachment(source)
 
     def _process_attachment(self, source):
         if isinstance(source, bytes):
@@ -30,13 +33,34 @@ class Attachment(BaseDataModel):
                 self.name += '.png'
             self.__from_bytes(source)
 
-        elif isinstance(source, (str, Path)):
-            path = Path(source)
-            self.type = mimetypes.guess_type(str(path))[0] or 'application/octet-stream'
-            self.__from_file(path)
+        elif isinstance(source, (dict, list, int, float, bool, type(None))):
+            self.type_ = 'application/json'
+            if not self.name.endswith('.json'):
+                self.name += '.json'
+            data = json.dumps(source, ensure_ascii=False, indent=2).encode('utf-8')
+            self.__from_bytes(data)
 
-        elif hasattr(source, 'read'):  # file-like
-            self.type = mimetypes.guess_type(getattr(source, 'name'))[0] or 'application/octet-stream'
+        elif isinstance(source, str):
+            path = Path(source)
+            if path.exists():
+                self.type_ = mimetypes.guess_type(str(path))[0] or 'application/octet-stream'
+                self.__from_file(path)
+            else:
+                try:
+                    parsed = json.loads(source)
+                    self.type_ = 'application/json'
+                    if not self.name.endswith('.json'):
+                        self.name += '.json'
+                    self.__from_bytes(json.dumps(parsed, ensure_ascii=False, indent=2).encode('utf-8'))
+                except json.JSONDecodeError:
+                    raise ValueError("String source must be a path or valid JSON")
+
+        elif isinstance(source, Path):
+            self.type_ = mimetypes.guess_type(str(source))[0] or 'application/octet-stream'
+            self.__from_file(source)
+
+        elif hasattr(source, 'read'):
+            self.type_ = mimetypes.guess_type(getattr(source, 'name', ''))[0] or 'application/octet-stream'
             self.__from_filelike(source)
 
         else:
@@ -51,8 +75,7 @@ class Attachment(BaseDataModel):
             self.name += ext
 
         dest_path = self.root / self.name
-
-        if not os.path.exists(dest_path):
+        if not dest_path.exists():
             shutil.copy2(file_path, dest_path)
 
     def __from_bytes(self, data: bytes):
@@ -65,3 +88,16 @@ class Attachment(BaseDataModel):
         if isinstance(data, str):
             data = data.encode('utf-8')
         self.__from_bytes(data)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'Attachment':
+        name = data.get("name")
+        type_ = data.get("type_")
+
+        # Проверка, что файл физически существует
+        path = cls.root / name
+        if not path.exists():
+            raise FileNotFoundError(f"Attachment file not found: {path}")
+
+        # Возвращаем объект без повторной обработки файла
+        return cls(path, name=name, type_=type_, _skip_processing=True)

@@ -1,9 +1,6 @@
 import pytest
 from contextlib import contextmanager
 
-from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
-from playwright.sync_api import Page
-
 from b_logger.entities.steps import Step
 from b_logger.entities.exceptions import possible_exceptions
 from b_logger.integrations import Integrations
@@ -39,7 +36,7 @@ class BLogger:
         runtime.set_env(env)
 
     @staticmethod
-    def set_browser(browser: RemoteWebDriver | WebDriver | Page):
+    def set_browser(browser: "RemoteWebDriver | WebDriver | Page"):
         """
         Set browser in a browser init fixture or in a test
 

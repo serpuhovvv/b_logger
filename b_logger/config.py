@@ -20,8 +20,8 @@ class BLoggerConfig(BaseDataModel):
         config_data = self._load_config_file(path)
 
         self.set_project_name(config_data.project_name)
-        self.set_qase(config_data.integrations.qase or False)
-        self.set_allure(config_data.integrations.allure or False)
+        # self.set_qase(config_data.integrations.qase or False)
+        # self.set_allure(config_data.integrations.allure or False)
         # self.set_links(config_data.links or None)
 
     def _load_config_file(self, path: str):

@@ -12,7 +12,6 @@ authors = [{name="serpuhovvv", email="pudikovserg@gmail.com"}]
 requires-python = ">=3.12"
 dependencies = [
     'pytest',
-    'pytest-xdist',
     'pyyaml',
     'filelock',
     'Jinja2'
@@ -27,6 +26,7 @@ classifiers = [
 
 [project.optional-dependencies]
 extra = [
+    'pytest-xdist',
     "selenium",
     "playwright",
     "pytest-playwright",

@@ -20,7 +20,8 @@ class DotDict(dict):
         try:
             return self[key]
         except KeyError:
-            raise AttributeError(f"No such attribute: {key}")
+            print(f"No such attribute: {key}")
+            return None
 
     def __setattr__(self, key, value):
         self[key] = value
