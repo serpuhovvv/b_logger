@@ -17,14 +17,14 @@ class BLoggerConfig(BaseDataModel):
     links = None
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/blog.config.yaml'):
-        config_data = self._load(path)
+        config_data = self._load_config_file(path)
 
         self.set_project_name(config_data.project_name)
         self.set_qase(config_data.integrations.qase or False)
         self.set_allure(config_data.integrations.allure or False)
-        self.set_links(config_data.links or None)
+        # self.set_links(config_data.links or None)
 
-    def _load(self, path: str):
+    def _load_config_file(self, path: str):
         config_path = Path(path)
         if not os.path.exists(config_path):
             raise FileNotFoundError(f'Config file not found: {path}')

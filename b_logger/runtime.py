@@ -2,19 +2,20 @@ import json
 import os
 import traceback
 from pathlib import Path
-from typing import Union, BinaryIO
+from typing import Union, BinaryIO, TYPE_CHECKING
 
-from playwright.sync_api import Page
-from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
+if TYPE_CHECKING:
+    from playwright.sync_api import Page
+    from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
 
-from b_logger.config import blog_config
+from b_logger.entities.reports import RunReport
+from b_logger.entities.tests import TestReport, TestStatus
 from b_logger.entities.attachments import Attachment
 from b_logger.entities.prints import Print
-from b_logger.entities.reports import RunReport
-from b_logger.entities.statuses import py_outcome_to_tstatus
-from b_logger.entities.tests import TestReport, TestStatus
 from b_logger.entities.steps import Step, StepStatus, StepError, StepContainer
+from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.integrations import Integrations
+from b_logger.utils.browser_adapters import get_browser_adapter
 from b_logger.utils.formatters import format_tb
 from b_logger.utils.paths import attachments_path
 
@@ -36,7 +37,7 @@ class RunTime:
     def set_env(self, env: str):
         self.run_report.set_env(env)
 
-    def set_browser(self, browser: RemoteWebDriver | WebDriver | Page):
+    def set_browser(self, browser: "RemoteWebDriver | WebDriver | Page"):
         self.browser = browser
 
     def start_test(self, item):
@@ -154,7 +155,7 @@ class RunTime:
 
             info[key] = v
 
-            Integrations.info(key, v)
+            # Integrations.info(key, v)
 
         current_step = self.step_container.get_current_step()
 
@@ -198,35 +199,18 @@ class RunTime:
         if not scr_name:
             index = 1
             while True:
-                if is_error:
-                    scr_name = f'err_scr_{self.test_report.name}_{index}.png'
-                else:
-                    scr_name = f'scr_{self.test_report.name}_{index}.png'
-
+                scr_name = f"{'err_' if is_error else ''}scr_{self.test_report.name}_{index}.png"
                 if scr_name not in os.listdir(attachments_path()):
                     break
                 index += 1
 
-        if isinstance(self.browser, (RemoteWebDriver, WebDriver)):
-            try:
-                self.attach(self.browser.get_screenshot_as_png(), f'{"err_" if is_error else ''}scr_{scr_name}.png')
-            except Exception as e:
-                raise RuntimeError(f'Unable to make screenshot: {e}')
+        adapter = get_browser_adapter(self.browser)
 
-        elif isinstance(self.browser, Page):
-            pages = self.browser.context.pages
-            for page in pages:
-                try:
-                    self.attach(page.screenshot(), scr_name)
-                    return
-                except Exception as e:
-                    pass
-
-            raise RuntimeError(f'Unable to make screenshot! There is no valid playwright page: {pages}')
-
-        else:
-            raise RuntimeError(f'Browser is incorrect, unable to make screenshot!!! '
-                               f'Current browser is {self.browser}')
+        try:
+            screenshot_bytes = adapter.make_screenshot()
+            self.attach(screenshot_bytes, scr_name)
+        except Exception as e:
+            raise RuntimeError(f"[ERROR] Unable to make screenshot: {e}")
 
     def attach(self, source: Union[str, Path, bytes, BinaryIO], name: str = None, mime_type: str = None):
         attachment = Attachment(source, name)
