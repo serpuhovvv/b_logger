@@ -7,8 +7,9 @@ from typing import Union, BinaryIO
 from playwright.sync_api import Page
 from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
 
+from b_logger.config import blog_config
 from b_logger.entities.attachments import Attachment
-from b_logger.entities.prints import Print, PrintStatus
+from b_logger.entities.prints import Print
 from b_logger.entities.reports import RunReport
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.entities.tests import TestReport, TestStatus
@@ -153,6 +154,8 @@ class RunTime:
 
             info[key] = v
 
+            Integrations.info(key, v)
+
         current_step = self.step_container.get_current_step()
 
         if current_step:
@@ -206,7 +209,7 @@ class RunTime:
 
         if isinstance(self.browser, (RemoteWebDriver, WebDriver)):
             try:
-                self.attach(self.browser.get_screenshot_as_png(), scr_name)
+                self.attach(self.browser.get_screenshot_as_png(), f'{"err_" if is_error else ''}scr_{scr_name}.png')
             except Exception as e:
                 raise RuntimeError(f'Unable to make screenshot: {e}')
 
@@ -235,3 +238,13 @@ class RunTime:
         self.test_report.add_attachment(attachment)
 
         Integrations.attach(source, attachment)
+
+    # def link(self, id_):
+    #     if blog_config.link_prefix:
+    #         url = f'{blog_config.link_prefix}/{id_}'
+    #     else:
+    #         url = f'{id_}'
+    #
+    #     self.apply_info(link=url)
+    #
+    #     Integrations.link(url)

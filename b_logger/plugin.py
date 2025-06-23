@@ -11,7 +11,7 @@ from b_logger.runtime import RunTime
 
 runtime = RunTime()
 
-debug = True
+debug = False
 
 
 def pytest_addoption(parser):

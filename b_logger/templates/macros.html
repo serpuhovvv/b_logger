@@ -38,7 +38,7 @@
     </div>
     <div class="content active">
         <div class="meta-grid">
-            <div class="meta-item"><span>Environment</span><strong>{{ report.env }}</strong></div>
+            <div class="meta-item"><span>Environment</span><strong>{{ report.env | upper }}</strong></div>
             <div class="meta-item"><span>Base URL</span><strong>{{ report.base_url }}</strong></div>
             <div class="meta-item"><span>Duration</span><strong>{{ report.duration }}</strong></div>
             <div class="meta-item"><span>Start Time</span><strong>{{ report.start_time }}</strong></div>
@@ -274,11 +274,11 @@
 {% macro render_step(step) %}
 {% set has_addons = step.expected or step.info or step.error or step.attachments or step.known_bugs %}
 {% if step.id.startswith('print_') %}
-    <div class="step print level-1">
+    <div class="step print level-0">
         <span class="step-title">{{ step.title }}</span>
     </div>
 {% else %}
-    <div class="step {{ step.status }} level-1">
+    <div class="step {{ step.status }} level-0">
         <div class="step-header" onclick="toggleStep(this)">
             <div class="step-info">
                 <span class="step-title">{{ step.title }}</span>
@@ -339,7 +339,6 @@
     </div>
 {% endif %}
 {% endmacro %}
-
 
 
 

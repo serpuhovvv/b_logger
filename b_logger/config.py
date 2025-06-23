@@ -14,7 +14,7 @@ class BLoggerConfig(BaseDataModel):
     base_url: str = None
     qase: bool = None
     allure: bool = None
-    html = None
+    links = None
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/blog.config.yaml'):
         config_data = self._load(path)
@@ -22,6 +22,7 @@ class BLoggerConfig(BaseDataModel):
         self.set_project_name(config_data.project_name)
         self.set_qase(config_data.integrations.qase or False)
         self.set_allure(config_data.integrations.allure or False)
+        self.set_links(config_data.links or None)
 
     def _load(self, path: str):
         config_path = Path(path)
@@ -42,6 +43,10 @@ class BLoggerConfig(BaseDataModel):
 
     def set_allure(self, allure: bool):
         self.allure = allure
+
+    # def set_links(self, links):
+    #     # for link in links:
+    #     self.links = links
 
     def __getattr__(self, item):
         return getattr(self._data, item)

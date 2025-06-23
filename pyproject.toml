@@ -1,22 +1,38 @@
 [project]
 name = "b_logger"
 version = "1.0.0"
-description = "Pytest plugin for logging and combining allure and qase functionality as well as generating lightweight reports"
+description = """
+    BLogger is a Pytest plugin for enhanced test logging and reporting.
+    It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots.
+    Works seamlessly with Selenium WebDriver and Playwright Page instances.
+    Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
+    """
+readme = "README.md"
 authors = [{name="serpuhovvv", email="pudikovserg@gmail.com"}]
+requires-python = ">=3.12"
 dependencies = [
     'pytest',
     'pytest-xdist',
-    'allure-pytest',
-    'pathlib',
-    'qase-pytest',
-    'pytest-playwright',
-    'playwright',
     'pyyaml',
     'filelock',
-    'Jinja2',
-    'selenium'
+    'Jinja2'
 ]
-requires-python = ">=3.12"
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+
+[project.optional-dependencies]
+extra = [
+    "selenium",
+    "playwright",
+    "pytest-playwright",
+    "allure-pytest",
+    "qase-pytest"
+]
 
 
 [project.entry-points.pytest11]

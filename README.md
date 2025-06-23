@@ -6,7 +6,8 @@
 
 BLogger is a Pytest plugin for enhanced test logging and reporting.  
 It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots.  
-Works seamlessly with Selenium WebDriver and Playwright Page instances.
+Works seamlessly with Selenium WebDriver and Playwright Page instances. \
+Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 
 ### Features
 
@@ -41,7 +42,7 @@ import random
 from pytest_playwright.pytest_playwright import Playwright
 from selenium import webdriver
 
-from b_logger import blog, PrintStatus
+from b_logger import blog
 
 
 blog.set_env('prod')

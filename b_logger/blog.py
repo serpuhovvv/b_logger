@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
 from playwright.sync_api import Page
 
-from b_logger.entities.prints import PrintStatus
 from b_logger.entities.steps import Step
 from b_logger.entities.exceptions import possible_exceptions
 from b_logger.integrations import Integrations
@@ -134,7 +133,7 @@ class BLogger:
     @staticmethod
     @contextmanager
     def step(title: str, expected: str = None):
-        with Integrations.steps(title, expected):
+        with Integrations.step(title, expected):
 
             step = Step(title=title, expected=expected)
 
@@ -186,3 +185,7 @@ class BLogger:
             It will be added to Test Run and Current Step
         """
         runtime.attach(source, name)
+
+    # @staticmethod
+    # def link(url: str):
+    #     pass

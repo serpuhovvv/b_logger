@@ -3,7 +3,7 @@ import random
 from pytest_playwright.pytest_playwright import Playwright
 from selenium import webdriver
 
-from b_logger import blog, PrintStatus
+from b_logger import blog
 
 blog.set_env('prod')
 
