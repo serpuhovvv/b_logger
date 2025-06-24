@@ -132,13 +132,13 @@
         .tab-btn:hover { background: var(--border-light); color: var(--text); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg-card); }
         .tab-btn.error { color: var(--failed); }
-        .tab-content { display: none; padding: 1.5rem; }
+        .tab-content { display: none; padding: 1rem; }
         .tab-content.active { display: block; }
 
         /* ============================================ */
         /* CONTENT SECTIONS */
         /* ============================================ */
-        .section { margin-bottom: 1.5rem; }
+        .section { margin-bottom: 1rem; margin-top: 0.25rem;}
 
         .description { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap; font-size: 0.875rem;}
 
@@ -148,7 +148,7 @@
         .info-value { font-size: 0.875rem; }
 
         .bug-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-        .bug-item { background: var(--failed-bg); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 0.5rem; }
+        .bug-item { background: var(--failed-bg); padding: 1rem; border-radius: var(--radius-sm); }
         .bug-desc { font-weight: 600; color: var(--failed); }
         .bug-item a { color: var(--failed); text-decoration: none; font-size: 0.875rem; }
 
@@ -169,7 +169,7 @@
         .step-badge { font-size: 0.875rem; padding: 0.5rem; align-items: center; display: flex; gap: 0.5rem;}
         .step-title { font-weight: 500; white-space: pre-wrap;}
         .error-icon { color: var(--failed); font-size: 0.875rem; }
-        .step-content { display: none; padding: 0.5rem; background: var(--bg-card); border-radius: var(--radius-sm); }
+        .step-content { display: none; margin-top: 0.5rem; padding: 0rem; background: var(--bg-card); border-radius: var(--radius-sm); }
         .step-content.active { display: block; }
         .step-children { margin-top: 0.5rem; }
         .step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
@@ -207,7 +207,7 @@
         /* ============================================ */
         /* ERROR SECTIONS */
         /* ============================================ */
-        .error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1.5rem; border-radius: var(--radius); }
+        .error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1rem; border-radius: var(--radius); }
         .error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; }
         .stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem; font-weight: 550; overflow-x: auto; white-space: pre-wrap; }
 
@@ -215,99 +215,85 @@
         /* MODAL */
         /* ============================================ */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            overflow: auto;
+          display: none;
+          position: fixed;
+          z-index: 999;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.8);
+          overflow: auto;
+          padding: 2vh 2vw;
         }
 
         .modal-content {
-            position: relative;
-            margin: 5% auto;
-            padding: 1rem 1.5rem;
-            background: var(--bg-card, #fff);
-            border-radius: var(--radius, 8px);
-            max-width: 90%;
-            max-height: 90%;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+          position: relative;
+          margin: auto;
+          background: #fff;
+          border-radius: 8px;
+          max-width: 90vw;
+          max-height: 90vh;
+          padding: 1rem;
+          box-sizing: border-box;
         }
 
-        .modal-title {
-            margin: 0 0 1rem;
-            font-size: 1.25rem;
-            text-align: center;
+        .attachment-body {
+          max-height: 80vh;
+          overflow: auto;
+          margin-top: 1rem;
+          text-align: center;
         }
 
-        .modal-body {
-            text-align: left;
-            margin-bottom: 1rem;
-            overflow: auto;
-            max-height: 70vh;
-        }
-
-        .image-container {
-            text-align: center;
-            cursor: grab;
-        }
-
-        .image-container img {
-            max-width: none;
-            max-height: none;
-            width: auto;
-            height: auto;
-            transition: transform 0.2s ease;
-            transform-origin: center center;
+        #modalImage {
+          max-width: 100%;
+          max-height: 100%;
+          transition: transform 0.2s ease;
+          transform-origin: center;
+          cursor: grab;
         }
 
         #modalPDF {
-            width: 100%;
-            height: 70vh;
+          width: 100%;
+          height: 70vh;
+          border: none;
         }
 
         #modalText {
-            font-family: monospace;
-            background: #f8f9fa;
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            color: #333;
+          background: #f9f9f9;
+          text-align: left;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          padding: 1rem;
+          border-radius: 6px;
+          font-family: monospace;
+          font-size: 0.95rem;
         }
 
-        .modal-download {
-            display: inline-block;
-            margin-top: 1rem;
-            text-align: center;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            background: #007bff;
-            color: white;
-            border-radius: var(--radius-sm);
-            text-decoration: none;
+        .download-link {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 0.5rem 1rem;
+          background: #007bff;
+          color: #fff;
+          border-radius: 5px;
+          text-decoration: none;
         }
 
-        .modal-download:hover {
-            background: #0056b3;
+        .download-link:hover {
+          background: #0056b3;
         }
 
         .close {
-            position: absolute;
-            top: 0.5rem;
-            right: 1rem;
-            font-size: 1.75rem;
-            color: #aaa;
-            background: none;
-            border: none;
-            cursor: pointer;
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          font-size: 1.5rem;
+          background: none;
+          border: none;
+          color: #888;
+          cursor: pointer;
         }
 
         .close:hover {
-            color: #333;
+          color: #000;
         }
 
         /* ============================================ */
@@ -351,17 +337,17 @@
     <div id="attachmentModal" class="modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="close" onclick="closeModal(event)">×</button>
-            <h2 id="modalTitle" class="modal-title"></h2>
+            <h2 id="modalTitle"></h2>
 
-            <div id="imageContainer" class="modal-body image-container">
-                <img id="modalImage" src="" alt="Image preview" />
+            <div id="imageContainer" class="attachment-body">
+              <img id="modalImage" src="" alt="Attachment" />
             </div>
 
-            <iframe id="modalPDF" class="modal-body" style="display:none;" frameborder="0"></iframe>
+            <iframe id="modalPDF" class="attachment-body" style="display: none;"></iframe>
 
-            <pre id="modalText" class="modal-body" style="display:none;"></pre>
+            <pre id="modalText" class="attachment-body" style="display: none;"></pre>
 
-            <a id="modalDownload" class="modal-download" target="_blank">Download file</a>
+            <a id="modalDownload" class="download-link" target="_blank" style="display: none;">Download file</a>
         </div>
     </div>
 
@@ -511,70 +497,95 @@
             if (targetContent) targetContent.classList.add('active');
         }
 
+        const modal = document.getElementById('attachmentModal');
+        const title = document.getElementById('modalTitle');
+        const image = document.getElementById('modalImage');
+        const imageContainer = document.getElementById('imageContainer');
+        const textPreview = document.getElementById('modalText');
+        const pdfFrame = document.getElementById('modalPDF');
+        const download = document.getElementById('modalDownload');
+
+        let scale = 1;
+
         function openAttachment(name, type) {
-            const modal = document.getElementById('attachmentModal');
-            const title = document.getElementById('modalTitle');
-            const image = document.getElementById('modalImage');
-            const imageContainer = document.getElementById('imageContainer');
-            const textPreview = document.getElementById('modalText');
-            const download = document.getElementById('modalDownload');
-            const pdfFrame = document.getElementById('modalPDF');
+          const path = `./attachments/${name}`;
 
-            // Очистка состояния
-            image.src = '';
-            pdfFrame.src = '';
-            textPreview.textContent = '';
-            imageContainer.style.display = 'none';
-            image.style.display = 'none';
-            textPreview.style.display = 'none';
-            pdfFrame.style.display = 'none';
-            download.style.display = 'none';
+          // Reset state
+          scale = 1;
+          image.style.transform = 'scale(1)';
+          image.src = '';
+          pdfFrame.src = '';
+          textPreview.textContent = '';
+          [imageContainer, textPreview, pdfFrame, download].forEach(el => el.style.display = 'none');
 
-            title.textContent = name;
-            const filePath = `./attachments/${name}`;
+          title.textContent = name;
 
-            if (type.startsWith('image/')) {
-                image.src = filePath;
-                imageContainer.style.display = 'block';
-                image.style.display = 'block';
+          if (type.startsWith('image/')) {
+            image.src = path;
+            imageContainer.style.display = 'block';
 
-            } else if (type === 'application/pdf') {
-                pdfFrame.src = filePath;
-                pdfFrame.style.display = 'block';
+          } else if (type === 'application/pdf') {
+            pdfFrame.src = path;
+            pdfFrame.style.display = 'block';
 
-            } else if (
-                type.startsWith('text/') ||
-                /\.(json|log|txt|py|csv|md)$/i.test(name)
-            ) {
-                fetch(filePath)
-                    .then(response => response.text())
-                    .then(text => {
-                        textPreview.textContent = text;
-                        textPreview.style.display = 'block';
-                    })
-                    .catch(() => {
-                        textPreview.textContent = '[Ошибка загрузки текста]';
-                        textPreview.style.display = 'block';
-                    });
+          } else if (type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
+            fetch(path)
+              .then(res => res.text())
+              .then(text => {
+                textPreview.textContent = text;
+                textPreview.style.display = 'block';
+              })
+              .catch(() => {
+                textPreview.textContent = '[Ошибка загрузки текста]';
+                textPreview.style.display = 'block';
+              });
 
-            } else {
-                download.href = filePath;
-                download.style.display = 'inline-block';
-            }
+          } else {
+            download.href = path;
+            download.style.display = 'inline-block';
+          }
 
-            modal.style.display = 'block';
+          modal.style.display = 'block';
         }
 
         function closeModal(event) {
-            if (event.target.id === 'attachmentModal' || event.target.classList.contains('close')) {
-                document.getElementById('attachmentModal').style.display = 'none';
-            }
+          if (event.target.id === 'attachmentModal' || event.target.classList.contains('close')) {
+            modal.style.display = 'none';
+          }
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('attachmentModal');
-            if (event.target === modal) modal.style.display = 'none';
-        }
+        // Zoom + drag
+        imageContainer.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          scale += e.deltaY * -0.001;
+          scale = Math.min(Math.max(scale, 0.5), 5);
+          image.style.transform = `scale(${scale})`;
+        });
+
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        imageContainer.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          startX = e.pageX;
+          startY = e.pageY;
+          scrollLeft = imageContainer.scrollLeft;
+          scrollTop = imageContainer.scrollTop;
+          imageContainer.style.cursor = 'grabbing';
+        });
+
+        imageContainer.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          imageContainer.scrollLeft = scrollLeft - (e.pageX - startX);
+          imageContainer.scrollTop = scrollTop - (e.pageY - startY);
+        });
+
+        ['mouseup', 'mouseleave'].forEach(evt =>
+          imageContainer.addEventListener(evt, () => {
+            isDragging = false;
+            imageContainer.style.cursor = 'grab';
+          })
+        );
 
         document.addEventListener('DOMContentLoaded', function() {
             initFilters();
