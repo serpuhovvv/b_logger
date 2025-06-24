@@ -374,3 +374,106 @@
     {% endif %}
 </div>
 {% endmacro %}
+
+
+
+
+{% macro render_overall_statistics(report) %}
+<table class="card table">
+  <caption>Overall Test Statistics</caption>
+  <thead>
+    <tr>
+      <th>Metric</th><th>Count (Percent)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set passed = report.run_results.PASSED %}
+    {% set failed = report.run_results.FAILED %}
+    {% set broken = report.run_results.BROKEN %}
+    {% set skipped = report.run_results.SKIPPED %}
+    {% set total = passed + failed + broken + skipped %}
+    {% for label, count in [('Total', total), ('Passed', passed), ('Failed', failed), ('Broken', broken), ('Skipped', skipped)] %}
+    {% set pct = (count / total * 100 if total > 0 else 0) | round(1) %}
+    <tr>
+      <td>{{ label }}</td>
+      <td>{{ count }} ({{ pct }}%)</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
+
+
+
+{% macro render_module_statistics(report) %}
+<table class="card table">
+  <caption>Module Statistics</caption>
+  <thead>
+    <tr>
+      <th>Module</th><th>Count</th><th>Passed (%)</th><th>Failed (%)</th><th>Broken (%)</th><th>Skipped (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for module_name, module_data in report.modules.items() %}
+      {% set m_passed = module_data.results.PASSED or 0 %}
+      {% set m_failed = module_data.results.FAILED or 0 %}
+      {% set m_broken = module_data.results.BROKEN or 0 %}
+      {% set m_skipped = module_data.results.SKIPPED or 0 %}
+      {% set m_total = m_passed + m_failed + m_broken + m_skipped %}
+      <tr>
+        <td>{{ module_name }}</td>
+        <td>{{ m_total }}</td>
+        <td>{{ m_passed }} ({{ (m_passed/m_total*100 if m_total>0 else 0) | round(1) }}%)</td>
+        <td>{{ m_failed }} ({{ (m_failed/m_total*100 if m_total>0 else 0) | round(1) }}%)</td>
+        <td>{{ m_broken }} ({{ (m_broken/m_total*100 if m_total>0 else 0) | round(1) }}%)</td>
+        <td>{{ m_skipped }} ({{ (m_skipped/m_total*100 if m_total>0 else 0) | round(1) }}%)</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
+
+
+
+{% macro render_failed_tests(report) %}
+<table class="card table">
+  <caption>Failed Tests Details</caption>
+  <thead>
+    <tr>
+      <th>Module</th><th>Test</th><th>Error</th><th>Attachments</th><th>Known Bugs</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for module_name, module_data in report.modules.items() %}
+      {% for test_name, test_runs in module_data.tests.items() %}
+        {% for run in test_runs %}
+            {% if run.status == "FAILED" or run.status == "BROKEN" %}
+                {% set attach_count = run.attachments | length if run.attachments else 0 %}
+                {% set bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
+                <tr>
+                  <td>{{ module_name }}</td>
+                  <td>{{ run.name }}</td>
+                  <td><pre>{{ run.error }}</pre></td>
+                  <td>{{ attach_count }}</td>
+                  <td>{{ bugs_count }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
+
+
+
+{% macro render_full_report_summary(report) %}
+{{ render_overall_statistics(report) }}
+<br/>
+{{ render_module_statistics(report) }}
+<br/>
+{{ render_failed_tests(report) }}
+{% endmacro %}

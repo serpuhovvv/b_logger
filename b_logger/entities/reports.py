@@ -47,7 +47,7 @@ class RunReport(BaseDataModel):
             }
         )
 
-    def set_env(self, env):
+    def set_env(self, env: str):
         self.env = env
 
     def set_worker(self, worker):

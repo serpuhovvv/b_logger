@@ -1,10 +1,15 @@
-import pytest
-
 from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.generators.report_gen import ReportGenerator
 from b_logger.utils.py_addons import BLoggerOptions, BLoggerMarkers
 from b_logger.utils.paths import *
 from b_logger.runtime import RunTime
+
+
+try:
+    import pytest
+except ImportError:
+    raise ImportError('[ERROR] To use b_logger you need pytest to be installed')
+
 
 try:
     from xdist import is_xdist_controller, get_xdist_worker_id
@@ -30,7 +35,7 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     BLoggerMarkers.add_blog_markers(config)
 
-    print(f'ROOTDIR: {config.rootpath}')
+    # print(f'ROOTDIR: {config.rootpath}')
 
     try:
         env = config.option.blog_env
@@ -89,9 +94,15 @@ def pytest_runtest_call(item):
     _apply_browser(item)
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_runtest_teardown(item):
-    runtime.finish_test(item)
+# @pytest.hookimpl(tryfirst=True)
+# def pytest_runtest_teardown(item):
+#     yield
+#     runtime.finish_test(item)
+
+
+@pytest.hookimpl
+def pytest_runtest_logfinish():
+    runtime.finish_test()
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -150,6 +161,7 @@ def _apply_browser(item):
                 try:
                     browser = item.funcargs.get(browser_name, None)
                     runtime.set_browser(browser)
+                    return
                 except Exception as e:
                     print(f"[WARN] Error setting up browser automatically: {e}")
 

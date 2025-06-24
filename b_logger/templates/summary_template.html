@@ -1,0 +1,129 @@
+{% import 'macros.html' as macros %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.proj_name }} - Summary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+        /* ============================================ */
+        /* CSS VARIABLES AND RESET */
+        /* ============================================ */
+        :root {
+            --passed: #10B981; --passed-bg: #ECFDF5; --passed-light: #D1FAE5;
+            --failed: #EF4444; --failed-bg: #FEF2F2; --failed-light: #FECACA;
+            --broken: #F59E0B; --broken-bg: #FFFBEB; --broken-light: #FEF3C7;
+            --skipped: #6B7280; --skipped-bg: #F9FAFB; --skipped-light: #F3F4F6;
+            --print: #8B5CF6; --print-bg: #F5F3FF; --print-light: #E0E7FF;
+
+            --primary: #3B82F6; --primary-dark: #1D4ED8;
+            --bg: #F8FAFC; --bg-card: #FFFFFF; --bg-light: #F1F5F9;
+            --text: #0F172A; --text-light: #475569; --text-muted: #64748B;
+            --border: #E2E8F0; --border-light: #F1F5F9;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --radius: 8px; --radius-sm: 4px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .container { margin: 0 auto; padding: 2rem; }
+
+        .card.table {
+          width: 100%;
+          border-radius: var(--radius-sm);
+          background: var(--bg-card);
+          margin: 1.5rem 0;
+          border-collapse: collapse;
+          font-family: inherit;
+        }
+
+        .card.table caption {
+          caption-side: top;
+          text-align: left;
+          font-size: 1.25rem;
+          font-weight: 600;
+          padding: 1rem;
+          background: var(--bg-light);
+          color: var(--text);
+          border-bottom: 1px solid var(--border);
+        }
+
+        .card.table th,
+        .card.table td {
+          padding: 0.75rem 1rem;
+          border: 1px solid var(--border);
+          text-align: left;
+          vertical-align: top;
+        }
+
+        .card.table thead th {
+          background: var(--bg-light);
+          color: var(--text);
+          font-weight: 600;
+        }
+
+        .card.table tbody tr:nth-child(odd) {
+          background: var(--bg-card);
+        }
+
+        .card.table tbody tr:hover {
+          background: var(--bg-light);
+        }
+
+        /* Бейджи внутри таблицы (если используются) */
+        .badge {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          border-radius: var(--radius-sm);
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+        .badge.passed { background: var(--passed-light); color: var(--passed); }
+        .badge.failed { background: var(--failed-light); color: var(--failed); }
+        .badge.broken { background: var(--broken-light); color: var(--broken); }
+        .badge.skipped { background: var(--skipped-light); color: var(--skipped); }
+
+        /* Мобильная адаптивность для почтовых клиентов */
+        @media only screen and (max-width: 600px) {
+          .card.table, .card.table thead, .card.table tbody,
+          .card.table th, .card.table td, .card.table caption {
+            display: block; width: 100%;
+          }
+          .card.table thead { display: none; }
+          .card.table caption { border-bottom: none; }
+          .card.table tbody tr {
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.5rem;
+            background: var(--bg-card);
+          }
+          .card.table tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+          }
+          .card.table tbody td:last-child { border-bottom: none; }
+          .card.table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-muted);
+          }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {{ macros.render_full_report_summary(report) }}
+    </div>
+</body>
+</html>

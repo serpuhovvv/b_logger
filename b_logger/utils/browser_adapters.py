@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import importlib
 
 
-
 class BrowserAdapter(ABC):
     @abstractmethod
     def make_screenshot(self) -> bytes:
@@ -30,12 +29,17 @@ class PlaywrightAdapter(BrowserAdapter):
         self.page = page
 
     def make_screenshot(self) -> bytes:
-        pages = self.page.context.pages
-        for page in pages:
-            try:
-                return page.screenshot()
-            except Exception:
-                pass
+        contexts = self.page.context.browser.contexts
+        # print(contexts)
+        for context in contexts:
+            pages = context.pages
+            # print(pages)
+            for page in pages:
+                try:
+                    return page.screenshot()
+                except Exception:
+                    pass
+
         print(f'[ERROR] No valid Playwright page found for screenshot')
         # raise RuntimeError("No valid Playwright page found for screenshot")
 

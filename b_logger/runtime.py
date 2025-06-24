@@ -44,7 +44,7 @@ class RunTime:
         self.step_container = StepContainer()
         self.test_report = TestReport(module, test_name, test_originalname)
 
-    def finish_test(self, item):
+    def finish_test(self):
         self.step_container.save_json()
         self.test_report.set_steps(self.step_container.container_id)
 
@@ -117,11 +117,14 @@ class RunTime:
     def handle_step_result(self, step: Step, exc=None):
         if exc:
             if not self.step_container.failed:
-                # self.make_screenshot(is_error=True)
+                self.make_screenshot(is_error=True)
 
                 step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
 
                 self.step_container.failed = True
+
+            if not self.step_container.get_current_step().parent_id:
+                self.step_container.failed = False
 
             step.set_status(StepStatus.FAILED)
 
