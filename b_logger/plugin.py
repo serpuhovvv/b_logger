@@ -23,7 +23,7 @@ except ImportError:
 
 runtime = RunTime()
 
-debug = False
+debug = True
 
 
 def pytest_addoption(parser):
@@ -84,6 +84,8 @@ def pytest_runtest_protocol(item, nextitem):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item):
+    runtime.step_container.current_stage = 'setup'
+
     _apply_py_params(item)
 
     _apply_fixtures(item)
@@ -93,7 +95,14 @@ def pytest_runtest_setup(item):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_call(item):
+    runtime.step_container.current_stage = 'call'
+
     _apply_browser(item)
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_teardown(item):
+    runtime.step_container.current_stage = 'teardown'
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)

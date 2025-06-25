@@ -37,7 +37,6 @@ class TestReport(BaseDataModel):
         self.info = {}
         self.attachments = []
         self.known_bugs = []
-        self.preconditions = None
         self.steps = None
         self.error = None
         self.stacktrace = None
@@ -47,9 +46,6 @@ class TestReport(BaseDataModel):
 
     def set_duration(self, duration: float):
         self.duration = duration
-
-    def set_preconditions(self, preconditions_id):
-        self.preconditions = preconditions_id
 
     def set_steps(self, steps_id):
         self.steps = steps_id
@@ -80,15 +76,15 @@ class TestReport(BaseDataModel):
                 self.info[key] = value
 
     def add_attachment(self, attachment: Attachment):
-        for attach in self.attachments:
-            if attach.name == attachment.name:
-                return
+        # for attach in self.attachments:
+        #     if attach.name == attachment.name:
+        #         return
         self.attachments.append(attachment)
 
-    def get_steps(self):
-        steps_path = f'{b_logs_tmp_steps_path()}/{self.steps}.json'
-        try:
-            steps = StepContainer.from_json(steps_path)
-            return steps
-        except Exception as e:
-            print(f'[WARN] Unable to get steps for {self.name}: {e}')
+    # def get_steps(self):
+    #     steps_path = f'{b_logs_tmp_steps_path()}/{self.steps}.json'
+    #     try:
+    #         steps = StepContainer.from_json(steps_path)
+    #         return steps
+    #     except Exception as e:
+    #         print(f'[WARN] Unable to get steps for {self.name}: {e}')

@@ -5,6 +5,7 @@ from enum import Enum
 from filelock import FileLock
 
 from b_logger.entities.attachments import Attachment
+from b_logger.entities.prints import Print
 from b_logger.utils.paths import b_logs_tmp_path, b_logs_tmp_steps_path
 from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.utils.formatters import format_exc, format_tb
@@ -88,34 +89,47 @@ class Step(BaseDataModel):
             return self.steps
 
 
-class StepContainer(BaseDataModel, list):
+class StepContainer(BaseDataModel, dict):
     def __init__(self):
         super().__init__()
         self.container_id = f'steps_{uuid.uuid4()}'
         self.current_step_id = None
         self.failed = False
+        self.current_stage = None
+        self['setup'] = []
+        self['call'] = []
+        self['teardown'] = []
 
     def set_current_step(self, step_id):
         self.current_step_id = step_id
 
-    def add_step(self, step):
-        self.append(step)
+    def add_step(self, step: Step | Print):
+        cur_stg = self.get(self.current_stage)
+        cur_stg.append(step)
 
-    def get_step_by_id(self, step_id) -> Step | None:
-        for step in self:
-            if getattr(step, 'id', None) == step_id:
-                return step
-
-            nested_steps = getattr(step, 'steps', None)
-            if isinstance(nested_steps, (list, StepContainer)):
-                found = StepContainer.get_step_by_id(nested_steps, step_id)
-                if found:
-                    return found
-
-        return None
+    def get_all_steps(self) -> list[Step]:
+        return self.get('setup', []) + self.get('call', []) + self.get('teardown', [])
 
     def get_current_step(self) -> Step | None:
         return self.get_step_by_id(self.current_step_id)
+
+    def get_step_by_id(self, step_id: str) -> Step | None:
+        for step in self.get_all_steps():
+            found = self._recursive_search(step, step_id)
+            if found:
+                return found
+        return None
+
+    @staticmethod
+    def _recursive_search(step: Step, step_id: str) -> Step | None:
+        if step.id == step_id:
+            return step
+        for sub_step in step.steps:
+            if not sub_step.id.startswith('print_'):
+                found = StepContainer._recursive_search(sub_step, step_id)
+                if found:
+                    return found
+        return None
 
     def save_json(self, file_name=None):
         root = f'{b_logs_tmp_steps_path()}'

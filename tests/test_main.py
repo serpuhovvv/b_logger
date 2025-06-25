@@ -10,6 +10,17 @@ blog.set_env('prod')
 blog.set_base_url('https://base-url.url')
 
 
+@pytest.fixture()
+def some_fixture():
+    with blog.step('aaa'):
+        pass
+
+    yield
+
+    with blog.step('bbb'):
+        pass
+
+
 @blog.description(
     'Test with base functionality, '
     'this description can be modified inside the test'
@@ -22,7 +33,7 @@ blog.set_base_url('https://base-url.url')
     info_explanation='You can leave any useful information by using blog.info()',
     meta={'platform': 'linux', 'python_version': 3.12}
 )
-def test_main_functionality():
+def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
 
     with blog.step('Step 1'):

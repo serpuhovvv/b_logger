@@ -70,21 +70,24 @@ class BaseDataModel:
         return {k: convert(v) for k, v in self.__dict__.items()}
 
     @classmethod
-    def from_dict(cls, data: dict):
-        obj = cls()
-
-        if isinstance(data, list):
-            return data
-
-        for key, value in data.items():
-            if hasattr(obj, key):
-                setattr(obj, key, value)
-            else:
-                obj.__dict__[key] = value
-        return obj
-
-    @classmethod
     def from_json(cls, filepath: str):
         with open(filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
         return cls.from_dict(data)
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if isinstance(data, list):
+            return data
+
+        obj = cls()
+
+        for key, value in data.items():
+            if isinstance(obj, dict):
+                obj[key] = value
+            elif hasattr(obj, key):
+                setattr(obj, key, value)
+            else:
+                obj.__dict__[key] = value
+
+        return obj

@@ -184,8 +184,13 @@
         <div class="steps">
             {% set step_data = steps[test.steps] %}
             {% if step_data %}
-                {% for step in step_data %}
-                    {{ render_step(step) }}
+                {% for stage, steps in step_data.items() %}
+                    {% if steps %}
+                    <h4>{{ stage | upper }}</h4>
+                    {% endif %}
+                    {% for step in steps %}
+                        {{ render_step(step) }}
+                    {% endfor %}
                 {% endfor %}
             {% else %}
                 <div class="no-steps">No step details available</div>
@@ -206,6 +211,55 @@
     </div>
     {% endif %}
 </div>
+
+<!--{% macro render_test_tabs(test, steps) %}-->
+<!--<div class="tabs">-->
+<!--    <div class="tab-nav">-->
+<!--        <button class="tab-btn active" onclick="switchTab(this, 'overview')">Overview</button>-->
+<!--        {% set step_data = steps[test.steps] %}-->
+<!--        {% if step_data %}-->
+<!--            {% if step_data.get('setup') %}<button class="tab-btn" onclick="switchTab(this, 'setup')">Setup</button>{% endif %}-->
+<!--            {% if step_data.get('call') %}<button class="tab-btn" onclick="switchTab(this, 'call')">Steps</button>{% endif %}-->
+<!--            {% if step_data.get('teardown') %}<button class="tab-btn" onclick="switchTab(this, 'teardown')">PostSteps</button>{% endif %}-->
+<!--        {% endif %}-->
+<!--        {% if test.attachments %}<button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>{% endif %}-->
+<!--        {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}-->
+<!--    </div>-->
+
+<!--    <div class="tab-content active" data-tab="overview">-->
+<!--        {% if test.description %}{{ render_description(test.description) }}{% endif %}-->
+<!--        {% if test.info %}{{ render_info(test.info) }}{% endif %}-->
+<!--        {% if test.known_bugs %}{{ render_known_bugs(test.known_bugs) }}{% endif %}-->
+<!--    </div>-->
+
+<!--    {% if step_data %}-->
+<!--        {% for stage, steps in step_data.items() %}-->
+<!--        <div class="tab-content" data-tab="{{ stage }}">-->
+<!--            <div class="steps">-->
+<!--                {% for step in steps %}-->
+<!--                    {{ render_step(step) }}-->
+<!--                {% endfor %}-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        {% endfor %}-->
+<!--    {% else %}-->
+<!--        <div class="no-steps">No step details available</div>-->
+<!--    {% endif %}-->
+
+<!--    {% if test.attachments %}-->
+<!--    <div class="tab-content" data-tab="attachments">-->
+<!--        {{ render_attachments(test.attachments) }}-->
+<!--    </div>-->
+<!--    {% endif %}-->
+
+<!--    {% if test.error %}-->
+<!--    <div class="tab-content" data-tab="error">-->
+<!--        {{ render_error(test.error, test.stacktrace) }}-->
+<!--    </div>-->
+<!--    {% endif %}-->
+<!--</div>-->
+<!--{% endmacro %}-->
+
 {% endmacro %}
 
 
