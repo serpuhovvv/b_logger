@@ -29,18 +29,21 @@ class PlaywrightAdapter(BrowserAdapter):
         self.page = page
 
     def make_screenshot(self) -> bytes:
-        contexts = self.page.context.browser.contexts
-        # print(contexts)
-        for context in contexts:
-            pages = context.pages
-            # print(pages)
-            for page in pages:
-                try:
-                    return page.screenshot()
-                except Exception:
-                    pass
+        try:
+            contexts = self.page.context.browser.contexts
 
-        print(f'[ERROR] No valid Playwright page found for screenshot')
+            for context in contexts:
+                pages = context.pages
+
+                for page in pages:
+                    try:
+                        return page.screenshot()
+                    except Exception as e:
+                        print(e)
+        except Exception as e:
+            print(e)
+
+        # print(f'[ERROR] No valid Playwright page found for screenshot')
         # raise RuntimeError("No valid Playwright page found for screenshot")
 
     @classmethod

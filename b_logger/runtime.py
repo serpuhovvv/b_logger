@@ -28,7 +28,7 @@ class RunTime:
         self.step_container: StepContainer = StepContainer()
 
     def set_base_url(self, base_url: str):
-        self.run_report.base_url = base_url
+        self.run_report.set_base_url(base_url)
 
     def set_env(self, env: str):
         self.run_report.set_env(env)
@@ -189,7 +189,7 @@ class RunTime:
         else:
             self.step_container.add_step(print_)
 
-        print(f'\n{data}')
+        print(f'{data}')
 
     def make_screenshot(self, scr_name: str = None, is_error: bool = False):
         if self.browser is None:

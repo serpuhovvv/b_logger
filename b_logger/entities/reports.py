@@ -32,8 +32,8 @@ class RunReport(BaseDataModel):
     def __init__(self):
         self.report_id = f'report_{uuid.uuid4()}'
         self.proj_name = blog_config.project_name
-        self.env = None
         self.base_url = None
+        self.env = None
         self.worker = None
         self.start_time = datetime.now()
         self.end_time = None
@@ -46,6 +46,9 @@ class RunReport(BaseDataModel):
                 "tests": defaultdict(list)
             }
         )
+
+    def set_base_url(self, base_url: str):
+        self.base_url = base_url
 
     def set_env(self, env: str):
         self.env = env
@@ -85,30 +88,32 @@ class RunReport(BaseDataModel):
 
     def get_steps(self) -> dict:
         steps_by_id = {}
-        for module_data in self.modules.values():
-            for test_name, test_reports in module_data["tests"].items():
-                for report in test_reports:
-                    steps_id = report.get('steps')
-                    if steps_id:
-                        path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
-                        try:
-                            steps_by_id[steps_id] = StepContainer.from_json(path)
-                        except FileNotFoundError:
-                            continue
+        if self.modules:
+            for module_data in self.modules.values():
+                for test_name, test_reports in module_data["tests"].items():
+                    for report in test_reports:
+                        steps_id = report.get('steps')
+                        if steps_id:
+                            path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
+                            try:
+                                steps_by_id[steps_id] = StepContainer.from_json(path)
+                            except FileNotFoundError:
+                                continue
         return steps_by_id
 
     def combine_modules(self, run_report):
-        for module_name, module_data in run_report.modules.items():
-            mod_results = module_data["results"]
-            mod_tests: dict = module_data["tests"]
+        if run_report.modules:
+            for module_name, module_data in run_report.modules.items():
+                mod_results = module_data["results"]
+                mod_tests: dict = module_data["tests"]
 
-            module = self.modules[module_name]
+                module = self.modules[module_name]
 
-            for status, count in mod_results.items():
-                module['results'].increase(status, count)
+                for status, count in mod_results.items():
+                    module['results'].increase(status, count)
 
-            for test_name, test_reports in mod_tests.items():
-                module['tests'][test_name].extend(test_reports)
+                for test_name, test_reports in mod_tests.items():
+                    module['tests'][test_name].extend(test_reports)
 
     def save_json(self, file_name=None):
         root = f'{b_logs_tmp_reports_path()}'

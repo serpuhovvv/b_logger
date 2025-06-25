@@ -37,11 +37,11 @@ def pytest_configure(config):
 
     # print(f'ROOTDIR: {config.rootpath}')
 
-    try:
-        env = config.option.blog_env
-        runtime.run_report.set_env(env)
-    except Exception as e:
-        pass
+    if not runtime.run_report.base_url:
+        runtime.set_base_url(config.option.blog_base_url)
+
+    if not runtime.run_report.env:
+        runtime.set_env(config.option.blog_env)
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -75,9 +75,11 @@ def _is_main_worker(session):
     return is_xdist_controller(session) or get_xdist_worker_id(session) == 'master'
 
 
-@pytest.hookimpl(tryfirst=True)
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_protocol(item, nextitem):
     runtime.start_test(item)
+    yield
+    runtime.finish_test()
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -94,17 +96,6 @@ def pytest_runtest_call(item):
     _apply_browser(item)
 
 
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_runtest_teardown(item):
-#     yield
-#     runtime.finish_test(item)
-
-
-@pytest.hookimpl
-def pytest_runtest_logfinish():
-    runtime.finish_test()
-
-
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(call, item):
 
@@ -117,26 +108,9 @@ def pytest_runtest_makereport(call, item):
 
     if report.when == 'setup':
         if report.outcome == 'passed':
-                    return
+            return
 
     runtime.process_test_status(report, call, item)
-
-
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_runtest_logreport(report):
-#     if report.when not in ["setup", "call"]:
-#         return
-#
-#     if report.when == 'setup':
-#         if report.outcome == 'passed':
-#             return
-#
-#     valid_outcome = runtime.process_test_status(report)
-#
-#     module = report.location[0]
-#     runtime.run_report.add_run_result(valid_outcome)
-#     runtime.run_report.add_module_result(module, valid_outcome)
-#     runtime.run_report.add_test_report(module, runtime.test_report)
 
 
 def _apply_py_params(item):
@@ -161,7 +135,6 @@ def _apply_browser(item):
                 try:
                     browser = item.funcargs.get(browser_name, None)
                     runtime.set_browser(browser)
-                    return
                 except Exception as e:
                     print(f"[WARN] Error setting up browser automatically: {e}")
 
