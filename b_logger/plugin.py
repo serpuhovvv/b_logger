@@ -1,6 +1,7 @@
+from b_logger.config import blog_config
 from b_logger.generators.html_gen import HTMLGenerator
 from b_logger.generators.report_gen import ReportGenerator
-from b_logger.utils.py_addons import BLoggerOptions, BLoggerMarkers
+from b_logger.utils.py_addons import BlogPyAddons
 from b_logger.utils.paths import *
 from b_logger.runtime import RunTime
 
@@ -29,13 +30,15 @@ debug = True
 def pytest_addoption(parser):
     group = parser.getgroup('blog')
 
-    BLoggerOptions.add_blog_options(parser, group)
+    BlogPyAddons.add_blog_options(parser, group)
 
 
 def pytest_configure(config):
-    BLoggerMarkers.add_blog_markers(config)
+    BlogPyAddons.add_blog_markers(config)
 
-    # print(f'ROOTDIR: {config.rootpath}')
+    blog_config.apply_cli_options(config)
+
+    blog_config.rootpath = str(config.rootpath)
 
     if not runtime.run_report.base_url:
         runtime.set_base_url(config.option.blog_base_url)

@@ -32,8 +32,8 @@ class RunReport(BaseDataModel):
     def __init__(self):
         self.report_id = f'report_{uuid.uuid4()}'
         self.proj_name = blog_config.project_name
-        self.base_url = None
-        self.env = None
+        self.base_url = blog_config.base_url
+        self.env = blog_config.env
         self.worker = None
         self.start_time = datetime.now()
         self.end_time = None
@@ -101,7 +101,7 @@ class RunReport(BaseDataModel):
                                 continue
         return steps_by_id
 
-    def combine_modules(self, run_report):
+    def combine_modules_from_report(self, run_report):
         if run_report.modules:
             for module_name, module_data in run_report.modules.items():
                 mod_results = module_data["results"]

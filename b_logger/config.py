@@ -1,58 +1,97 @@
-import pytest
+from typing import Optional
 import yaml
-import json
 import os
 from pathlib import Path
+
 from b_logger.utils.paths import pathfinder
-from b_logger.utils.basedatamodel import BaseDataModel
-from b_logger.utils.dotdict import DotDict
 
 
-class BLoggerConfig(BaseDataModel):
-    project_name: str = None
-    env: str = None
-    base_url: str = None
-    qase: bool = None
-    allure: bool = None
-    links = None
+class BLoggerConfig:
+    _instance: Optional["BLoggerConfig"] = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    @classmethod
+    def get(cls) -> "BLoggerConfig":
+        if cls._instance is None:
+            cls._instance = BLoggerConfig()
+        return cls._instance
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/blog.config.yaml'):
-        config_data = self._load_config_file(path)
-
-        self.set_project_name(config_data.project_name)
-        # self.set_qase(config_data.integrations.qase or False)
-        # self.set_allure(config_data.integrations.allure or False)
-        # self.set_links(config_data.links or None)
-
-    def _load_config_file(self, path: str):
         config_path = Path(path)
-        if not os.path.exists(config_path):
-            raise FileNotFoundError(f'Config file not found: {path}')
+        self._data = self._load_config_file(config_path)
 
-        with config_path.open('r') as f:
-            raw_data = yaml.safe_load(f)
-        self._data = DotDict(raw_data)
+        # Значения из YAML
+        self.project_name: Optional[str] = self._data.get("project_name")
+        self.env: Optional[str] = self._data.get("env")
+        self.base_url: Optional[str] = self._data.get("base_url")
 
-        return self._data
+        integrations = self._data.get("integrations", {})
+        self.qase: bool = bool(integrations.get("qase", False))
+        self.allure: bool = bool(integrations.get("allure", False))
 
-    def set_project_name(self, project_name: str):
-        self.project_name = project_name
+        self.links = self._data.get("links")
 
-    def set_qase(self, qase: bool):
-        self.qase = qase
+        # Все прочие значения
+        self._extra = {
+            k: v for k, v in self._data.items()
+            if not hasattr(self, k)
+        }
 
-    def set_allure(self, allure: bool):
-        self.allure = allure
+    @staticmethod
+    def _load_config_file(path: Path = None) -> dict:
+        if not path.exists():
+            raise FileNotFoundError(f"[ERROR] blog.config.yaml file not found: {path}")
+        with path.open("r", encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
 
-    # def set_links(self, links):
-    #     # for link in links:
-    #     self.links = links
+    def apply_cli_options(self, config):
+        for opt_name in config.option.__dict__:
+            if opt_name.startswith("blog_"):
+                value = getattr(config.option, opt_name)
+                if value is not None:
+                    field_name = opt_name.replace("blog_", "")
+                    setattr(self, field_name, value)
 
-    def __getattr__(self, item):
-        return getattr(self._data, item)
+    def __getitem__(self, key: str):
+        return getattr(self, key, self._extra.get(key, None))
 
-    def __getitem__(self, item):
-        return self._data[item]
+    def __setitem__(self, key: str, value):
+        if hasattr(self, key):
+            setattr(self, key, value)
+        else:
+            self._extra[key] = value
+
+    def __getattr__(self, key):
+        if key in self._extra:
+            return self._extra[key]
+        raise AttributeError(f"'BLoggerConfig' object has no attribute '{key}'")
+
+    def __setattr__(self, key, value):
+        if key in {
+            "_data", "_extra", "project_name", "env", "base_url",
+            "qase", "allure", "links"
+        }:
+            object.__setattr__(self, key, value)
+        else:
+            self._extra[key] = value
+
+    def as_dict(self) -> dict:
+        base = {
+            "project_name": self.project_name,
+            "env": self.env,
+            "base_url": self.base_url,
+            "qase": self.qase,
+            "allure": self.allure,
+            "links": self.links,
+        }
+        return {**base, **self._extra}
+
+    def __repr__(self):
+        return f"<BLoggerConfig {self.as_dict()}>"
 
 
-blog_config = BLoggerConfig()
+blog_config = BLoggerConfig.get()

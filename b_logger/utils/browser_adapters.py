@@ -37,7 +37,7 @@ class PlaywrightAdapter(BrowserAdapter):
 
                 for page in pages:
                     try:
-                        return page.screenshot()
+                        return page.screenshot(animations='disabled')
                     except Exception as e:
                         print(e)
         except Exception as e:

@@ -1,8 +1,1 @@
 project_name: "BLogger Project"
-
-integrations:
-  qase: True
-  allure: True
-
-links:
-  link_prefix: ""

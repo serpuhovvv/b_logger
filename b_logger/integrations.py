@@ -1,8 +1,10 @@
+import json
 import os
 import mimetypes
 from pathlib import Path
 from contextlib import contextmanager, ExitStack
 from abc import ABC, abstractmethod
+from pprint import pformat
 
 from b_logger.config import blog_config
 from b_logger.entities.attachments import Attachment
@@ -47,7 +49,7 @@ class AllureAdapter(IntegrationBase):
             self._allure = None
 
     def is_enabled(self):
-        return self._allure is not None
+        return bool(blog_config.allure) and self._allure is not None
 
     @contextmanager
     def step(self, title, expected=None):
@@ -92,7 +94,7 @@ class QaseAdapter(IntegrationBase):
             self._qase = None
 
     def is_enabled(self):
-        return self._qase is not None
+        return bool(blog_config.qase) and self._qase is not None
 
     @contextmanager
     def step(self, title, expected=None):
@@ -108,7 +110,21 @@ class QaseAdapter(IntegrationBase):
 
     def info(self, name, value):
         if self._qase:
-            self._qase.fields((name, value))
+
+            if isinstance(value, (dict, list, tuple, set)):
+                content = json.dumps(value, indent=2, ensure_ascii=False)
+                mimetype = 'application/json'
+            elif isinstance(value, (str, int, float, bool)):
+                content = str(value)
+                mimetype = 'text/plain'
+            elif isinstance(value, bytes):
+                content = value
+                mimetype = 'application/octet-stream'
+            else:
+                content = pformat(value)
+                mimetype = 'text/plain'
+
+            self._qase.attach((content, name, mimetype))
 
     def attach(self, source, attachment):
         if self._qase:
