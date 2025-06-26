@@ -76,9 +76,6 @@ class TestReport(BaseDataModel):
                 self.info[key] = value
 
     def add_attachment(self, attachment: Attachment):
-        # for attach in self.attachments:
-        #     if attach.name == attachment.name:
-        #         return
         self.attachments.append(attachment)
 
     # def get_steps(self):

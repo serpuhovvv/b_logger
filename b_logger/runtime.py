@@ -145,7 +145,8 @@ class RunTime:
     def apply_info(self, **kwargs):
 
         if not kwargs:
-            raise ValueError('blog.info() requires at least one keyword argument')
+            print('[WARN] blog.info() requires at least one keyword argument')
+            return
 
         info = {}
 
@@ -195,13 +196,9 @@ class RunTime:
         if self.browser is None:
             return
 
-        if not scr_name:
-            index = 1
-            while True:
-                scr_name = f"{'err_' if is_error else ''}scr_{self.test_report.name}_{index}.png"
-                if scr_name not in os.listdir(attachments_path()):
-                    break
-                index += 1
+        scr_name = (f'{"err_" if is_error else ""}'
+                    f'scr_'
+                    f'{self.test_report.name if not scr_name else scr_name}')
 
         adapter = get_browser_adapter(self.browser)
 
@@ -209,10 +206,20 @@ class RunTime:
             screenshot_bytes = adapter.make_screenshot()
             self.attach(screenshot_bytes, scr_name)
         except Exception as e:
-            raise RuntimeError(f"[ERROR] Unable to make screenshot: {e}")
+            print(f'[ERROR] Unable to make screenshot: {e}')
 
     def attach(self, source: Union[str, Path, bytes, BinaryIO], name: str = None, mime_type: str = None):
-        attachment = Attachment(source, name)
+        if name:
+            index = 1
+            existing_names = {
+                str(attachment.name).split('.')[-2]
+                for attachment in self.test_report.attachments
+            }
+            while name in existing_names:
+                name = f'{name}_{index}'
+                index += 1
+
+        attachment = Attachment(source=source, name=name)
 
         current_step = self.step_container.get_current_step()
         if current_step:

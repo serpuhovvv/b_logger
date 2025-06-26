@@ -1,0 +1,133 @@
+{% macro render_run_info(report) %}
+<h3>Run Information</h3>
+<div class="run-info">
+  <table class="card table">
+    <tbody>
+      <tr>
+        <td>Environment</td><td><strong>{{ report.env | upper }}</strong></td>
+      </tr>
+      <tr>
+        <td>Base URL</td><td><strong>{{ report.base_url }}</strong></td>
+      </tr>
+      <tr>
+        <td>Duration</td><td><strong>{{ report.duration }}</strong></td>
+      </tr>
+      <tr>
+        <td>Start Time</td><td><strong>{{ report.start_time }}</strong></td>
+      </tr>
+      <tr>
+        <td>End Time</td><td><strong>{{ report.end_time }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="card table">
+    <thead>
+      <tr>
+        <th>Status</th><th>Count (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set passed = report.run_results.PASSED %}
+      {% set failed = report.run_results.FAILED %}
+      {% set broken = report.run_results.BROKEN %}
+      {% set skipped = report.run_results.SKIPPED %}
+      {% set total = passed + failed + broken + skipped %}
+      {% for label, count, cls in [
+          ('Total', total, ''),
+          ('Passed', passed, 'passed'),
+          ('Failed', failed, 'failed'),
+          ('Broken', broken, 'broken'),
+          ('Skipped', skipped, 'skipped')
+          ] %}
+      {% set pct = (count / total * 100 if total > 0 else 0) | round(1) %}
+      <tr class="row {{ cls if cls }}">
+        <td>
+        {% if cls %}
+        <span class="badge {{ cls }}">{{ label }}</span>
+        {% else %}
+        {{ label }}
+        {% endif %}
+        </td>
+        <td>{{ count }} ({{ pct }}%)</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+
+
+
+{% macro render_module_statistics(report) %}
+<h3>Module Statistics</h3>
+<table class="card table">
+  <thead>
+    <tr>
+      <th>Module</th><th>Total</th>
+      <th>Passed (%)</th><th>Failed (%)</th>
+      <th>Broken (%)</th><th>Skipped (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for module_name, module_data in report.modules.items() %}
+      {% set p = module_data.results.PASSED or 0 %}
+      {% set f = module_data.results.FAILED or 0 %}
+      {% set b = module_data.results.BROKEN or 0 %}
+      {% set s = module_data.results.SKIPPED or 0 %}
+      {% set t = p + f + b + s %}
+      <tr>
+        <td>{{ module_name }}</td>
+        <td>{{ t }}</td>
+        <td><span class="badge passed">{{ p }} ({{ (p/t*100 if t>0 else 0) | round(1) }}%)</span></td>
+        <td><span class="badge failed">{{ f }} ({{ (f/t*100 if t>0 else 0) | round(1) }}%)</span></td>
+        <td><span class="badge broken">{{ b }} ({{ (b/t*100 if t>0 else 0) | round(1) }}%)</span></td>
+        <td><span class="badge skipped">{{ s }} ({{ (s/t*100 if t>0 else 0) | round(1) }}%)</span></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
+
+
+
+{% macro render_failed_tests(report) %}
+<h3>Failed Tests Details</h3>
+<table class="card table">
+  <thead>
+    <tr>
+      <th>Module</th><th>Test</th><th>Error</th><th>Attachments</th><th>Known Bugs</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for module_name, module_data in report.modules.items() %}
+      {% for test_name, test_runs in module_data.tests.items() %}
+        {% for run in test_runs %}
+          {% if run.status in ["FAILED", "BROKEN"] %}
+            {% set attach_count = run.attachments | length if run.attachments else 0 %}
+            {% set bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
+            <tr class="row {{ run.status.lower() }}">
+              <td>{{ module_name }}</td>
+              <td>{{ run.name }}</td>
+              <td><pre>{{ run.error }}</pre></td>
+              <td>{{ attach_count }}</td>
+              <td>{{ bugs_count }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
+
+
+
+{% macro render_full_report_summary(report) %}
+  {{ render_run_info(report) }}
+  {{ render_module_statistics(report) }}
+  {{ render_failed_tests(report) }}
+{% endmacro %}

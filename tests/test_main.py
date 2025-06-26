@@ -145,4 +145,4 @@ def test_playwright(playwright_page):  #  <-- Will be detected automatically
         playwright_page.goto(f'https://google.com')
 
         with blog.step('Raise fake error to check error screenshot'):
-            print(aaa)
+            print(empty_variable)

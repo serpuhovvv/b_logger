@@ -55,9 +55,6 @@ class Step(BaseDataModel):
         self.parent_id = parent_id
 
     def add_attachment(self, attachment: Attachment):
-        for attach in self.attachments:
-            if attach.name == attachment.name:
-                return
         self.attachments.append(attachment)
 
     def set_status(self, status: StepStatus):
@@ -95,7 +92,7 @@ class StepContainer(BaseDataModel, dict):
         self.container_id = f'steps_{uuid.uuid4()}'
         self.current_step_id = None
         self.failed = False
-        self.current_stage = None
+        self.current_stage = 'setup'
         self['setup'] = []
         self['call'] = []
         self['teardown'] = []

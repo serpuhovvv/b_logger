@@ -1,6 +1,5 @@
 from typing import Optional
 import yaml
-import os
 from pathlib import Path
 
 from b_logger.utils.paths import pathfinder
@@ -21,11 +20,13 @@ class BLoggerConfig:
         return cls._instance
 
     def __init__(self, path: str = f'{pathfinder.project_root()}/blog.config.yaml'):
+        self._extra = {}
+
         config_path = Path(path)
         self._data = self._load_config_file(config_path)
 
-        # Значения из YAML
-        self.project_name: Optional[str] = self._data.get("project_name")
+        # YAML
+        self.project_name: str = self._data.get("project_name")
         self.env: Optional[str] = self._data.get("env")
         self.base_url: Optional[str] = self._data.get("base_url")
 
@@ -33,9 +34,9 @@ class BLoggerConfig:
         self.qase: bool = bool(integrations.get("qase", False))
         self.allure: bool = bool(integrations.get("allure", False))
 
-        self.links = self._data.get("links")
+        self.links = self._data.get("links", {})
 
-        # Все прочие значения
+        # Other
         self._extra = {
             k: v for k, v in self._data.items()
             if not hasattr(self, k)
@@ -66,9 +67,10 @@ class BLoggerConfig:
             self._extra[key] = value
 
     def __getattr__(self, key):
-        if key in self._extra:
-            return self._extra[key]
-        raise AttributeError(f"'BLoggerConfig' object has no attribute '{key}'")
+        _extra = object.__getattribute__(self, "_extra") if "_extra" in self.__dict__ else {}
+        if key in _extra:
+            return _extra[key]
+        print(f'[WARN] blog_config object has no attribute "{key}"')
 
     def __setattr__(self, key, value):
         if key in {
