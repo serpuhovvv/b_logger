@@ -1,68 +1,70 @@
 {% macro render_run_info(report) %}
 <h3>Run Information</h3>
-<div class="run-info">
-  <table class="card table">
-    <tbody>
-      <tr>
-        <td>Environment</td><td><strong>{{ report.env | upper }}</strong></td>
-      </tr>
-      <tr>
-        <td>Base URL</td><td><strong>{{ report.base_url }}</strong></td>
-      </tr>
-      <tr>
-        <td>Duration</td><td><strong>{{ report.duration }}</strong></td>
-      </tr>
-      <tr>
-        <td>Start Time</td><td><strong>{{ report.start_time }}</strong></td>
-      </tr>
-      <tr>
-        <td>End Time</td><td><strong>{{ report.end_time }}</strong></td>
-      </tr>
-    </tbody>
-  </table>
+<div>
+  <div class="table-wrapper">
+    <table>
+      <tbody>
+        <tr>
+          <td>Environment</td><td><strong>{{ report.env | upper }}</strong></td>
+        </tr>
+        <tr>
+          <td>Base URL</td><td><strong>{{ report.base_url }}</strong></td>
+        </tr>
+        <tr>
+          <td>Duration</td><td><strong>{{ report.duration }}</strong></td>
+        </tr>
+        <tr>
+          <td>Start Time</td><td><strong>{{ report.start_time }}</strong></td>
+        </tr>
+        <tr>
+          <td>End Time</td><td><strong>{{ report.end_time }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <table class="card table">
-    <thead>
-      <tr>
-        <th>Status</th><th>Count (%)</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% set passed = report.run_results.PASSED %}
-      {% set failed = report.run_results.FAILED %}
-      {% set broken = report.run_results.BROKEN %}
-      {% set skipped = report.run_results.SKIPPED %}
-      {% set total = passed + failed + broken + skipped %}
-      {% for label, count, cls in [
-          ('Total', total, ''),
-          ('Passed', passed, 'passed'),
-          ('Failed', failed, 'failed'),
-          ('Broken', broken, 'broken'),
-          ('Skipped', skipped, 'skipped')
-          ] %}
-      {% set pct = (count / total * 100 if total > 0 else 0) | round(1) %}
-      <tr class="row {{ cls if cls }}">
-        <td>
-        {% if cls %}
-        <span class="badge {{ cls }}">{{ label }}</span>
-        {% else %}
-        {{ label }}
-        {% endif %}
-        </td>
-        <td>{{ count }} ({{ pct }}%)</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th><th>Count (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set passed = report.run_results.PASSED %}
+        {% set failed = report.run_results.FAILED %}
+        {% set broken = report.run_results.BROKEN %}
+        {% set skipped = report.run_results.SKIPPED %}
+        {% set total = passed + failed + broken + skipped %}
+        {% for label, count, cls in [
+            ('Total', total, ''),
+            ('Passed', passed, 'passed'),
+            ('Failed', failed, 'failed'),
+            ('Broken', broken, 'broken'),
+            ('Skipped', skipped, 'skipped')
+            ] %}
+        {% set pct = (count / total * 100 if total > 0 else 0) | round(1) %}
+        <tr class="row {{ cls if cls }}">
+          <td>
+          {% if cls %}
+          <span class="badge {{ cls }}">{{ label }}</span>
+          {% else %}
+          {{ label }}
+          {% endif %}
+          </td>
+          <td>{{ count }} ({{ pct }}%)</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endmacro %}
 
 
-
-
 {% macro render_module_statistics(report) %}
 <h3>Module Statistics</h3>
-<table class="card table">
+<table>
   <thead>
     <tr>
       <th>Module</th><th>Total</th>
@@ -91,11 +93,9 @@
 {% endmacro %}
 
 
-
-
 {% macro render_failed_tests(report) %}
 <h3>Failed Tests Details</h3>
-<table class="card table">
+<table>
   <thead>
     <tr>
       <th>Module</th><th>Test</th><th>Error</th><th>Attachments</th><th>Known Bugs</th>
@@ -111,7 +111,7 @@
             <tr class="row {{ run.status.lower() }}">
               <td>{{ module_name }}</td>
               <td>{{ run.name }}</td>
-              <td><pre>{{ run.error }}</pre></td>
+              <td>{{ run.error }}</td>
               <td>{{ attach_count }}</td>
               <td>{{ bugs_count }}</td>
             </tr>
@@ -122,8 +122,6 @@
   </tbody>
 </table>
 {% endmacro %}
-
-
 
 
 {% macro render_full_report_summary(report) %}

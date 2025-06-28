@@ -30,9 +30,9 @@ class BLoggerConfig:
         self.env: Optional[str] = self._data.get("env")
         self.base_url: Optional[str] = self._data.get("base_url")
 
-        integrations = self._data.get("integrations", {})
-        self.qase: bool = bool(integrations.get("qase", False))
-        self.allure: bool = bool(integrations.get("allure", False))
+        self.integrations = self._data.get("integrations", {})
+        self.qase: bool = bool(self.integrations.get("qase", False))
+        self.allure: bool = bool(self.integrations.get("allure", False))
 
         self.links = self._data.get("links", {})
 

@@ -58,12 +58,14 @@ class ReportGenerator:
     def _merge_env(self, report: RunReport):
         if self.combined.env and self.combined.env != report.env:
             print(f"[WARN] Inconsistent env: {self.combined.env} vs {report.env}")
+            return
 
         self.combined.env = report.env
 
     def _merge_base_url(self, report: RunReport):
         if self.combined.base_url and self.combined.base_url != report.base_url:
             print(f"[WARN] Inconsistent base url: {self.combined.base_url} vs {report.base_url}")
+            return
 
         self.combined.base_url = report.base_url
 

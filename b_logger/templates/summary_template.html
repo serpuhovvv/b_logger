@@ -1,203 +1,98 @@
+<!DOCTYPE html>
 {% import 'summary_macros.html' as macros %}
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ report.proj_name }} - Summary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-<style>
-        :root {
-          --passed: #10B981;     --passed-bg: #ECFDF5;     --passed-light: #D1FAE5;
-          --failed: #EF4444;     --failed-bg: #FEF2F2;     --failed-light: #FECACA;
-          --broken: #F59E0B;     --broken-bg: #FFFBEB;     --broken-light: #FEF3C7;
-          --skipped: #6B7280;    --skipped-bg: #F9FAFB;    --skipped-light: #F3F4F6;
-          --print: #8B5CF6;      --print-bg: #F5F3FF;      --print-light: #E0E7FF;
-
-          --primary: #3B82F6;    --primary-dark: #1D4ED8;
-          --bg: #F8FAFC;         --bg-card: #FFFFFF;       --bg-light: #F1F5F9;
-          --text: #0F172A;       --text-light: #475569;    --text-muted: #64748B;
-          --border: #E2E8F0;     --border-light: #F1F5F9;
-          --shadow: 0 1px 3px rgba(0,0,0,0.1);
-          --radius: 8px;         --radius-sm: 4px;
-        }
-
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
+    <style>
         body {
-          font-family: 'Inter', sans-serif;
-          color: var(--text);
+          font-family: Arial, sans-serif;
+          color: #0F172A;
           line-height: 1.6;
+          background-color: #F8FAFC;
+          padding: 20px;
         }
 
-        .container {
-          margin: 0 auto;
-          padding: 2rem;
-        }
-
-        /* ============================================ */
-        /* TABLE CARD */
-        /* ============================================ */
-        .run-info { display: flex; gap: 2rem;}
-
-        .card.table {
+        table {
           width: 100%;
           border-collapse: collapse;
-          margin: 1.5rem 0;
-          border-collapse: collapse;
-          font-family: inherit;
+          margin-bottom: 20px;
+          font-size: 14px;
         }
 
-        .card.table th,
-        .card.table td {
-          padding: 0.75rem 1rem;
-          border: 1px solid var(--border);
+        th, td {
+          border: 1px solid #E2E8F0;
+          padding: 10px;
           text-align: left;
         }
 
-        .card.table thead th {
-          background: var(--bg-light);
-          color: var(--text);
-          font-weight: 600;
+        th {
+          background-color: #F1F5F9;
+          font-weight: bold;
         }
 
-        .card.table tbody tr:not(.passed):not(.failed):not(.broken):not(.skipped) {
-          background: var(--bg-card);
-        }
-
-        .card.table tbody tr:hover {
-          background: var(--bg-light);
-        }
-
-        /* ============================================ */
-        /* BADGES */
-        /* ============================================ */
         .badge {
           display: inline-block;
-          padding: 0.25rem 0.5rem;
-          border-radius: var(--radius-sm);
-          font-size: 0.75rem;
-          font-weight: 600;
+          padding: 4px 8px;
+          font-size: 12px;
+          font-weight: bold;
           text-transform: uppercase;
+          border-radius: 4px;
         }
 
-        .badge.passed { background: var(--passed-light);
-<!--        color: var(&#45;&#45;passed); -->
-        }
-        .badge.failed { background: var(--failed-light);
-<!--        color: var(&#45;&#45;failed); -->
-        }
-        .badge.broken { background: var(--broken-light);
-<!--        color: var(&#45;&#45;broken); -->
-        }
-        .badge.skipped { background: var(--skipped-light);
-<!--        color: var(&#45;&#45;skipped); -->
-        }
-        .badge.print { background: var(--print-light); color: var(--print); }
-
-        /* ============================================ */
-        /* STATUS STYLING FOR CARDS, ROWS, HEADERS, ETC */
-        /* ============================================ */
-        .row.passed,
-        .card.passed { background: var(--passed-bg);
-<!--        border-left: 4px solid var(&#45;&#45;passed); -->
+        .passed {
+          background-color: #D1FAE5;
+          color: #10B981;
         }
 
-        .row.failed,
-        .card.failed { background: var(--failed-bg);
-<!--        border-left: 4px solid var(&#45;&#45;failed); -->
+        .failed {
+          background-color: #FECACA;
+          color: #EF4444;
         }
 
-        .row.broken,
-        .card.broken { background: var(--broken-bg);
-<!--        border-left: 4px solid var(&#45;&#45;broken); -->
+        .broken {
+          background-color: #FEF3C7;
+          color: #F59E0B;
         }
 
-        .row.skipped,
-        .card.skipped { background: var(--skipped-bg);
-<!--        border-left: 4px solid var(&#45;&#45;skipped); -->
+        .skipped {
+          background-color: #F3F4F6;
+          color: #6B7280;
         }
 
-        /* Headers */
-        .header.passed { color: var(--passed); }
-        .header.failed { color: var(--failed); }
-        .header.broken { color: var(--broken); }
-        .header.skipped { color: var(--skipped); }
+        .row.passed {
+          background-color: #ECFDF5;
+        }
 
-        /* Status Dots */
-        .status-dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
+        .row.failed {
+          background-color: #FEF2F2;
+        }
+
+        .row.broken {
+          background-color: #FFFBEB;
+        }
+
+        .row.skipped {
+          background-color: #F9FAFB;
+        }
+
+        h3 {
+          margin-top: 30px;
+          margin-bottom: 10px;
+          color: #1E293B;
+        }
+
+        .table-wrapper {
+          width: 48%;
           display: inline-block;
-          margin-right: 0.5rem;
+          vertical-align: top;
+          margin-right: 2%;
         }
 
-        .status-dot.passed { background-color: var(--passed); }
-        .status-dot.failed { background-color: var(--failed); }
-        .status-dot.broken { background-color: var(--broken); }
-        .status-dot.skipped { background-color: var(--skipped); }
-
-        /* Status Text */
-        .status-text.passed { color: var(--passed); }
-        .status-text.failed { color: var(--failed); }
-        .status-text.broken { color: var(--broken); }
-        .status-text.skipped { color: var(--skipped); }
-
-        /* Light Boxes (nested blocks, info panels) */
-        .box-light.passed { background: var(--passed-light); }
-        .box-light.failed { background: var(--failed-light); }
-        .box-light.broken { background: var(--broken-light); }
-        .box-light.skipped { background: var(--skipped-light); }
-
-        /* ============================================ */
-        /* MOBILE ADAPTIVITY */
-        /* ============================================ */
-        @media only screen and (max-width: 600px) {
-          .card.table, .card.table thead, .card.table tbody,
-          .card.table th, .card.table td, .card.table caption {
-            display: block;
-            width: 100%;
-          }
-
-          .card.table thead {
-            display: none;
-          }
-
-          .card.table caption {
-            border-bottom: none;
-          }
-
-          .card.table tbody tr {
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 0.5rem;
-          }
-
-          .card.table tbody td {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem;
-            border: none;
-            border-bottom: 1px solid var(--border-light);
-          }
-
-          .card.table tbody td:last-child {
-            border-bottom: none;
-          }
-
-          .card.table tbody td::before {
-            content: attr(data-label);
-            font-weight: 600;
-            color: var(--text-muted);
-          }
+        .table-wrapper:last-child {
+          margin-right: 0;
         }
     </style>
 </head>
