@@ -84,4 +84,4 @@ class TestReport(BaseDataModel):
     #         steps = StepContainer.from_json(steps_path)
     #         return steps
     #     except Exception as e:
-    #         print(f'[WARN] Unable to get steps for {self.name}: {e}')
+    #         print(f'[BLogger][WARN] Unable to get steps for {self.name}: {e}')

@@ -44,22 +44,18 @@
 
         .passed {
           background-color: #D1FAE5;
-          color: #10B981;
         }
 
         .failed {
           background-color: #FECACA;
-          color: #EF4444;
         }
 
         .broken {
           background-color: #FEF3C7;
-          color: #F59E0B;
         }
 
         .skipped {
           background-color: #F3F4F6;
-          color: #6B7280;
         }
 
         .row.passed {
@@ -85,13 +81,20 @@
         }
 
         .table-wrapper {
-          width: 48%;
+          width: 49%;
           display: inline-block;
           vertical-align: top;
         }
 
         .table-wrapper:last-child {
           margin-right: 0;
+        }
+
+        @media (max-width: 768px) {
+        .table-wrapper {
+          width: 100%;
+          display: block;
+          margin-bottom: 1rem;
         }
     </style>
 </head>

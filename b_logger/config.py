@@ -45,7 +45,7 @@ class BLoggerConfig:
     @staticmethod
     def _load_config_file(path: Path = None) -> dict:
         if not path.exists():
-            raise FileNotFoundError(f"[ERROR] blog.config.yaml file not found: {path}")
+            raise FileNotFoundError(f'[BLogger][ERROR] blog.config.yaml file not found: {path}')
         with path.open("r", encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
 
@@ -70,7 +70,7 @@ class BLoggerConfig:
         _extra = object.__getattribute__(self, "_extra") if "_extra" in self.__dict__ else {}
         if key in _extra:
             return _extra[key]
-        print(f'[WARN] blog_config object has no attribute "{key}"')
+        print(f'[BLogger][WARN] blog_config object has no attribute "{key}"')
 
     def __setattr__(self, key, value):
         if key in {

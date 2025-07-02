@@ -28,23 +28,33 @@ class PlaywrightAdapter(BrowserAdapter):
     def __init__(self, page):
         self.page = page
 
-    def make_screenshot(self) -> bytes:
+    def make_screenshot(self) -> bytes | None:
+        def try_screenshot(page):
+            try:
+                if page.is_closed():
+                    return None
+                return page.screenshot(animations='disabled')
+            except Exception as e:
+                print(f'[BLogger][WARN] Screenshot failed on page: {getattr(page, 'url', '?')}: {e}')
+                return None
+
+        scr = try_screenshot(self.page)
+        if scr:
+            return scr
+
         try:
-            contexts = self.page.context.browser.contexts
-
-            for context in contexts:
-                pages = context.pages
-
-                for page in pages:
-                    try:
-                        return page.screenshot(animations='disabled')
-                    except Exception as e:
-                        print(e)
+            for context in self.page.context.browser.contexts:
+                for other_page in context.pages:
+                    if other_page == self.page:
+                        continue
+                    scr = try_screenshot(other_page)
+                    if scr:
+                        return scr
         except Exception as e:
-            print(e)
+            print(f'[BLogger][WARN] Fallback screenshot iteration failed: {e}')
 
-        # print(f'[ERROR] No valid Playwright page found for screenshot')
-        # raise RuntimeError("No valid Playwright page found for screenshot")
+        print('[BLogger][WARN] All playwright screenshot attempts failed')
+        return None
 
     @classmethod
     def is_valid(cls, obj) -> bool:

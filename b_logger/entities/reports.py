@@ -20,6 +20,7 @@ class RunResults(BaseDataModel):
         self.FAILED: int = 0
         self.BROKEN: int = 0
         self.SKIPPED: int = 0
+        self.NONE: int = 0
 
     def increase(self, result: TestStatus, amount: int = 1):
         if not hasattr(self, result):

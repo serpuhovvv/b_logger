@@ -129,7 +129,7 @@ def init_dirs():
         if src.exists():
             shutil.copyfile(src, dst)
         else:
-            print(f"[WARN] static file not found: {src}")
+            print(f'[BLogger][WARN] static file not found: {src}')
 
 
 def clear_directory(directory: str, rmdir=False):

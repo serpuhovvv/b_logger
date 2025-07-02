@@ -123,7 +123,7 @@ class RunTime:
 
                 self.step_container.failed = True
 
-            if not self.step_container.get_current_step().parent_id:
+            if step.parent_id is None:
                 self.step_container.failed = False
 
             step.set_status(StepStatus.FAILED)
@@ -145,7 +145,7 @@ class RunTime:
     def apply_info(self, **kwargs):
 
         if not kwargs:
-            print('[WARN] blog.info() requires at least one keyword argument')
+            print('[BLogger][WARN] blog.info() requires at least one keyword argument')
             return
 
         info = {}
@@ -206,18 +206,20 @@ class RunTime:
             screenshot_bytes = adapter.make_screenshot()
             self.attach(screenshot_bytes, scr_name)
         except Exception as e:
-            print(f'[ERROR] Unable to make screenshot: {e}')
+            print(f'[BLogger][ERROR] Unable to make screenshot: {e}')
 
-    def attach(self, source: Union[str, Path, bytes, BinaryIO], name: str = None, mime_type: str = None):
+    def attach(self,
+               source: Union[str, Path, bytes, BinaryIO, dict, list, int, float, None],
+               name: str = None,
+               mime_type: str = None
+               ):
         if name:
-            index = 1
-            existing_names = {
-                str(attachment.name).split('.')[-2]
-                for attachment in self.test_report.attachments
-            }
+            existing_names = {Path(att.name).stem for att in self.test_report.attachments}
+            base_name = name
+            index = 0
             while name in existing_names:
-                name = f'{name}_{index}'
                 index += 1
+                name = f'{base_name}_{index}'
 
         attachment = Attachment(source=source, name=name)
 

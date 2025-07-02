@@ -9,7 +9,7 @@ from b_logger.runtime import RunTime
 try:
     import pytest
 except ImportError:
-    raise ImportError('[ERROR] To use b_logger you need pytest to be installed')
+    raise ImportError('[BLogger][ERROR] To use b_logger you need pytest to be installed')
 
 
 try:
@@ -118,9 +118,10 @@ def pytest_runtest_makereport(call, item):
 
     runtime.process_test_result(report, call, item)
 
-    if report.when == 'setup':
-        if report.outcome == 'passed':
-            return
+    if report.when == 'setup' and report.outcome == 'passed':
+        return
+
+    _apply_py_output(report)
 
     runtime.process_test_status(report, call, item)
 
@@ -130,6 +131,18 @@ def _apply_py_params(item):
         params = item.callspec.params
         for param_name, param_value in params.items():
             runtime.apply_info(parameters={param_name: param_value})
+
+
+def _apply_py_output(report):
+    captured_output = {
+        "stdout": getattr(report, "capstdout", None),
+        "stderr": getattr(report, "capstderr", None),
+        "log": getattr(report, "caplog", None),
+    }
+
+    for k, v in captured_output.items():
+        if v:
+            runtime.attach(source=v, name=k)
 
 
 def _apply_fixtures(item):
@@ -148,7 +161,7 @@ def _apply_browser(item):
                     browser = item.funcargs.get(browser_name, None)
                     runtime.set_browser(browser)
                 except Exception as e:
-                    print(f"[WARN] Error setting up browser automatically: {e}")
+                    print(f'[BLogger][WARN] Error setting up browser automatically: {e}')
 
 
 def _apply_markers(item):
@@ -186,7 +199,7 @@ def __apply_known_bug_mark(item):
             if description:
                 runtime.apply_known_bug(description, url)
             else:
-                print(f'[WARN] blog.known_bug usage is incorrect: {bug}')
+                print(f'[BLogger][WARN] blog.known_bug usage is incorrect: {bug}')
 
     except AttributeError as e:
         pass

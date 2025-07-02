@@ -24,7 +24,7 @@ class ReportGenerator:
                 report = RunReport.from_json(rep)
                 self.merge(report)
             except Exception as e:
-                print(f"[ERROR] Failed to process {rep}: {e}")
+                print(f'[BLogger][ERROR] Failed to process {rep}: {e}')
                 raise e
 
     def merge(self, report: RunReport):
@@ -51,20 +51,20 @@ class ReportGenerator:
 
     def _merge_proj_name(self, report: RunReport):
         if self.combined.proj_name and self.combined.proj_name != report.proj_name:
-            print(f"[WARN] Inconsistent project name: {self.combined.proj_name} vs {report.proj_name}")
+            print(f'[BLogger][WARN] Inconsistent project name: {self.combined.proj_name} vs {report.proj_name}')
 
         self.combined.proj_name = report.proj_name
 
     def _merge_env(self, report: RunReport):
         if self.combined.env and self.combined.env != report.env:
-            print(f"[WARN] Inconsistent env: {self.combined.env} vs {report.env}")
+            print(f'[BLogger][WARN] Inconsistent env: {self.combined.env} vs {report.env}')
             return
 
         self.combined.env = report.env
 
     def _merge_base_url(self, report: RunReport):
         if self.combined.base_url and self.combined.base_url != report.base_url:
-            print(f"[WARN] Inconsistent base url: {self.combined.base_url} vs {report.base_url}")
+            print(f'[BLogger][WARN] Inconsistent base url: {self.combined.base_url} vs {report.base_url}')
             return
 
         self.combined.base_url = report.base_url
