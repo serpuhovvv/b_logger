@@ -45,4 +45,4 @@ include = ["b_logger*"]
 
 
 [tool.setuptools.package-data]
-b_logger = ["templates/*.html"]
+b_logger = ["templates/*.html", "templates/*.css", "templates/*.js"]

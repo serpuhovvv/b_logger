@@ -25,7 +25,7 @@ class PathFinder:
         # Маркеры, определяющие корень проекта
         self.project_markers = project_markers or {'blog.config.yaml', 'requirements.txt', 'conftest.py'}
         # Маркеры, определяющие корень библиотеки
-        self.library_markers = library_markers or {'b_logger'}
+        self.library_markers = library_markers or {'plugin.py', 'b_logger'}
 
     @staticmethod
     def _get_possible_roots(cur_file_dir: str) -> Set[str]:
@@ -112,14 +112,24 @@ pathfinder = PathFinder()
 def init_dirs():
     os.makedirs(f'{b_logs_path()}', exist_ok=True)
     os.makedirs(f'{attachments_path()}', exist_ok=True)
+    os.makedirs(f'{static_path()}', exist_ok=True)
+
     os.makedirs(f'{b_logs_tmp_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_reports_path()}', exist_ok=True)
-    os.makedirs(f'{b_logs_tmp_preconditions_path()}', exist_ok=True)
     os.makedirs(f'{b_logs_tmp_steps_path()}', exist_ok=True)
 
     clear_b_logs()
-    clear_attachments()
+    # clear_attachments()
     clear_b_logs_tmp()
+
+    for filename in ("scripts.js", "styles.css"):
+        src = Path(pathfinder.library_root()) / f'b_logger/templates/{filename}'
+        dst = Path(static_path()) / filename
+
+        if src.exists():
+            shutil.copyfile(src, dst)
+        else:
+            print(f"[WARN] static file not found: {src}")
 
 
 def clear_directory(directory: str, rmdir=False):
@@ -151,6 +161,11 @@ def attachments_path():
 
 
 @lru_cache(maxsize=1)
+def static_path():
+    return pathfinder.find('b_logs/static')
+
+
+@lru_cache(maxsize=1)
 def b_logs_tmp_path():
     return pathfinder.find('b_logs_tmp')
 
@@ -163,11 +178,6 @@ def b_logs_tmp_reports_path():
 @lru_cache(maxsize=1)
 def b_logs_tmp_steps_path():
     return pathfinder.find('b_logs_tmp/steps')
-
-
-@lru_cache(maxsize=1)
-def b_logs_tmp_preconditions_path():
-    return pathfinder.find('b_logs_tmp/preconditions')
 
 
 def clear_b_logs():
