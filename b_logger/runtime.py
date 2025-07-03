@@ -214,7 +214,7 @@ class RunTime:
                mime_type: str = None
                ):
         if name:
-            existing_names = {Path(att.name).stem for att in self.test_report.attachments}
+            existing_names = {Path(att).stem for att in os.listdir(f'{attachments_path()}')}
             base_name = name
             index = 0
             while name in existing_names:

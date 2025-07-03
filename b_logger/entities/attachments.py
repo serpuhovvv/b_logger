@@ -20,7 +20,7 @@ class Attachment(BaseDataModel):
         type_: Optional[str] = None,
         _skip_processing: bool = False,
     ):
-        self.name = name or f'attachment_{uuid.uuid4()}'
+        self.name = name if name else f'attachment_{uuid.uuid4()}'
         self.type_ = type_
 
         if not _skip_processing:
