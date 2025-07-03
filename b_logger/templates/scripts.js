@@ -154,7 +154,7 @@ const title = document.getElementById('modalTitle');
 const image = document.getElementById('modalImage');
 const imageContainer = document.getElementById('imageContainer');
 const textPreview = document.getElementById('modalText');
-const pdfFrame = document.getElementById('modalPDF');
+const pdfContainer = document.getElementById('modalPDF');
 const download = document.getElementById('modalDownload');
 
 let scale = 1;
@@ -167,9 +167,9 @@ function openAttachment(name, type) {
   scale = 1;
   image.style.transform = 'scale(1)';
   image.src = '';
-  pdfFrame.src = '';
+  pdfContainer.src = '';
   textPreview.textContent = '';
-  [imageContainer, textPreview, pdfFrame, download].forEach(el => el.style.display = 'none');
+  [imageContainer, textPreview, pdfContainer, download].forEach(el => el.style.display = 'none');
 
   title.textContent = name;
 
@@ -178,8 +178,8 @@ function openAttachment(name, type) {
     imageContainer.style.display = 'block';
 
   } else if (type === 'application/pdf') {
-    pdfFrame.src = path;
-    pdfFrame.style.display = 'block';
+    pdfContainer.src = path;
+    pdfContainer.style.display = 'block';
 
   } else if (type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
     fetch(path)
