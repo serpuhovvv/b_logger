@@ -30,11 +30,18 @@ from b_logger.entities.attachments import Attachment
 class IntegrationBase(ABC):
     @abstractmethod
     def is_enabled(self) -> bool: ...
+
     @abstractmethod
     @contextmanager
     def step(self, title, expected=None): ...
+
+    @abstractmethod
     def description(self, text): ...
+
+    @abstractmethod
     def info(self, name, value): ...
+
+    @abstractmethod
     def attach(self, source, attachment): ...
 
 
@@ -71,8 +78,8 @@ class AllureAdapter(IntegrationBase):
         if not self._allure:
             return
         mime_type = mimetypes.guess_type(attachment.type_)[0] \
-                            if not attachment.type_.startswith("image/") \
-                        else attachment.type_
+            if not attachment.type_.startswith("image/") \
+            else attachment.type_
         mime_map = {
             "image/png": self._AttachmentType.PNG,
             "image/jpeg": self._AttachmentType.JPG,
@@ -110,7 +117,6 @@ class QaseAdapter(IntegrationBase):
 
     def info(self, name, value):
         if self._qase:
-
             if isinstance(value, (dict, list, tuple, set)):
                 content = json.dumps(value, indent=2, ensure_ascii=False)
                 mimetype = 'application/json'
@@ -143,11 +149,11 @@ class Integrations:
     @contextmanager
     def step(title, expected=None):
         # for adapter in adapters:
-            # if adapter.is_enabled():
-            #     with adapter.step(title, expected):
-            #         yield
-            # else:
-            #     yield
+        # if adapter.is_enabled():
+        #     with adapter.step(title, expected):
+        #         yield
+        # else:
+        #     yield
 
         with ExitStack() as stack:
             for adapter in adapters:
@@ -172,7 +178,6 @@ class Integrations:
         for a in adapters:
             if a.is_enabled():
                 a.attach(source, attachment)
-
 
 #
 # try:

@@ -26,7 +26,7 @@ class BLoggerConfig:
         self._data = self._load_config_file(config_path)
 
         # YAML
-        self.project_name: str = self._data.get("project_name")
+        self.project_name: Optional[str] = self._data.get("project_name")
         self.env: Optional[str] = self._data.get("env")
         self.base_url: Optional[str] = self._data.get("base_url")
 

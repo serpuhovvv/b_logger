@@ -81,27 +81,31 @@ class BLogger:
 
         return pytest.mark.blog_description(description=description)
 
+    # @staticmethod
+    # def links(url: str, name: str = None):
+    #     pass
+
     @staticmethod
     def info(**kwargs):
         """
-        Leave any info or note about Test or Step before or during execution
+        Leave any info or note about Test or Step
 
         Usage:
-            @blog.info(
+            @blog.info(                             <-- Will be added for a Test
                 parameters=['param 1', 'param 2'],
                 some_info='some info',
                 meta={'platform': 'linux', 'python_version': 3.12}
             )
+            def test_main_functionality():
+                blog.info(a='a')                    <-- Will be added for a Test
 
-            or
-
-            with blog.step('Step 1'):
-                blog.info(
-                    step_info={
-                        step_info_1: 'string',
-                        step_info_2: 123
-                        }
-                )
+                with blog.step('Step 1'):
+                    blog.info(                      <-- Will be added for a Step
+                        step_1_info={
+                            'b': 2,
+                            'c': 3
+                            }
+                    )
         """
         runtime.apply_info(**kwargs)
 
@@ -110,18 +114,18 @@ class BLogger:
     @staticmethod
     def known_bug(description: str, url: str = None):
         """
-        Mark the test as having a known bug or apply it to current step.
+        Add known bug for Test or Step
 
         Usage:
-            @blog.known_bug(
-                'Fake Bug Description or Name',
+            @blog.known_bug(                                                        <-- Will be added for a Test
+                'Test Bug 1',
                 'https://link-to-your-bug/1.com'
             )
+            def test_main_functionality():
+                blog.known_bug('Test Bug 2', 'https://link-to-your-bug/2.com')      <-- Will be added for a Test
 
-            or
-
-            with blog.step('Step 1'):
-                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+                with blog.step('Step Title'):
+                    blog.known_bug('Step Bug', 'https://link-to-your-bug/3.com')    <-- Will be added for a Test and a Step
         """
         runtime.apply_known_bug(description, url)
 
@@ -182,7 +186,3 @@ class BLogger:
             It will be added to Test Run and Current Step
         """
         runtime.attach(source, name)
-
-    # @staticmethod
-    # def link(url: str):
-    #     pass
