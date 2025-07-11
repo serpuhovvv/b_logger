@@ -47,6 +47,17 @@ def pytest_configure(config):
         runtime.set_env(config.option.blog_env)
 
 
+# def pytest_unconfigure(config):
+#     report_generator: ReportGenerator = ReportGenerator()
+#     html_generator: HTMLGenerator = HTMLGenerator()
+#
+#     report_generator.generate_combined_report()
+#     html_generator.generate_html()
+#
+#     if not debug:
+#         clear_b_logs_tmp(rmdir=True)
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session):
     if _is_main_worker(session):
