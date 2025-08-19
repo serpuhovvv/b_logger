@@ -47,15 +47,19 @@ def pytest_configure(config):
         runtime.set_env(config.option.blog_env)
 
 
-# def pytest_unconfigure(config):
-#     report_generator: ReportGenerator = ReportGenerator()
-#     html_generator: HTMLGenerator = HTMLGenerator()
-#
-#     report_generator.generate_combined_report()
-#     html_generator.generate_html()
-#
-#     if not debug:
-#         clear_b_logs_tmp(rmdir=True)
+def pytest_unconfigure(config):
+    try:
+        report_generator: ReportGenerator = ReportGenerator()
+        html_generator: HTMLGenerator = HTMLGenerator()
+
+        report_generator.generate_combined_report()
+        html_generator.generate_html()
+
+        if not debug:
+            clear_b_logs_tmp(rmdir=True)
+
+    except Exception as e:
+        print(f'[BLogger][ERROR] Unable to generate blog_report: {e}')
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -74,15 +78,15 @@ def pytest_sessionfinish(session):
         runtime.run_report.count_duration()
         runtime.run_report.save_json()
 
-    if _is_main_worker(session):
-        report_generator: ReportGenerator = ReportGenerator()
-        html_generator: HTMLGenerator = HTMLGenerator()
-
-        report_generator.generate_combined_report()
-        html_generator.generate_html()
-
-        if not debug:
-            clear_b_logs_tmp(rmdir=True)
+    # if _is_main_worker(session):
+    #     report_generator: ReportGenerator = ReportGenerator()
+    #     html_generator: HTMLGenerator = HTMLGenerator()
+    #
+    #     report_generator.generate_combined_report()
+    #     html_generator.generate_html()
+    #
+    #     if not debug:
+    #         clear_b_logs_tmp(rmdir=True)
 
 
 def _is_main_worker(session):
@@ -94,6 +98,7 @@ def pytest_runtest_protocol(item, nextitem):
     runtime.start_test(item)
     yield
     runtime.finish_test()
+    runtime.run_report.save_json()
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -217,7 +222,7 @@ def __apply_known_bug_mark(item):
 
 
 """
-Just a hint for order of pytest hooks
+Just a pytest hooks order hint
 
 pytest_cmdline_main(config)
 pytest_collection(session)

@@ -2,7 +2,7 @@
 
 ---
 
-### Overview
+## Overview
 
 BLogger is a Pytest plugin for enhanced test logging and reporting.  
 It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots.  
@@ -19,27 +19,46 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 - Take and attach **screenshots** automatically on demand or on errors.  
 - Attach files or arbitrary data to steps.
 
-### Reports 
+### Report Examples
 #### blog_report.html
 ![img.png](readme_img/report_overview_1.png)
 ![img.png](readme_img/report_overview_2.png)
 
-### Installation
+## Installation
 
 ```bash
 pip install b_logger
 ```
 
-### Setup
+## Setup
 Add blog.config.yaml file to the root of your project.\
 Bare minimum for everything to work: 
 ```yaml
 project_name: "Project Name"
 ```
+You can also add env and base url here:
+```yaml
+project_name: "Project Name"
 
-### Usage examples
+env: "prod"
+base_url: 'https://base-url.com'
+```
+By default, integrations are turned off.\
+If you are using Allure and want steps, info, description etc. to be duplicated to Allure, simply add integrations block:
+```yaml
+project_name: "Project Name"
 
-You may just read through this test file and understand common usage.
+env: "prod"
+base_url: 'https://base-url.com'
+
+integrations:
+  allure: True
+```
+
+## Usage examples
+
+You may just read through this test file and understand common usage.\
+More detailed info can be found in "Documentation on Methods" block below
 
 ```python
 import pytest
@@ -193,16 +212,12 @@ def test_playwright(playwright_page):  #  <-- Will be detected automatically
 
 ```
 
-### Documentation on Methods
+## Documentation on Methods
 
 ```python
 import pytest
 from contextlib import contextmanager
 
-from selenium.webdriver.ie.webdriver import RemoteWebDriver, WebDriver
-from playwright.sync_api import Page
-
-from b_logger.entities.prints import PrintStatus
 from b_logger.entities.steps import Step
 from b_logger.entities.exceptions import possible_exceptions
 from b_logger.integrations import Integrations
@@ -219,7 +234,7 @@ class BLogger:
             Can also be added in blog.config.yaml:
                 base_url: 'https://base-url.com'
 
-            Or in command line options:
+            Or via command line options:
                 --blog_base_url 'https://base-url.com'
         """
         runtime.set_base_url(base_url)
@@ -230,15 +245,15 @@ class BLogger:
         Set env for the entire Run
 
             Can also be added in blog.config.yaml:
-                    env: 'prod'
+                env: 'prod'
 
-            Or in command line options:
+            Or via command line options:
                 --blog_env 'prod'
         """
         runtime.set_env(env)
 
     @staticmethod
-    def set_browser(browser: RemoteWebDriver | WebDriver | Page):
+    def set_browser(browser: "RemoteWebDriver | WebDriver | Page"):
         """
         Set browser in a browser init fixture or in a test
 
@@ -286,22 +301,28 @@ class BLogger:
     @staticmethod
     def info(**kwargs):
         """
-        Leave any info or note about Test or Step before or during execution
+        Leave any info or note about Test or Step
+            Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
+            k is a name of an info block
+            v supports any data type, but {} is most readable and convenient
+            Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
 
         Usage:
-            @blog.info(
-                first_parameter='param 1',
-                second_parameter='param 2'
+            @blog.info(                             <-- Will be added for a Test
+                parameters=['param 1', 'param 2'],
+                some_info='some info',
                 meta={'platform': 'linux', 'python_version': 3.12}
             )
+            def test_main_functionality():
+                blog.info(a='a')                    <-- Will be added for a Test
 
-            or
-
-            with blog.step('Step 1'):
-                blog.info(
-                    step_param_1='param',
-                    step_param_2=123
-                )
+                with blog.step('Step 1'):
+                    blog.info(                      <-- Will be added for a Step
+                        step_1_info={
+                            'b': 2,
+                            'c': 3
+                            }
+                    )
         """
         runtime.apply_info(**kwargs)
 
@@ -310,18 +331,18 @@ class BLogger:
     @staticmethod
     def known_bug(description: str, url: str = None):
         """
-        Mark the test as having a known bug or apply it to current step.
+        Add known bug for Test or Step
 
         Usage:
-            @blog.known_bug(
-                'Fake Bug Description or Name',
+            @blog.known_bug(                                                        <-- Will be added for a Test
+                'Test Bug 1',
                 'https://link-to-your-bug/1.com'
             )
+            def test_main_functionality():
+                blog.known_bug('Test Bug 2', 'https://link-to-your-bug/2.com')      <-- Will be added for a Test
 
-            or
-
-            with blog.step('Step 1'):
-                blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+                with blog.step('Step Title'):
+                    blog.known_bug('Step Bug', 'https://link-to-your-bug/3.com')    <-- Will be added for a Test and a Step
         """
         runtime.apply_known_bug(description, url)
 
@@ -330,7 +351,13 @@ class BLogger:
     @staticmethod
     @contextmanager
     def step(title: str, expected: str = None):
-        with Integrations.steps(title, expected):
+        """
+        Usage:
+            with blog.step('Step Title', 'Expected Result'):
+                with blog.step('Sub Step Title'):
+                    pass
+        """
+        with Integrations.step(title, expected):
 
             step = Step(title=title, expected=expected)
 
@@ -348,7 +375,7 @@ class BLogger:
                 runtime.finish_step(step)
 
     @staticmethod
-    def print(data, status: PrintStatus = PrintStatus.NONE):
+    def print(data):
         """
         Print any message (str, dict, list, object, etc.)
             It will be added to a Current Step as SubStep
@@ -361,7 +388,7 @@ class BLogger:
             blog.print(f'Probably too long str\n'
                         'can be newlined like that')
         """
-        runtime.print_message(data, status)
+        runtime.print_message(data)
 
     @staticmethod
     def screenshot(name: str = None, is_error: bool = False):
@@ -380,6 +407,26 @@ class BLogger:
         """
         Attach file or screenshot
             It will be added to Test Run and Current Step
+            
+        Usage:
+            blog.attach({"a": 1, "b": 2}, 'some_data')
         """
         runtime.attach(source, name)
 ```
+
+## Publishing to CI/CD
+### Jenkins
+
+To post results to Jenkins you could simply use the HTMLpublisher utility and the following command:
+```
+publishHTML([
+    reportName: 'BLog Report',
+    reportDir: 'b_logs',
+    reportFiles: 'blog_report.html',
+    allowMissing: false,
+    keepAll: true,
+    alwaysLinkToLastBuild: true
+])
+```
+However, you may face the problem of CSP (Content Security Policy) blocking .js and .css.\
+In order not to affect CSP you can set up Resource Root URL: https://www.jenkins.io/doc/book/security/user-content/#resource-root-url

@@ -89,6 +89,10 @@ class BLogger:
     def info(**kwargs):
         """
         Leave any info or note about Test or Step
+            Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
+            k is a name of an info block
+            v supports any data type, but {} is most readable and convenient
+            Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
 
         Usage:
             @blog.info(                             <-- Will be added for a Test
@@ -134,6 +138,11 @@ class BLogger:
     @staticmethod
     @contextmanager
     def step(title: str, expected: str = None):
+        """
+        Usage:
+            with blog.step('Step Title', 'Expected Result'):
+            pass
+        """
         with Integrations.step(title, expected):
 
             step = Step(title=title, expected=expected)
@@ -184,5 +193,8 @@ class BLogger:
         """
         Attach file or screenshot
             It will be added to Test Run and Current Step
+
+        Usage:
+            blog.attach({"a": 1, "b": 2}, 'some_data')
         """
         runtime.attach(source, name)

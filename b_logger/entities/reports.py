@@ -36,7 +36,7 @@ class RunReport(BaseDataModel):
         self.base_url = blog_config.base_url
         self.env = blog_config.env
         self.worker = None
-        self.start_time = datetime.now()
+        self.start_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         self.end_time = None
         self.duration = None
         self.report_ids = {}
@@ -58,7 +58,7 @@ class RunReport(BaseDataModel):
         self.worker = worker
 
     def set_end_time(self):
-        self.end_time = datetime.now()
+        self.end_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
     def count_duration(self):
         if isinstance(self.start_time, str) or isinstance(self.end_time, str):
