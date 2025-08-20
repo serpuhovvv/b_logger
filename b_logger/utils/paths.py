@@ -119,7 +119,6 @@ def init_dirs():
     os.makedirs(f'{b_logs_tmp_steps_path()}', exist_ok=True)
 
     clear_b_logs()
-    # clear_attachments()
     clear_b_logs_tmp()
 
     for filename in ("scripts.js", "styles.css"):

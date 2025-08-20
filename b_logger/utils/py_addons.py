@@ -9,6 +9,6 @@ class BlogPyAddons:
     @staticmethod
     def add_blog_markers(config):
         config.addinivalue_line('markers', 'blog_description')
-        # config.addinivalue_line('markers', 'blog_links')
         config.addinivalue_line('markers', 'blog_info')
+        config.addinivalue_line('markers', 'blog_link')
         config.addinivalue_line('markers', 'blog_known_bug')

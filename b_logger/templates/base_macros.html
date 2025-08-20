@@ -243,7 +243,7 @@
 {% macro render_info_value(value) %}
 {% if value is mapping %}
     {% for sub_key, sub_value in value.items() %}
-        <div><span>{{ sub_key }}:</span> {{ render_info_value(sub_value) }}</div>
+        <div><span><strong>{{ sub_key }}:</strong></span> {{ render_info_value(sub_value) }}</div>
     {% endfor %}
 {% elif value is sequence and value is not string %}
     {% for sub_value in value %}

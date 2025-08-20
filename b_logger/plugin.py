@@ -24,7 +24,7 @@ except ImportError:
 
 runtime = RunTime()
 
-debug = False
+debug = True
 
 
 def pytest_addoption(parser):
@@ -47,19 +47,19 @@ def pytest_configure(config):
         runtime.set_env(config.option.blog_env)
 
 
-def pytest_unconfigure(config):
-    try:
-        report_generator: ReportGenerator = ReportGenerator()
-        html_generator: HTMLGenerator = HTMLGenerator()
-
-        report_generator.generate_combined_report()
-        html_generator.generate_html()
-
-        if not debug:
-            clear_b_logs_tmp(rmdir=True)
-
-    except Exception as e:
-        print(f'[BLogger][ERROR] Unable to generate blog_report: {e}')
+# def pytest_unconfigure(config):
+#     try:
+#         report_generator: ReportGenerator = ReportGenerator()
+#         html_generator: HTMLGenerator = HTMLGenerator()
+#
+#         report_generator.generate_combined_report()
+#         html_generator.generate_html()
+#
+#         if not debug:
+#             clear_b_logs_tmp(rmdir=True)
+#
+#     except Exception as e:
+#         print(f'[BLogger][ERROR] Unable to generate blog_report: {e}')
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -78,15 +78,19 @@ def pytest_sessionfinish(session):
         runtime.run_report.count_duration()
         runtime.run_report.save_json()
 
-    # if _is_main_worker(session):
-    #     report_generator: ReportGenerator = ReportGenerator()
-    #     html_generator: HTMLGenerator = HTMLGenerator()
-    #
-    #     report_generator.generate_combined_report()
-    #     html_generator.generate_html()
-    #
-    #     if not debug:
-    #         clear_b_logs_tmp(rmdir=True)
+    if _is_main_worker(session):
+        try:
+            report_generator: ReportGenerator = ReportGenerator()
+            html_generator: HTMLGenerator = HTMLGenerator()
+
+            report_generator.generate_combined_report()
+            html_generator.generate_html()
+
+            if not debug:
+                clear_b_logs_tmp(rmdir=True)
+
+        except Exception as e:
+            print(f'[BLogger][ERROR] Unable to generate blog_report: {e}')
 
 
 def _is_main_worker(session):
@@ -163,7 +167,7 @@ def _apply_py_output(report):
 
 def _apply_fixtures(item):
     fixtures = item.fixturenames
-    runtime.apply_info(fixtures=fixtures)
+    runtime.apply_info(fixtures=', '.join(fixtures))
 
 
 _possible_browser_names = ['driver', 'page', 'selenium_driver', 'driver_init', 'playwright_page']
@@ -183,6 +187,7 @@ def _apply_browser(item):
 def _apply_markers(item):
     __apply_description_mark(item)
     __apply_info_mark(item)
+    __apply_link_mark(item)
     __apply_known_bug_mark(item)
 
 
@@ -201,6 +206,17 @@ def __apply_info_mark(item):
             kwargs = info.kwargs.get('kwargs', {})
 
             runtime.apply_info(**kwargs)
+
+    except AttributeError as e:
+        pass
+
+
+def __apply_link_mark(item):
+    try:
+        for link in reversed(list(item.iter_markers(name='blog_link'))):
+            kwargs = link.kwargs.get('kwargs', {})
+
+            runtime.apply_link(**kwargs)
 
     except AttributeError as e:
         pass

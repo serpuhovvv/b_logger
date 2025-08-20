@@ -88,21 +88,26 @@ def some_fixture():
     'Test with base functionality, '
     'this description can be modified inside the test'
 )
-@blog.known_bug(
-    'Fake Bug Description or Name',
-    'https://link-to-your-bug/1.com'
-)
 @blog.info(
     info_explanation='You can leave any useful information by using blog.info()',
     meta={'platform': 'linux', 'python_version': 3.12}
+)
+@blog.link(
+    first_link='http://aaa.com',
+    second_link='http://bbb.com'
+)
+@blog.known_bug(
+    'Known Bug Description or Name',
+    'https://link-to-your-bug/1.com'
 )
 def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
 
     with blog.step('Step 1'):
         data = {"a": 1, "b": 2}
+        blog.print(f'Some data: \n{data}')
 
-        blog.print(f'Some important data: \n{data}')
+        blog.link(third_link='http://ccc.com')
 
         with blog.step('Step 1.1'):
             step_param_1 = random.randint(1, 100)
@@ -114,7 +119,7 @@ def test_main_functionality(some_fixture):
             )
 
     with blog.step('Step 2'):
-        blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+        blog.known_bug('Known Bug for a step', 'https://link-to-your-bug/2.com')
 
         with blog.step('Step 2.1'):
             pass
@@ -303,25 +308,24 @@ class BLogger:
         """
         Leave any info or note about Test or Step
             Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
+
             k is a name of an info block
             v supports any data type, but {} is most readable and convenient
+
             Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
 
         Usage:
             @blog.info(                             <-- Will be added for a Test
-                parameters=['param 1', 'param 2'],
-                some_info='some info',
                 meta={'platform': 'linux', 'python_version': 3.12}
+                additional_parameters=['param 1', 'param 2'],
+                some_info='some info',
             )
             def test_main_functionality():
                 blog.info(a='a')                    <-- Will be added for a Test
 
                 with blog.step('Step 1'):
                     blog.info(                      <-- Will be added for a Step
-                        step_1_info={
-                            'b': 2,
-                            'c': 3
-                            }
+                        step_1_info={'b': 2, 'c': 3}
                     )
         """
         runtime.apply_info(**kwargs)
@@ -329,20 +333,49 @@ class BLogger:
         return pytest.mark.blog_info(kwargs=kwargs)
 
     @staticmethod
+    def link(**kwargs):
+        """
+        Attach links to Test or Step
+            Can be used as marker @blog.link(k=v) as well as function blog.link(k=v)
+
+            k is a name of a link
+            v is a URL
+
+            Any amount of links is allowed: @blog.link(k=v, k=v, k=v, ...)
+
+        Usage:
+            @blog.link(
+                first_link='http://aaa.com',
+                second_link='http://bbb.com'
+            )
+            def test_main_functionality():
+                blog.link(third_link='http://ccc.com')
+        """
+        runtime.apply_link(**kwargs)
+
+        return pytest.mark.blog_link(kwargs=kwargs)
+
+    @staticmethod
     def known_bug(description: str, url: str = None):
         """
         Add known bug for Test or Step
 
         Usage:
-            @blog.known_bug(                                                        <-- Will be added for a Test
+            @blog.known_bug(                            <-- Will be added for a Test
                 'Test Bug 1',
                 'https://link-to-your-bug/1.com'
             )
             def test_main_functionality():
-                blog.known_bug('Test Bug 2', 'https://link-to-your-bug/2.com')      <-- Will be added for a Test
+                blog.known_bug(                         <-- Will be added for a Test
+                    'Test Bug 2',
+                    'https://link-to-your-bug/2.com'
+                )
 
-                with blog.step('Step Title'):
-                    blog.known_bug('Step Bug', 'https://link-to-your-bug/3.com')    <-- Will be added for a Test and a Step
+                with blog.step('Step Title'):           <-- Will be added for a Test and a Step
+                    blog.known_bug(
+                        'Step Bug',
+                        'https://link-to-your-bug/3.com'
+                    )
         """
         runtime.apply_known_bug(description, url)
 
@@ -354,8 +387,7 @@ class BLogger:
         """
         Usage:
             with blog.step('Step Title', 'Expected Result'):
-                with blog.step('Sub Step Title'):
-                    pass
+                pass
         """
         with Integrations.step(title, expected):
 
@@ -399,6 +431,7 @@ class BLogger:
 
         Usage:
             blog.screenshot('scr_name')
+            blog.screenshot('err_scr_name', True)
         """
         runtime.make_screenshot(name, is_error)
 
@@ -407,7 +440,7 @@ class BLogger:
         """
         Attach file or screenshot
             It will be added to Test Run and Current Step
-            
+
         Usage:
             blog.attach({"a": 1, "b": 2}, 'some_data')
         """

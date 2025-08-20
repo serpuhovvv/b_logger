@@ -8,10 +8,10 @@ from b_logger.utils.basedatamodel import BaseDataModel
 from b_logger.utils.paths import b_logs_tmp_steps_path
 
 
-class TestError(BaseDataModel):
-    def __init__(self, exc, stacktrace):
-        self.exception = exc
-        self.stacktrace = stacktrace
+# class TestError(BaseDataModel):
+#     def __init__(self, exc, stacktrace):
+#         self.exception = exc
+#         self.stacktrace = stacktrace
 
 
 # class TestInfo(BaseDataModel):

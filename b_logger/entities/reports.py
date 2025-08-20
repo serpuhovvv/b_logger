@@ -91,7 +91,7 @@ class RunReport(BaseDataModel):
         steps_by_id = {}
         if self.modules:
             for module_data in self.modules.values():
-                for test_name, test_reports in module_data["tests"].items():
+                for test_name, test_reports in module_data['tests'].items():
                     for report in test_reports:
                         steps_id = report.get('steps')
                         if steps_id:

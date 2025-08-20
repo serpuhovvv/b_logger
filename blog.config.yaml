@@ -2,4 +2,4 @@ project_name: "BLogger Project"
 
 integrations:
   allure: True
-  qase: True
+  qase: False

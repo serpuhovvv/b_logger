@@ -66,7 +66,7 @@ class Step(BaseDataModel):
     def add_sub_step(self, step):
         self.steps.append(step)
 
-    def add_info(self, info):
+    def add_info(self, info: dict):
         for key, value in info.items():
             if key in self.info:
                 existing = self.info[key]

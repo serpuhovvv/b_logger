@@ -6,6 +6,8 @@ from contextlib import contextmanager, ExitStack
 from abc import ABC, abstractmethod
 from pprint import pformat
 
+import allure
+
 from b_logger.config import blog_config
 from b_logger.entities.attachments import Attachment
 
@@ -42,6 +44,9 @@ class IntegrationBase(ABC):
     def info(self, name, value): ...
 
     @abstractmethod
+    def link(self, url, name): ...
+
+    @abstractmethod
     def attach(self, source, attachment): ...
 
 
@@ -71,8 +76,20 @@ class AllureAdapter(IntegrationBase):
             self._allure.dynamic.description(text)
 
     def info(self, name, value):
-        if self._allure:
+        if not self._allure:
+            return
+
+        try:
             self._allure.dynamic.parameter(name, value)
+        except Exception:
+            try:
+                self._allure.attach(str(value), name, self._AttachmentType.TEXT)
+            except Exception:
+                pass
+
+    def link(self, url, name):
+        if self._allure:
+            self._allure.dynamic.link(url, name=name)
 
     def attach(self, source, attachment):
         if not self._allure:
@@ -132,6 +149,9 @@ class QaseAdapter(IntegrationBase):
 
             self._qase.attach((content, name, mimetype))
 
+    def link(self, url, name):
+        pass
+
     def attach(self, source, attachment):
         if self._qase:
             self._qase.attach((source, attachment.name, attachment.type_))
@@ -148,13 +168,6 @@ class Integrations:
     @staticmethod
     @contextmanager
     def step(title, expected=None):
-        # for adapter in adapters:
-        # if adapter.is_enabled():
-        #     with adapter.step(title, expected):
-        #         yield
-        # else:
-        #     yield
-
         with ExitStack() as stack:
             for adapter in adapters:
                 if adapter.is_enabled():
@@ -172,6 +185,12 @@ class Integrations:
         for a in adapters:
             if a.is_enabled():
                 a.info(name, value)
+
+    @staticmethod
+    def link(url, name):
+        for a in adapters:
+            if a.is_enabled():
+                a.link(url, name)
 
     @staticmethod
     def attach(source, attachment: Attachment):

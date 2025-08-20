@@ -155,7 +155,7 @@ class RunTime:
 
             info[key] = v
 
-            # Integrations.info(key, v)
+            # Integrations.info(k, v)
 
         current_step = self.step_container.get_current_step()
 
@@ -164,8 +164,38 @@ class RunTime:
         else:
             self.test_report.add_info(info)
 
+    def apply_link(self, **kwargs):
+
+        links = {}
+
+        for k, v in kwargs.items():
+            key = k.replace('_', ' ').capitalize().upper()
+
+            links[key] = f'<a href={v}>{v}</a>'
+
+            Integrations.link(v, key)
+
+        self.apply_info(links=links)
+
+        # links = {}
+        #
+        # for k, v in kwargs.items():
+        #     key = k.replace('_', ' ').capitalize().upper()
+        #
+        #     links[key] = f'<a href={v}>{v}</a>'
+        #
+        # current_step = self.step_container.get_current_step()
+        #
+        # if current_step:
+        #     current_step.add_info(links)
+        #
+        # self.test_report.add_info(links)
+
     def apply_known_bug(self, description: str, url: str = None):
-        bug = {"description": description, "url": url}
+        bug = {
+            "description": description,
+            "url": url
+        }
 
         current_step = self.step_container.get_current_step()
 
@@ -230,13 +260,3 @@ class RunTime:
         self.test_report.add_attachment(attachment)
 
         Integrations.attach(source, attachment)
-
-    # def link(self, id_):
-    #     if blog_config.link_prefix:
-    #         url = f'{blog_config.link_prefix}/{id_}'
-    #     else:
-    #         url = f'{id_}'
-    #
-    #     self.apply_info(link=url)
-    #
-    #     Integrations.link(url)

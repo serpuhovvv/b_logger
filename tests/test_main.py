@@ -25,21 +25,26 @@ def some_fixture():
     'Test with base functionality, '
     'this description can be modified inside the test'
 )
-@blog.known_bug(
-    'Fake Bug Description or Name',
-    'https://link-to-your-bug/1.com'
-)
 @blog.info(
     info_explanation='You can leave any useful information by using blog.info()',
     meta={'platform': 'linux', 'python_version': 3.12}
+)
+@blog.link(
+    first_link='http://aaa.com',
+    second_link='http://bbb.com'
+)
+@blog.known_bug(
+    'Known Bug Description or Name',
+    'https://link-to-your-bug/1.com'
 )
 def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
 
     with blog.step('Step 1'):
         data = {"a": 1, "b": 2}
+        blog.print(f'Some data: \n{data}')
 
-        blog.print(f'Some important data: \n{data}')
+        blog.link(third_link='http://ccc.com')
 
         with blog.step('Step 1.1'):
             step_param_1 = random.randint(1, 100)
@@ -51,7 +56,7 @@ def test_main_functionality(some_fixture):
             )
 
     with blog.step('Step 2'):
-        blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+        blog.known_bug('Known Bug for a step', 'https://link-to-your-bug/2.com')
 
         with blog.step('Step 2.1'):
             pass
