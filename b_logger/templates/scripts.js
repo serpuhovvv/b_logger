@@ -1,80 +1,137 @@
-
 function initFilters() {
-    const searchInput = document.getElementById('searchInput');
+    const searchInput  = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
     const moduleFilter = document.getElementById('moduleFilter');
 
+    // обработчики
     searchInput?.addEventListener('input', filterTests);
     statusFilter?.addEventListener('change', filterTests);
     moduleFilter?.addEventListener('change', filterTests);
 
+    searchInput?.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            filterTests();
+        }
+    });
+
+    // кнопки-мульти
     document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+        btn.addEventListener('click', function () {
+            this.classList.toggle('active');
             filterTests();
         });
     });
+
+    // сброс
+    document.getElementById('clearFilters')?.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSelect(statusFilter);
+        clearSelect(moduleFilter);
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        filterTests();
+    });
+
+    filterTests();
 }
 
+// helpers
+function getSelectedValues(select) {
+    if (!select) return [];
+    let values = [];
+    if (select.multiple) {
+        values = Array.from(select.selectedOptions).map(o => o.value);
+    } else {
+        if (select.value) values = [select.value];
+    }
+    return values
+        .map(v => (v ?? '').toString().trim())
+        .filter(v => v && v.toLowerCase() !== 'all');
+}
 
+function clearSelect(select) {
+    if (!select) return;
+    if (select.multiple) {
+        Array.from(select.options).forEach(o => (o.selected = false));
+    } else {
+        const hasAll = Array.from(select.options).some(o => o.value.toLowerCase() === 'all');
+        select.value = hasAll ? 'all' : '';
+    }
+}
+
+function normalizeStatus(s) {
+    return (s ?? '').toString().trim().toUpperCase();
+}
+
+function matchesFilters(nameLC, statusRaw, moduleName, filters) {
+    const statusU = normalizeStatus(statusRaw);
+    if (filters.search && !nameLC.includes(filters.search)) return false;
+    if (filters.status.length && !filters.status.includes(statusU)) return false;
+    if (filters.module.length && !filters.module.includes(moduleName)) return false;
+    if (filters.buttonStatuses.length && !filters.buttonStatuses.includes(statusU.toLowerCase())) return false;
+    return true;
+}
+
+// основная фильтрация
 function filterTests() {
-    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const status = document.getElementById('statusFilter')?.value || 'all';
-    const module = document.getElementById('moduleFilter')?.value || 'all';
-    const filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-    let visibleCount = 0;
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+    const statusSelected = getSelectedValues(document.getElementById('statusFilter')).map(v => v.toUpperCase());
+    const moduleSelected = getSelectedValues(document.getElementById('moduleFilter'));
+    const activeButtons = Array.from(document.querySelectorAll('.filter-btn.active'))
+        .map(b => (b.dataset.filter || '').toLowerCase().trim())
+        .filter(f => f && f !== 'all');
 
-    document.querySelectorAll('.module').forEach(moduleEl => {
+    const filters = {
+        search,
+        status: statusSelected,
+        module: moduleSelected,
+        buttonStatuses: activeButtons
+    };
+
+    const modules = document.querySelectorAll('.module');
+    let modulesVisible = 0;
+
+    modules.forEach(moduleEl => {
         const moduleName = moduleEl.dataset.module;
         const tests = moduleEl.querySelectorAll('.test');
-        let moduleVisible = false;
+        let moduleHasVisible = false;
 
         tests.forEach(test => {
-            const isGroup = test.classList.contains('test-multi');
-            const testName = test.dataset.test?.toLowerCase() || '';
+            const isGroup  = test.classList.contains('test-multi');
+            const testName = (test.dataset.test || '').toLowerCase();
             let visible = false;
 
             if (isGroup) {
-                const subtests = test.querySelectorAll('.test-sub');
                 let subVisible = 0;
-                subtests.forEach(sub => {
+                test.querySelectorAll('.test-sub').forEach(sub => {
+                    const subName   = (sub.dataset.test || '').toLowerCase();
                     const subStatus = sub.dataset.status;
-                    const subName = sub.dataset.test?.toLowerCase() || '';
-                    let show = true;
-                    if (search && !subName.includes(search)) show = false;
-                    if (status !== 'all' && subStatus !== status) show = false;
-                    if (module !== 'all' && moduleName !== module) show = false;
-                    if (filter !== 'all' && subStatus.toLowerCase() !== filter) show = false;
+                    const show = matchesFilters(subName, subStatus, moduleName, filters);
                     sub.style.display = show ? 'block' : 'none';
                     if (show) subVisible++;
                 });
                 visible = subVisible > 0;
             } else {
                 const testStatus = test.dataset.status;
-                visible = true;
-                if (search && !testName.includes(search)) visible = false;
-                if (status !== 'all' && testStatus !== status) visible = false;
-                if (module !== 'all' && moduleName !== module) visible = false;
-                if (filter !== 'all' && testStatus.toLowerCase() !== filter) visible = false;
+                visible = matchesFilters(testName, testStatus, moduleName, filters);
             }
 
             test.style.display = visible ? 'block' : 'none';
-            if (visible) moduleVisible = true;
+            if (visible) moduleHasVisible = true;
         });
 
-        moduleEl.style.display = moduleVisible ? 'block' : 'none';
-        if (moduleVisible) visibleCount++;
+        moduleEl.style.display = moduleHasVisible ? 'block' : 'none';
+        if (moduleHasVisible) modulesVisible++;
     });
 
     let noResults = document.getElementById('noResults');
-    if (visibleCount === 0) {
+    if (modulesVisible === 0) {
         if (!noResults) {
             noResults = document.createElement('div');
             noResults.id = 'noResults';
             noResults.className = 'no-results';
             noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
-            document.querySelector('.container').appendChild(noResults);
+            document.querySelector('.container').appendChild(noResults); // 👉 именно внизу
         }
     } else if (noResults) {
         noResults.remove();

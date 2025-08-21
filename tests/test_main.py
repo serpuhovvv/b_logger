@@ -40,9 +40,9 @@ def some_fixture():
 def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
 
-    with blog.step('Step 1'):
+    with blog.step('Step 1', 'Step is expected to pass'):
         data = {"a": 1, "b": 2}
-        blog.print(f'Some data: \n{data}')
+        blog.print(f'Some data: {data}')
 
         blog.link(third_link='http://ccc.com')
 
@@ -73,11 +73,11 @@ def test_main_functionality(some_fixture):
 
 @pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (333, 444)])  # <-- These parameters will be added to test automatically
 def test_parametrized(py_param_1, py_param_2):
-    with blog.step('step 1'):
-        with blog.step('step 2'):
-            with blog.step('step 3'):
+    with blog.step('Step 1'):
+        with blog.step('Step 2'):
+            with blog.step('Step 3', 'Step is expected to fail'):
                 blog.print(py_param_1)
-                with blog.step('step 4'):
+                with blog.step('Step 4'):
                     blog.print(py_param_2)
                 assert py_param_1 in [111, 444]
 

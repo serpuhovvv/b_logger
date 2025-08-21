@@ -24,7 +24,7 @@ except ImportError:
 
 runtime = RunTime()
 
-debug = True
+debug = False
 
 
 def pytest_addoption(parser):

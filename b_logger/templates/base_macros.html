@@ -287,13 +287,6 @@
         <div class="step-header" onclick="toggleStep(this)">
             <div class="step-info">
                 <span class="step-title">{{ step.title }}</span>
-                {% if step.error %}<i class="fas fa-exclamation-triangle error-icon"></i>{% endif %}
-                {% if step.attachments %}<i class="fas fa-paperclip attach-icon"></i>{% endif %}
-                {% if step.info %}<i class="fas fa-info-circle"></i>{% endif %}
-                {% if step.known_bugs %}<i class="fas fa-bug bug-icon"></i>{% endif %}
-                {% if has_addons or step.steps %}
-                    <i class="fas fa-chevron-down toggle-icon"></i>
-                {% endif %}
             </div>
             {% if step.steps %}
                 {% set count_steps = namespace(count=0) %}
@@ -303,8 +296,19 @@
                     {% endif %}
                 {% endfor %}
                 <div class="step-badge">
+
+                    {% if step.error %}<span><i class="fas fa-exclamation-triangle error-icon"></i></span>{% endif %}
+                    {% if step.attachments %}<span><i class="fas fa-paperclip attach-icon"></i></span>{% endif %}
+                    {% if step.info %}<span><i class="fas fa-info-circle"></i></span>{% endif %}
+                    {% if step.known_bugs %}<span><i class="fas fa-bug bug-icon"></i></span>{% endif %}
+                    {% if step.expected %}<span><i class="fas fa-check-double"></i></span>{% endif %}
+
                     <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
-<!--                    <i class="fas fa-chevron-down toggle-icon"></i>-->
+                    <span>
+                        {% if has_addons or step.steps %}
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        {% endif %}
+                    </span>
                 </div>
             {% endif %}
         </div>
@@ -313,10 +317,10 @@
             {% if has_addons %}
             <div class="step-content">
                 {% if step.expected %}
-                <div class="step-section expected">
-                    <h5><i class="fas fa-check-double"></i> Expected</h5>
-                    <div class="step-value">{{ step.expected }}</div>
-                </div>
+                    <div class="section">
+                        <h4><i class="fas fa-check-double"></i> Expected</h4>
+                        <div class="info-item">{{ step.expected }}</div>
+                    </div>
                 {% endif %}
 
                 {% if step.info %}
