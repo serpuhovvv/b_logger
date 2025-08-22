@@ -9,7 +9,7 @@
     --print: #8B5CF6; --print-bg: #F5F3FF; --print-light: #E0E7FF;
 
     --primary: #3B82F6; --primary-dark: #1D4ED8;
-    --bg: #F8FAFC; --bg-card: #FFFFFF; --bg-light: #F1F5F9;
+    --bg: #F8FAFC; --bg-card: #FFFFFF; --bg-light: #F1F5F9; --bg-strong: #ced3d9;
     --text: #0F172A; --text-light: #475569; --text-muted: #64748B;
     --border: #E2E8F0; --border-light: #F1F5F9;
     --shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -51,6 +51,11 @@ a { text-decoration: underline; }
 .filter-buttons { display: flex; gap: 0.5rem; }
 .filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-light); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
 .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.reset-btn {
+  background: var(--bg-strong);
+}
+
+.reset-btn:hover { background: var(--primary); border-color: var(--primary); }
 
 /* ============================================ */
 /* COMPONENTS */

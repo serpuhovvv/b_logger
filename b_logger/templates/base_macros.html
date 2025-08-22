@@ -4,7 +4,7 @@
         <i class="fas fa-search"></i>
         <input type="text" id="searchInput" placeholder="Search tests...">
     </div>
-    <select id="statusFilter">
+    <select class="hidden" id="statusFilter">
         <option value="all">All Statuses</option>
         <option value="PASSED">Passed</option>
         <option value="FAILED">Failed</option>
@@ -18,11 +18,12 @@
         {% endfor %}
     </select>
     <div class="filter-buttons">
-        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn active hidden" data-filter="all">All</button>
         <button class="filter-btn" data-filter="passed">✓ Passed</button>
         <button class="filter-btn" data-filter="failed">✗ Failed</button>
         <button class="filter-btn" data-filter="broken">⚠ Broken</button>
         <button class="filter-btn" data-filter="skipped">→ Skipped</button>
+        <button class="filter-btn reset-btn" id="reset-filters">Reset Filters</button>
     </div>
 </div>
 {% endmacro %}

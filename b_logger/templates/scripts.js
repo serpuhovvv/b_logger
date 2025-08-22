@@ -3,7 +3,6 @@ function initFilters() {
     const statusFilter = document.getElementById('statusFilter');
     const moduleFilter = document.getElementById('moduleFilter');
 
-    // обработчики
     searchInput?.addEventListener('input', filterTests);
     statusFilter?.addEventListener('change', filterTests);
     moduleFilter?.addEventListener('change', filterTests);
@@ -15,7 +14,6 @@ function initFilters() {
         }
     });
 
-    // кнопки-мульти
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             this.classList.toggle('active');
@@ -23,19 +21,28 @@ function initFilters() {
         });
     });
 
-    // сброс
-    document.getElementById('clearFilters')?.addEventListener('click', () => {
-        searchInput.value = '';
+    document.getElementById("reset-filters").addEventListener("click", () => {
+        // Очистить поле поиска
+        searchInput.value = "";
+
+        // Сбросить select'ы к "all"
         clearSelect(statusFilter);
         clearSelect(moduleFilter);
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+
+        // Снять active у всех кнопок и вернуть "All"
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.remove("active");
+        });
+        document.querySelector('.filter-btn[data-filter="all"]')?.classList.add("active");
+
+        // Запустить фильтрацию заново
         filterTests();
     });
 
     filterTests();
 }
 
-// helpers
+
 function getSelectedValues(select) {
     if (!select) return [];
     let values = [];
@@ -49,6 +56,7 @@ function getSelectedValues(select) {
         .filter(v => v && v.toLowerCase() !== 'all');
 }
 
+
 function clearSelect(select) {
     if (!select) return;
     if (select.multiple) {
@@ -59,9 +67,11 @@ function clearSelect(select) {
     }
 }
 
+
 function normalizeStatus(s) {
     return (s ?? '').toString().trim().toUpperCase();
 }
+
 
 function matchesFilters(nameLC, statusRaw, moduleName, filters) {
     const statusU = normalizeStatus(statusRaw);
@@ -72,7 +82,7 @@ function matchesFilters(nameLC, statusRaw, moduleName, filters) {
     return true;
 }
 
-// основная фильтрация
+
 function filterTests() {
     const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
     const statusSelected = getSelectedValues(document.getElementById('statusFilter')).map(v => v.toUpperCase());
