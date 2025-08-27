@@ -102,7 +102,7 @@ class BLogger:
                 blog.info(a='a')                    <-- Will be added for a Test
 
                 with blog.step('Step 1'):
-                    blog.info(                      <-- Will be added for a Step
+                    blog.info(                      <-- Will be added for a Test and a Step
                         step_1_info={'b': 2, 'c': 3}
                     )
         """

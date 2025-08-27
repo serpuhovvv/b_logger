@@ -163,8 +163,8 @@ class RunTime:
 
         if current_step:
             current_step.add_info(info)
-        else:
-            self.test_report.add_info(info)
+
+        self.test_report.add_info(info)
 
     def apply_link(self, **kwargs):
 
@@ -228,9 +228,10 @@ class RunTime:
         if self.browser is None:
             return
 
-        scr_name = (f'{"err_" if is_error else ""}'
-                    f'scr_'
-                    f'{self.test_report.name if not scr_name else scr_name}')
+        scr_name = (
+            f'{"err_" if is_error else ""}'
+            f'scr_{self.test_report.name if not scr_name else scr_name}'
+        )
 
         adapter = get_browser_adapter(self.browser)
 

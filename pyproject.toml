@@ -11,12 +11,11 @@ dependencies = [
     'filelock',
     'Jinja2'
 ]
-#classifiers = [
-#    "Framework :: Pytest",
-#    "Programming Language :: Python :: 3",
-#    "License :: OSI Approved :: MIT License",
-#    "Operating System :: OS Independent"
-#]
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
 
 
 [project.optional-dependencies]

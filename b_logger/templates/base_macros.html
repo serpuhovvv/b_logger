@@ -62,6 +62,11 @@
     <div class="content active">
         <h2><i class="fas fa-chart-pie"></i> Test Results Summary</h2>
         <div class="summary-grid">
+            <div class="summary-card">
+                <div class="number">{{ total }}</div>
+                <div class="label">Total</div>
+                <div class="percentage">100%</div>
+            </div>
             {% for label, count, status in [('Passed', passed, 'passed'), ('Failed', failed, 'failed'), ('Broken', broken, 'broken'), ('Skipped', skipped, 'skipped')] %}
             <div class="summary-card {{ status }}">
                 <div class="number">{{ count }}</div>
@@ -127,7 +132,7 @@
                 </div>
                 <i class="fas fa-chevron-down toggle-icon"></i>
             </div>
-            <div class="test-content">
+            <div class="test-content expanded active">
                 {% for run in test_runs %}
                     {{ render_test_block(run, steps, is_sub=True) }}
                 {% endfor %}
@@ -288,30 +293,27 @@
         <div class="step-header" onclick="toggleStep(this)">
             <div class="step-info">
                 <span class="step-title">{{ step.title }}</span>
-            </div>
-            {% if step.steps %}
-                {% set count_steps = namespace(count=0) %}
-                {% for s in step.steps %}
-                    {% if s.id.startswith('step_') %}
-                        {% set count_steps.count = count_steps.count + 1 %}
-                    {% endif %}
-                {% endfor %}
-                <div class="step-badge">
+                {% if has_addons or step.steps %}
+                    <div class="step-badge">
+                        {% if step.error %}<span><i class="fas fa-exclamation-triangle error-icon"></i></span>{% endif %}
+                        {% if step.attachments %}<span><i class="fas fa-paperclip attach-icon"></i></span>{% endif %}
+                        {% if step.info %}<span><i class="fas fa-info-circle"></i></span>{% endif %}
+                        {% if step.known_bugs %}<span><i class="fas fa-bug bug-icon"></i></span>{% endif %}
+                        {% if step.expected %}<span><i class="fas fa-check-double"></i></span>{% endif %}
 
-                    {% if step.error %}<span><i class="fas fa-exclamation-triangle error-icon"></i></span>{% endif %}
-                    {% if step.attachments %}<span><i class="fas fa-paperclip attach-icon"></i></span>{% endif %}
-                    {% if step.info %}<span><i class="fas fa-info-circle"></i></span>{% endif %}
-                    {% if step.known_bugs %}<span><i class="fas fa-bug bug-icon"></i></span>{% endif %}
-                    {% if step.expected %}<span><i class="fas fa-check-double"></i></span>{% endif %}
-
-                    <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
-                    <span>
-                        {% if has_addons or step.steps %}
-                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        {% if step.steps %}
+                            {% set count_steps = namespace(count=0) %}
+                            {% for s in step.steps %}
+                                {% if s.id.startswith('step_') %}
+                                    {% set count_steps.count = count_steps.count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
                         {% endif %}
-                    </span>
-                </div>
-            {% endif %}
+                        <span><i class="fas fa-chevron-down toggle-icon"></i></span>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="step-body">

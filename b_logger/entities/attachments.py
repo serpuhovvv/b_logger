@@ -1,3 +1,4 @@
+import re
 import shutil
 import uuid
 import mimetypes
@@ -20,7 +21,7 @@ class Attachment(BaseDataModel):
         type_: Optional[str] = None,
         _skip_processing: bool = False,
     ):
-        self.name = name if name else f'attachment_{uuid.uuid4()}'
+        self.name = self.normalize_name(name) if name else f'attachment_{uuid.uuid4()}'
         self.type_ = type_
 
         if not _skip_processing:
@@ -108,6 +109,11 @@ class Attachment(BaseDataModel):
     def ensure_extension(self, ext: str):
         if not self.name.endswith(ext):
             self.name += ext
+
+    @staticmethod
+    def normalize_name(name: str):
+        name = re.sub(r'[^A-Za-z0-9_-]', '_', name)
+        return re.sub(r'_+', '_', name).strip('_')
 
 
 # class Attachment(BaseDataModel):
