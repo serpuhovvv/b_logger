@@ -157,7 +157,7 @@ class RunTime:
 
             info[key] = v
 
-            # Integrations.info(k, v)
+            Integrations.info(k, v)
 
         current_step = self.step_container.get_current_step()
 

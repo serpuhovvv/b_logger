@@ -1,12 +1,9 @@
 import json
-import os
 import mimetypes
-from pathlib import Path
 from contextlib import contextmanager, ExitStack
 from abc import ABC, abstractmethod
 from pprint import pformat
 
-import allure
 
 from b_logger.config import blog_config
 from b_logger.entities.attachments import Attachment
@@ -80,12 +77,12 @@ class AllureAdapter(IntegrationBase):
             return
 
         try:
-            self._allure.dynamic.parameter(name, value)
+            self._allure.attach(str(value), name, self._AttachmentType.TEXT)
         except Exception:
             try:
-                self._allure.attach(str(value), name, self._AttachmentType.TEXT)
+                self._allure.dynamic.parameter(name, value)
             except Exception:
-                pass
+                print(f'{name}: {value}')
 
     def link(self, url, name):
         if self._allure:
