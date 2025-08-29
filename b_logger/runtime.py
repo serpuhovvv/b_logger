@@ -157,6 +157,13 @@ class RunTime:
 
             info[key] = v
 
+            # if isinstance(v, (dict, list)):
+            #     v = json.dumps(v, indent=2, ensure_ascii=False)
+            # else:
+            #     v = str(v)
+            #
+            # print(f'{key}: {v}')
+
             Integrations.info(k, v)
 
         current_step = self.step_container.get_current_step()
@@ -246,13 +253,6 @@ class RunTime:
                name: str = None,
                mime_type: str = None
                ):
-        if name:
-            existing_names = {Path(att).stem for att in os.listdir(f'{attachments_path()}')}
-            base_name = name
-            index = 0
-            while name in existing_names:
-                index += 1
-                name = f'{base_name}_{index}'
 
         attachment = Attachment(source=source, name=name)
 

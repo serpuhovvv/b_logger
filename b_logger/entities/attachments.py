@@ -113,7 +113,16 @@ class Attachment(BaseDataModel):
     @staticmethod
     def normalize_name(name: str):
         name = re.sub(r'[^A-Za-z0-9_-]', '_', name)
-        return re.sub(r'_+', '_', name).strip('_')
+        name = re.sub(r'_+', '_', name).strip('_')
+
+        existing_names = {Path(att).stem for att in os.listdir(f'{attachments_path()}')}
+        base_name = name
+        index = 0
+        while name in existing_names:
+            index += 1
+            name = f'{base_name}_{index}'
+
+        return name
 
 
 # class Attachment(BaseDataModel):
