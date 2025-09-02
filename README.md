@@ -1,4 +1,4 @@
-# BLogger — Pytest Logging Plugin (Development)
+# BLogger — Pytest Logging Plugin
 
 ---
 
@@ -27,7 +27,7 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 ## Installation
 
 ```bash
-pip install b_logger
+pip install pytest-b-logger
 ```
 
 ## Setup
