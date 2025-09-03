@@ -1,6 +1,6 @@
 import json
-import os
 import traceback
+from datetime import datetime
 from pathlib import Path
 from typing import Union, BinaryIO
 
@@ -157,13 +157,6 @@ class RunTime:
 
             info[key] = v
 
-            # if isinstance(v, (dict, list)):
-            #     v = json.dumps(v, indent=2, ensure_ascii=False)
-            # else:
-            #     v = str(v)
-            #
-            # print(f'{key}: {v}')
-
             Integrations.info(k, v)
 
         current_step = self.step_container.get_current_step()
@@ -213,11 +206,15 @@ class RunTime:
 
         self.test_report.add_known_bug(bug)
 
+        Integrations.link(bug.get('url'), bug.get('description'))
+
     def print_message(self, message):
         if isinstance(message, (dict, list)):
             data = json.dumps(message, indent=2, ensure_ascii=False)
+            type_ = 'application/json'
         else:
             data = str(message)
+            type_ = 'text/plain'
 
         print_ = Print(data)
 
@@ -230,6 +227,8 @@ class RunTime:
             self.step_container.add_step(print_)
 
         print(f'{data}')
+
+        Integrations.attach(data, print_.id, type_)
 
     def make_screenshot(self, scr_name: str = None, is_error: bool = False):
         if self.browser is None:
@@ -250,8 +249,7 @@ class RunTime:
 
     def attach(self,
                source: Union[str, Path, bytes, BinaryIO, dict, list, int, float, None],
-               name: str = None,
-               mime_type: str = None
+               name: str = None
                ):
 
         attachment = Attachment(source=source, name=name)
@@ -262,4 +260,4 @@ class RunTime:
 
         self.test_report.add_attachment(attachment)
 
-        Integrations.attach(source, attachment)
+        Integrations.attach(source, attachment.name, attachment.type_)

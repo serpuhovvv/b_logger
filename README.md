@@ -13,11 +13,11 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 
 - Set global **base URL**, **environment**, and **browser** instance (Selenium or Playwright).  
 - Add/update **test descriptions** dynamically.
-- Log any **info** during tests or steps.  
+- Log any important **info** during tests or steps.  
 - Mark tests/steps with **known bugs** and optional bug tracker URLs.
-- Print messages attached to current step (supports multiline and complex data).  
+- **Print** messages attached to current step (supports multiline and complex data).  
 - Take and attach **screenshots** automatically on demand or on errors.  
-- Attach files or arbitrary data to steps.
+- **Attach** files or arbitrary data to steps.
 
 ### Report Examples
 #### blog_report.html
@@ -31,7 +31,7 @@ pip install pytest-b-logger
 ```
 
 ## Setup
-Add blog.config.yaml file to the root of your project.\
+Add **blog.config.yaml** file to the root of your project.\
 Bare minimum for everything to work: 
 ```yaml
 project_name: "Project Name"
@@ -456,6 +456,7 @@ publishHTML([
     reportName: 'BLog Report',
     reportDir: 'b_logs',
     reportFiles: 'blog_report.html',
+    icon: 'static/icon.png',
     allowMissing: false,
     keepAll: true,
     alwaysLinkToLastBuild: true

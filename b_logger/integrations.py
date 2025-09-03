@@ -44,7 +44,7 @@ class IntegrationBase(ABC):
     def link(self, url, name): ...
 
     @abstractmethod
-    def attach(self, source, attachment): ...
+    def attach(self, source, name, type_): ...
 
 
 class AllureAdapter(IntegrationBase):
@@ -77,10 +77,12 @@ class AllureAdapter(IntegrationBase):
             return
 
         try:
+            # self._allure.dynamic.parameter(name, value)
             self._allure.attach(str(value), name, self._AttachmentType.TEXT)
         except Exception:
             try:
                 self._allure.dynamic.parameter(name, value)
+                # self._allure.attach(str(value), name, self._AttachmentType.TEXT)
             except Exception:
                 print(f'{name}: {value}')
 
@@ -88,12 +90,14 @@ class AllureAdapter(IntegrationBase):
         if self._allure:
             self._allure.dynamic.link(url, name=name)
 
-    def attach(self, source, attachment):
+    def attach(self, source, name, type_):
         if not self._allure:
             return
-        mime_type = mimetypes.guess_type(attachment.type_)[0] \
-            if not attachment.type_.startswith("image/") \
-            else attachment.type_
+
+        mime_type = mimetypes.guess_type(type_)[0] \
+            if not type_.startswith("image/") \
+            else type_
+
         mime_map = {
             "image/png": self._AttachmentType.PNG,
             "image/jpeg": self._AttachmentType.JPG,
@@ -102,8 +106,9 @@ class AllureAdapter(IntegrationBase):
             "text/html": self._AttachmentType.HTML,
             "application/xml": self._AttachmentType.XML,
         }
+
         attach_type = mime_map.get(mime_type, self._AttachmentType.TEXT)
-        self._allure.attach(source, attachment.name, attach_type)
+        self._allure.attach(source, name, attach_type)
 
 
 class QaseAdapter(IntegrationBase):
@@ -149,9 +154,9 @@ class QaseAdapter(IntegrationBase):
     def link(self, url, name):
         pass
 
-    def attach(self, source, attachment):
+    def attach(self, source, name, type_):
         if self._qase:
-            self._qase.attach((source, attachment.name, attachment.type_))
+            self._qase.attach((source, name, type_))
 
 
 adapters = [QaseAdapter(), AllureAdapter()]
@@ -190,10 +195,10 @@ class Integrations:
                 a.link(url, name)
 
     @staticmethod
-    def attach(source, attachment: Attachment):
+    def attach(source, name, type_):
         for a in adapters:
             if a.is_enabled():
-                a.attach(source, attachment)
+                a.attach(source, name, type_)
 
 #
 # try:

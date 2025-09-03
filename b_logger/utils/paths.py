@@ -121,7 +121,7 @@ def init_dirs():
     clear_b_logs()
     clear_b_logs_tmp()
 
-    for filename in ("scripts.js", "styles.css"):
+    for filename in ("scripts.js", "styles.css", "icon.png"):
         src = Path(pathfinder.library_root()) / f'b_logger/templates/{filename}'
         dst = Path(static_path()) / filename
 

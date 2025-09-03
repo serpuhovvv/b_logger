@@ -84,7 +84,7 @@ class BLogger:
     @staticmethod
     def info(**kwargs):
         """
-        Leave any info or note about Test or Step
+        Leave any important info or note about Test or Step
             Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
 
             k is a name of an info block
