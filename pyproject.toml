@@ -1,7 +1,7 @@
 [project]
 name = "pytest-b-logger"
 version = "1.0.4"
-description = "BLogger is a Pytest plugin for enhanced test logging and generating convenient and lightweight reports.
+description = "BLogger is a Pytest plugin for enhanced test logging and generating convenient and lightweight reports."
 readme = "README.md"
 authors = [
     {name="serpuhovvv", email="pudikovserg@gmail.com"}
