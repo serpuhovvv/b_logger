@@ -43,9 +43,9 @@ a { text-decoration: underline; }
 /* ============================================ */
 /* SEARCH AND FILTERS */
 /* ============================================ */
-.search-filter { background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; display: grid; grid-template-columns: 2fr auto auto 3fr; gap: 1rem; align-items: center; }
+.search-filter { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; }
 .search-container { position: relative; }
-.search-container i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search-container i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text); }
 .search-container input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; }
 .search-filter select { padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); }
 .filter-buttons { display: flex; gap: 0.5rem; }
@@ -56,6 +56,11 @@ a { text-decoration: underline; }
 }
 
 .reset-btn:hover { background: var(--primary); border-color: var(--primary); }
+
+.main-icon {
+    width: 70px;
+    height: 70px;
+}
 
 /* ============================================ */
 /* COMPONENTS */

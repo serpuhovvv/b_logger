@@ -453,10 +453,10 @@ class BLogger:
 To post results to Jenkins you could simply use the HTMLpublisher utility and the following command:
 ```
 publishHTML([
-    reportName: 'BLog Report',
+    reportName: 'BLog',
     reportDir: 'b_logs',
     reportFiles: 'blog_report.html',
-    icon: 'static/icon.png',
+    icon: 'static/icon.svg',
     allowMissing: false,
     keepAll: true,
     alwaysLinkToLastBuild: true

@@ -1,6 +1,6 @@
 [project]
 name = "pytest-b-logger"
-version = "1.0.1"
+version = "1.0.2"
 description = "BLogger is a Pytest plugin for enhanced test logging and reporting. It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots. Works seamlessly with Selenium WebDriver and Playwright Page instances. Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc."
 readme = "README.md"
 authors = [
