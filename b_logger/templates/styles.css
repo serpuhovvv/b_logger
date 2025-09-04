@@ -47,7 +47,7 @@ a { text-decoration: underline; }
     background: var(--bg-card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 1rem;
+    padding: 0.25rem;
     margin-bottom: 1rem;
     display: flex;
     gap: 1rem;
@@ -60,7 +60,7 @@ a { text-decoration: underline; }
 .search-container i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text); }
 .search-container input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; }
 .search-filter select { padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); }
-.filter-buttons { display: flex; gap: 0.5rem; }
+.filter-buttons { display: flex; gap: 1rem; }
 .filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-light); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
 .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 .reset-btn {
