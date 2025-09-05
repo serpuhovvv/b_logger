@@ -23,6 +23,7 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 #### blog_report.html
 ![img.png](readme_img/report_overview_1.png)
 ![img.png](readme_img/report_overview_2.png)
+![img.png](readme_img/report_overview_3.png)
 
 ## Installation
 
