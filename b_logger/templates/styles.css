@@ -231,7 +231,7 @@ a { text-decoration: underline; }
   background: var(--bg-card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   overflow: hidden;
 }
 
@@ -378,7 +378,9 @@ a { text-decoration: underline; }
 /* ===============================
    SECTIONS & INFO
 ================================= */
-.section { margin-bottom: 1rem; margin-top: 0.25rem; }
+.section { margin-bottom: 0.5rem; }
+.section h4 { margin-bottom: 0.5rem; }
+
 .description { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap; font-size: 0.875rem; }
 
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
@@ -435,7 +437,18 @@ a { text-decoration: underline; }
    ATTACHMENTS
 ================================= */
 .attachments { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
-.attachment { display: flex; flex-direction: column; align-items: center; padding: 1rem; background: var(--bg-light); border-radius: var(--radius-sm); cursor: pointer; text-align: center; width: 150px; transition: background 0.2s; }
+.attachment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-light);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    width: 150px;
+    transition: all 0.2s;
+}
 .attachment img { max-width: 100px; max-height: 100px; border-radius: var(--radius-sm); }
 .attachment i { font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem; }
 .attachment span { font-size: 0.75rem; margin-top: 0.5rem; word-break: break-all; }
