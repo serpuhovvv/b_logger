@@ -68,7 +68,7 @@
 {% set skipped = report.run_results.SKIPPED %}
 {% set total = passed + failed + broken + skipped %}
 <div class="card">
-    <div class="header" onclick="toggleCard(this)">
+    <div class="header expanded" onclick="toggleCard(this)">
         <h3><i class="fas fa-chart-pie"></i> Test Results Summary</h3>
         <i class="fas fa-chevron-down toggle-icon"></i>
     </div>

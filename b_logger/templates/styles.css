@@ -42,7 +42,7 @@ body {
 
   --bg: #F8FAFC;
   --bg-card: #FFFFFF;
-  --bg-light: #F1F5F9;
+  --bg-light: #e6ebed;
   --bg-strong: #ced3d9;
 
   --text: #0F172A;
@@ -53,7 +53,7 @@ body {
   --border-light: #F1F5F9;
 
   /* Misc */
-  --shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  --shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
   --radius: 8px;
   --radius-sm: 4px;
 }
@@ -307,10 +307,10 @@ a { text-decoration: underline; }
    TESTS
 ================================= */
 .test {
-  border: 1px solid var(--border);
+  border: 1px solid var(--bg-strong);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   border-left: 5px solid;
 }
 .test.passed { border-left-color: var(--passed); }
@@ -319,20 +319,20 @@ a { text-decoration: underline; }
 .test.skipped { border-left-color: var(--skipped); }
 
 .test-header {
-  padding: 0.75rem;
+  padding: 0.5rem;
+  padding-left: 0.75rem;
   display: flex;
   border-radius: var(--radius-sm);
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  background: var(--bg-light);
+  background: var(--card);
   transition: background 0.2s;
 }
 .test-name { font-weight: 600; }
-.test-content { border-top: 1px solid var(--border); }
 
 .test.test-multi { border-left: 4px solid var(--primary); }
-.test.test-sub { margin-left: 1rem; margin-right: 1rem; margin-top: 0.75rem; }
+.test.test-sub { margin: 0.5rem; }
 
 /* Test info band */
 .test-info { display: flex; justify-content: space-between; align-items: center; margin: 0rem 0; gap: 1rem; }
@@ -368,7 +368,7 @@ a { text-decoration: underline; }
 
 .tab-content {
 	display: none;
-	padding: 1rem;
+	padding: 0.75rem;
 }
 
 .tab-content.active {
