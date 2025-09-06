@@ -22,20 +22,16 @@ function initFilters() {
     });
 
     document.getElementById("reset-filters").addEventListener("click", () => {
-        // Очистить поле поиска
         searchInput.value = "";
 
-        // Сбросить select'ы к "all"
         clearSelect(statusFilter);
         clearSelect(moduleFilter);
 
-        // Снять active у всех кнопок и вернуть "All"
         document.querySelectorAll(".filter-btn").forEach(btn => {
             btn.classList.remove("active");
         });
         document.querySelector('.filter-btn[data-filter="all"]')?.classList.add("active");
 
-        // Запустить фильтрацию заново
         filterTests();
     });
 
@@ -141,7 +137,7 @@ function filterTests() {
             noResults.id = 'noResults';
             noResults.className = 'no-results';
             noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
-            document.querySelector('.container').appendChild(noResults); // 👉 именно внизу
+            document.querySelector('.main-content').appendChild(noResults);
         }
     } else if (noResults) {
         noResults.remove();

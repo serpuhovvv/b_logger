@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 {% import 'base_macros.html' as macros %}
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ report.proj_name }} - BLog Report</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="./static/styles.css">
 </head>
 
 <body>
-    <div class="container">
-        {{ macros.render_search_filter(report) }}
-        {{ macros.render_report_header(report) }}
-        {{ macros.render_summary(report) }}
-        {% for module_name, module_data in report.modules.items() %}
-          {{ macros.render_module(module_name, module_data, steps) }}
-        {% endfor %}
+    <div class="main-container">
+        <div class="layout-wrapper">
+            <aside class="sidebar">
+                {{ macros.render_search_filter(report) }}
+                {{ macros.render_report_header(report) }}
+                {{ macros.render_summary(report) }}
+            </aside>
+            <main class="main-content">
+                {% for module_name, module_data in report.modules.items() %}
+                    {{ macros.render_module(module_name, module_data, steps) }}
+                {% endfor %}
+            </main>
+        </div>
     </div>
 
     <div id="attachmentModal" class="modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="close" onclick="closeModal(event)">×</button>
+            <button type="button" class="close" onclick="closeModal(event)">×</button>
             <h2 id="modalTitle"></h2>
 
             <div id="imageContainer" class="attachment-body">
-              <img id="modalImage" src="" alt="Attachment" />
+                <img id="modalImage" src="" alt="Attachment"/>
             </div>
 
             <div id="modalPDF" class="attachment-body"></div>
-
             <pre id="modalText" class="attachment-body"></pre>
-
-            <a id="modalDownload" class="download-link" target="_blank">Download file</a>
+            <a id="modalDownload" target="_blank" class="download-link">Download file</a>
         </div>
     </div>
 

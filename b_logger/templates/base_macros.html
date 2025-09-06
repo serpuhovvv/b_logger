@@ -1,11 +1,13 @@
 {% macro render_search_filter(report) %}
 <div class="search-filter">
-    <div><img src="./static/icon.svg" alt="main-icon" class="main-icon"></div>
-    <div class="search-container">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search tests...">
+    <div>
+        <img src="./static/icon.svg" alt="main-icon" class="main-icon"/>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search tests...">
+        </div>
     </div>
-    <select class="hidden" id="statusFilter">
+    <select id="statusFilter" class="hidden">
         <option value="all">All Statuses</option>
         <option value="PASSED">Passed</option>
         <option value="FAILED">Failed</option>
@@ -19,38 +21,44 @@
         {% endfor %}
     </select>
     <div class="filter-buttons">
-        <button class="filter-btn active hidden" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="passed">✓ Passed</button>
-        <button class="filter-btn" data-filter="failed">✗ Failed</button>
-        <button class="filter-btn" data-filter="broken">⚠ Broken</button>
-        <button class="filter-btn" data-filter="skipped">→ Skipped</button>
-        <button class="filter-btn reset-btn" id="reset-filters">Reset Filters</button>
+        <button type="button" data-filter="all" class="filter-btn active hidden">All</button>
+        <button type="button" data-filter="passed" class="filter-btn">✓ Passed</button>
+        <button type="button" data-filter="failed" class="filter-btn">✗ Failed</button>
+        <button type="button" data-filter="broken" class="filter-btn">⚠ Broken</button>
+        <button type="button" data-filter="skipped" class="filter-btn">→ Skipped</button>
+        <button type="button" id="reset-filters" class="filter-btn reset-btn">Reset Filters</button>
     </div>
 </div>
 {% endmacro %}
-
-
 
 
 {% macro render_report_header(report) %}
 <div class="card">
     <div class="header expanded" onclick="toggleCard(this)">
-        <h1><i class="fas fa-chart-line"></i> {{ report.proj_name }}</h1>
+        <h3><i class="fas fa-chart-line"></i> {{ report.proj_name }}</h3>
         <i class="fas fa-chevron-down toggle-icon"></i>
     </div>
     <div class="content active">
         <div class="meta-grid">
-            <div class="meta-item"><span>Environment</span><strong>{{ report.env | upper }}</strong></div>
-            <div class="meta-item"><span>Base URL</span><strong>{{ report.base_url }}</strong></div>
-            <div class="meta-item"><span>Duration</span><strong>{{ report.duration }}</strong></div>
-            <div class="meta-item"><span>Start Time</span><strong>{{ report.start_time }}</strong></div>
-            <div class="meta-item"><span>End Time</span><strong>{{ report.end_time }}</strong></div>
+            <div class="meta-item">
+                <span>Environment</span><strong>{{ report.env | upper }}</strong>
+            </div>
+            <div class="meta-item">
+                <span>Base URL</span><strong>{{ report.base_url }}</strong>
+            </div>
+            <div class="meta-item">
+                <span>Duration</span><strong>{{ report.duration }}</strong>
+            </div>
+            <div class="meta-item">
+                <span>Start Time</span><strong>{{ report.start_time }}</strong>
+            </div>
+            <div class="meta-item">
+                <span>End Time</span><strong>{{ report.end_time }}</strong>
+            </div>
         </div>
     </div>
 </div>
 {% endmacro %}
-
-
 
 
 {% macro render_summary(report) %}
@@ -60,8 +68,11 @@
 {% set skipped = report.run_results.SKIPPED %}
 {% set total = passed + failed + broken + skipped %}
 <div class="card">
+    <div class="header" onclick="toggleCard(this)">
+        <h3><i class="fas fa-chart-pie"></i> Test Results Summary</h3>
+        <i class="fas fa-chevron-down toggle-icon"></i>
+    </div>
     <div class="content active">
-        <h2><i class="fas fa-chart-pie"></i> Test Results Summary</h2>
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="number">{{ total }}</div>
@@ -86,15 +97,15 @@
 {% macro render_module(module_name, module_data, steps) %}
 <div class="card module" data-module="{{ module_name }}">
     <div class="header" onclick="toggleCard(this)">
-        <h3><i class="fas fa-file-code"></i> {{ module_name.split('\\')[-1] or module_name.split('/')[-1] or module_name }}</h3>
-        <div class="module-stats">
+        <h3><i class="fas fa-file-code"></i>
+            {{ module_name }}
             {% for status in ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'] %}
                 {% if module_data.results[status] %}
-                    <span class="badge {{ status.lower() }}">{{ module_data.results[status] }}</span>
+                <span class="badge {{ status.lower() }}">{{ module_data.results[status] }}</span>
                 {% endif %}
             {% endfor %}
             <i class="fas fa-chevron-down toggle-icon"></i>
-        </div>
+        </h3>
     </div>
     <div class="content">
         {% for test_name, test_runs in module_data.tests.items() %}
@@ -126,12 +137,12 @@
         {{ render_test_block(test_runs[0], steps) }}
     {% else %}
         <div class="test test-multi" data-test="{{ test_name }}" data-status="group">
-            <div class="test-header" onclick="toggleTest(this)">
+            <div class="test-header">
                 <div class="test-info">
                     <span class="test-name">{{ test_name }}</span>
                     {{ render_status_summary(test_runs) }}
+<!--                    <span><i class="fas fa-chevron-down toggle-icon"></i></span>-->
                 </div>
-                <i class="fas fa-chevron-down toggle-icon"></i>
             </div>
             <div class="test-content expanded active">
                 {% for run in test_runs %}
@@ -164,8 +175,8 @@
     <span class="test-name">{{ test_run.name }}</span>
     <span class="badge {{ test_run.status.lower() }}">{{ test_run.status }}</span>
     <span class="test-duration">{{ test_run.duration or 0 }}s</span>
+    <span><i class="fas fa-chevron-down toggle-icon"></i></span>
 </div>
-<i class="fas fa-chevron-down toggle-icon"></i>
 {% endmacro %}
 
 
