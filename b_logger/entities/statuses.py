@@ -13,6 +13,6 @@ def py_outcome_to_tstatus(outcome):
     return {
         'passed': TestStatus.PASSED,
         'failed': TestStatus.FAILED,
-        'skipped': TestStatus.SKIPPED,
         'broken': TestStatus.BROKEN,
+        'skipped': TestStatus.SKIPPED
     }.get(outcome, TestStatus.NONE)

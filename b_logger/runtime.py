@@ -89,11 +89,9 @@ class RunTime:
             else:
                 status = TestStatus.FAILED
         else:
-            if call.excinfo:
+            if call.excinfo and report.outcome == 'failed':
                 if call.excinfo.typename == 'AssertionError':
                     status = TestStatus.FAILED
-                elif call.excinfo.typename == 'Skipped':
-                    status = TestStatus.SKIPPED
                 else:
                     status = TestStatus.BROKEN
             else:
