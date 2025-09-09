@@ -276,7 +276,7 @@ class BLogger:
         runtime.make_screenshot(name, is_error)
 
     @staticmethod
-    def attach(source, name: str = None):
+    def attach(content, name: str = None):
         """
         Attach file or screenshot
             It will be added to Test Run and Current Step
@@ -284,7 +284,7 @@ class BLogger:
         Usage:
             blog.attach({"a": 1, "b": 2}, 'some_data')
         """
-        runtime.attach(source, name)
+        runtime.attach(content, name)
 ```
 
 ## Usage examples

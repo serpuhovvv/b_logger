@@ -16,7 +16,7 @@ class Attachment(BaseDataModel):
 
     def __init__(
         self,
-        source: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None] = None,
+        content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None] = None,
         name: Optional[str] = None,
         type_: Optional[str] = None,
         _skip_processing: bool = False,
@@ -25,35 +25,35 @@ class Attachment(BaseDataModel):
         self.type_ = type_
 
         if not _skip_processing:
-            self._process_attachment(source)
+            self._process_attachment(content)
 
-    def _process_attachment(self, source):
+    def _process_attachment(self, content):
         # 1. bytes
-        if isinstance(source, bytes):
+        if isinstance(content, bytes):
             self.type_ = 'image/png'
             self.ensure_extension('.png')
-            self.__from_bytes(source)
+            self.__from_bytes(content)
 
         # 2. JSON supported
-        elif isinstance(source, (dict, list, int, float, bool, type(None))):
+        elif isinstance(content, (dict, list, int, float, bool, type(None))):
             self.type_ = 'application/json'
             self.ensure_extension('.json')
-            data = json.dumps(source, ensure_ascii=False, indent=2).encode('utf-8')
+            data = json.dumps(content, ensure_ascii=False, indent=2).encode('utf-8')
             self.__from_bytes(data)
 
         # 3. str
-        elif isinstance(source, str):
-            if not source.strip():
+        elif isinstance(content, str):
+            if not content.strip():
                 print('[BLogger][WARN] Cannot attach empty string')
 
-            # path = Path(source)
+            # path = Path(content)
             # if path.exists() and path.is_file():
             #     self.type_ = mimetypes.guess_type(str(path))[0] or 'application/octet-stream'
             #     self.__from_file(path)
             # else:
 
             try:
-                parsed = json.loads(source)
+                parsed = json.loads(content)
                 self.type_ = 'application/json'
                 self.ensure_extension('.json')
                 formatted = json.dumps(parsed, ensure_ascii=False, indent=2).encode('utf-8')
@@ -61,22 +61,22 @@ class Attachment(BaseDataModel):
             except json.JSONDecodeError:
                 self.type_ = 'text/plain'
                 self.ensure_extension('.txt')
-                self.__from_bytes(source.encode('utf-8'))
+                self.__from_bytes(content.encode('utf-8'))
 
         # 4. Path
-        elif isinstance(source, Path):
-            if not source.exists() or not source.is_file():
-                print(f'[BLogger][WARN] Attachment path is invalid: {source}')
-            self.type_ = mimetypes.guess_type(str(source))[0] or 'application/octet-stream'
-            self.__from_file(source)
+        elif isinstance(content, Path):
+            if not content.exists() or not content.is_file():
+                print(f'[BLogger][WARN] Attachment path is invalid: {content}')
+            self.type_ = mimetypes.guess_type(str(content))[0] or 'application/octet-stream'
+            self.__from_file(content)
 
         # 5. File-like (BinaryIO)
-        elif hasattr(source, 'read'):
-            self.type_ = mimetypes.guess_type(getattr(source, 'name', ''))[0] or 'application/octet-stream'
-            self.__from_filelike(source)
+        elif hasattr(content, 'read'):
+            self.type_ = mimetypes.guess_type(getattr(content, 'name', ''))[0] or 'application/octet-stream'
+            self.__from_filelike(content)
 
         else:
-            print(f'[BLogger][WARN] Unsupported attachment source type: {type(source)}')
+            print(f'[BLogger][WARN] Unsupported attachment content type: {type(content)}')
 
     def __from_file(self, file_path: Path):
         if not file_path.exists():
@@ -130,7 +130,7 @@ class Attachment(BaseDataModel):
 #
 #     def __init__(
 #         self,
-#         source: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None] = None,
+#         content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None] = None,
 #         name: Optional[str] = None,
 #         type_: Optional[str] = None,
 #         _skip_processing: bool = False,
@@ -139,29 +139,29 @@ class Attachment(BaseDataModel):
 #         self.type_ = type_
 #
 #         if not _skip_processing:
-#             self._process_attachment(source)
+#             self._process_attachment(content)
 #
-#     def _process_attachment(self, source):
+#     def _process_attachment(self, content):
 #         # 1. bytes
-#         if isinstance(source, bytes):
+#         if isinstance(content, bytes):
 #             self.type_ = mimetypes.types_map.get('.png', 'image/png')
 #             self.ensure_extension('.png')
-#             self.__from_bytes(source)
+#             self.__from_bytes(content)
 #
 #         # 2. JSON-serializable (dict, list, int, float, bool, None)
-#         elif isinstance(source, (dict, list, int, float, bool, type(None))):
+#         elif isinstance(content, (dict, list, int, float, bool, type(None))):
 #             self.type_ = mimetypes.types_map.get('.json', 'application/json')
 #             self.ensure_extension('.json')
-#             data = json.dumps(source, ensure_ascii=False, indent=2).encode('utf-8')
+#             data = json.dumps(content, ensure_ascii=False, indent=2).encode('utf-8')
 #             self.__from_bytes(data)
 #
 #         # 3. str
-#         elif isinstance(source, str):
-#             if not source.strip():
+#         elif isinstance(content, str):
+#             if not content.strip():
 #                 raise ValueError("[BLogger][WARN] Cannot attach empty string")
 #
 #             try:
-#                 parsed = json.loads(source)
+#                 parsed = json.loads(content)
 #                 self.type_ = mimetypes.types_map.get('.json', 'application/json')
 #                 self.ensure_extension('.json')
 #                 formatted = json.dumps(parsed, ensure_ascii=False, indent=2).encode('utf-8')
@@ -169,24 +169,24 @@ class Attachment(BaseDataModel):
 #             except json.JSONDecodeError:
 #                 self.type_ = mimetypes.types_map.get('.txt', 'text/plain')
 #                 self.ensure_extension('.txt')
-#                 self.__from_bytes(source.encode('utf-8'))
+#                 self.__from_bytes(content.encode('utf-8'))
 #
 #         # 4. Path
-#         elif isinstance(source, Path):
-#             if not source.exists() or not source.is_file():
-#                 raise FileNotFoundError(f'[BLogger][WARN] Attachment path is invalid: {source}')
-#             self.type_ = mimetypes.guess_type(str(source))[0] or 'application/octet-stream'
-#             self.ensure_extension(source.suffix)
-#             self.__from_file(source)
+#         elif isinstance(content, Path):
+#             if not content.exists() or not content.is_file():
+#                 raise FileNotFoundError(f'[BLogger][WARN] Attachment path is invalid: {content}')
+#             self.type_ = mimetypes.guess_type(str(content))[0] or 'application/octet-stream'
+#             self.ensure_extension(content.suffix)
+#             self.__from_file(content)
 #
 #         # 5. File-like object
-#         elif hasattr(source, 'read'):
-#             self.type_ = mimetypes.guess_type(getattr(source, 'name', ''))[0] or 'application/octet-stream'
-#             self.ensure_extension(Path(getattr(source, 'name', '')).suffix or '.bin')
-#             self.__from_filelike(source)
+#         elif hasattr(content, 'read'):
+#             self.type_ = mimetypes.guess_type(getattr(content, 'name', ''))[0] or 'application/octet-stream'
+#             self.ensure_extension(Path(getattr(content, 'name', '')).suffix or '.bin')
+#             self.__from_filelike(content)
 #
 #         else:
-#             raise TypeError(f"[BLogger][WARN] Unsupported attachment source type: {type(source)}")
+#             raise TypeError(f"[BLogger][WARN] Unsupported attachment content type: {type(content)}")
 #
 #     def __from_file(self, file_path: Path):
 #         if not file_path.exists():

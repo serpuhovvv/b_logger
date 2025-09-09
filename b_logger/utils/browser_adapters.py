@@ -28,7 +28,7 @@ class PlaywrightAdapter(BrowserAdapter):
     def __init__(self, page):
         self.page = page
 
-    def make_screenshot(self) -> bytes | None:
+    def make_screenshot(self) -> bytes | list | None:
         def try_screenshot(page):
             try:
                 if page.is_closed():
@@ -55,6 +55,19 @@ class PlaywrightAdapter(BrowserAdapter):
 
         print('[BLogger][WARN] All playwright screenshot attempts failed')
         return None
+
+        # scr_container = []
+        #
+        # try:
+        #     for context in self.page.context.browser.contexts:
+        #         for page in context.pages:
+        #             scr = try_screenshot(page)
+        #             if scr:
+        #                 scr_container.append(scr)
+        #
+        #     return scr_container[0] if len(scr_container) == 1 else scr_container
+        # except Exception as e:
+        #     print(f'[BLogger][WARN] Fallback screenshot iteration failed: {e}')
 
     @classmethod
     def is_valid(cls, obj) -> bool:

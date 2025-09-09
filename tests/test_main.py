@@ -147,5 +147,9 @@ def test_playwright(playwright_page):  #  <-- Will be detected automatically
     with blog.step('Open any URL'):
         playwright_page.goto(f'https://google.com')
 
+        # playwright_page.goto(f'https://bp-dev.admortgage.net/login')
+        # playwright_page.context.browser.new_context()
+        # playwright_page.bring_to_front()
+
         with blog.step('Raise fake error to check error screenshot'):
             print(empty_variable)

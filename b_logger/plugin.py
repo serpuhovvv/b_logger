@@ -162,7 +162,7 @@ def _apply_py_output(report):
 
     for k, v in captured_output.items():
         if v:
-            runtime.attach(source=v, name=k)
+            runtime.attach(content=v, name=k)
 
 
 def _apply_fixtures(item):

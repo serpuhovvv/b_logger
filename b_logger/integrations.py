@@ -44,7 +44,7 @@ class IntegrationBase(ABC):
     def link(self, url, name): ...
 
     @abstractmethod
-    def attach(self, source, name, type_): ...
+    def attach(self, content, name, type_): ...
 
 
 class AllureAdapter(IntegrationBase):
@@ -90,7 +90,7 @@ class AllureAdapter(IntegrationBase):
         if self._allure:
             self._allure.dynamic.link(url, name=name)
 
-    def attach(self, source, name, type_):
+    def attach(self, content, name, type_):
         if not self._allure:
             return
 
@@ -108,7 +108,7 @@ class AllureAdapter(IntegrationBase):
         }
 
         attach_type = mime_map.get(mime_type, self._AttachmentType.TEXT)
-        self._allure.attach(source, name, attach_type)
+        self._allure.attach(content, name, attach_type)
 
 
 class QaseAdapter(IntegrationBase):
@@ -154,9 +154,9 @@ class QaseAdapter(IntegrationBase):
     def link(self, url, name):
         pass
 
-    def attach(self, source, name, type_):
+    def attach(self, content, name, type_):
         if self._qase:
-            self._qase.attach((source, name, type_))
+            self._qase.attach((content, name, type_))
 
 
 adapters = [QaseAdapter(), AllureAdapter()]
@@ -195,10 +195,10 @@ class Integrations:
                 a.link(url, name)
 
     @staticmethod
-    def attach(source, name, type_):
+    def attach(content, name, type_):
         for a in adapters:
             if a.is_enabled():
-                a.attach(source, name, type_)
+                a.attach(content, name, type_)
 
 #
 # try:
