@@ -313,7 +313,6 @@ a { text-decoration: underline; }
   margin-bottom: 0.5rem;
   border-left: 4px solid;
 }
-.test .badge { width: 80px; }
 
 .test.passed { border-left-color: var(--passed); }
 .test.failed { border-left-color: var(--failed); }
@@ -333,6 +332,14 @@ a { text-decoration: underline; }
 .test-name { font-weight: 600; }
 
 .test.test-multi { border-left: 4px solid var(--primary); }
+.test-header-multi {
+  padding: 0.5rem;
+  padding-left: 0.75rem;
+  display: flex;
+  border-radius: var(--radius-sm);
+  align-items: center;
+  background: var(--card);
+}
 .test.test-sub { margin: 0.5rem; margin-left: 0.75rem; }
 
 /* Test info band */
