@@ -125,7 +125,9 @@
         {% set _ = counter.update({run.status: count}) %}
     {% endfor %}
     {% for status, count in counter.items() %}
-        <span class="badge {{ status.lower() }}">{{ count }} {{ status|lower }}</span>
+        <div class="test-results">
+            <span class="badge {{ status.lower() }}">{{ count }} {{ status|lower }}</span>
+        </div>
     {% endfor %}
 {% endmacro %}
 
@@ -139,9 +141,11 @@
         <div class="test test-multi" data-test="{{ test_name }}" data-status="group">
             <div class="test-header">
                 <div class="test-info">
+                    <div class="test-results">
+                        {{ render_status_summary(test_runs) }}
+                    </div>
                     <span class="test-name">{{ test_name }}</span>
-                    {{ render_status_summary(test_runs) }}
-<!--                    <span><i class="fas fa-chevron-down toggle-icon"></i></span>-->
+
                 </div>
             </div>
             <div class="test-content expanded active">
@@ -172,10 +176,14 @@
 
 {% macro render_test_header(test_run) %}
 <div class="test-info">
+    <div class="test-results">
+        <span class="badge {{ test_run.status.lower() }}">{{ test_run.status }}</span>
+    </div>
     <span class="test-name">{{ test_run.name }}</span>
-    <span class="badge {{ test_run.status.lower() }}">{{ test_run.status }}</span>
-    <span class="test-duration">{{ test_run.duration or 0 }}s</span>
-    <span><i class="fas fa-chevron-down toggle-icon"></i></span>
+    <div class="test-results">
+        <span class="test-duration">{{ test_run.duration or 0 }}s</span>
+        <span><i class="fas fa-chevron-down toggle-icon"></i></span>
+    </div>
 </div>
 {% endmacro %}
 

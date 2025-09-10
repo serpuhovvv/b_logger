@@ -10,25 +10,41 @@ blog.set_env('prod')
 blog.set_base_url('https://base-url.url')
 
 
+@pytest.fixture()
+def some_fixture():
+    with blog.step('aaa'):
+        pass
+
+    yield
+
+    with blog.step('bbb'):
+        pass
+
+
 @blog.description(
     'Test with base functionality, '
     'this description can be modified inside the test'
-)
-@blog.known_bug(
-    'Fake Bug Description or Name',
-    'https://link-to-your-bug/1.com'
 )
 @blog.info(
     info_explanation='You can leave any useful information by using blog.info()',
     meta={'platform': 'linux', 'python_version': 3.12}
 )
-def test_main_functionality():
+@blog.link(
+    first_link='http://aaa.com',
+    second_link='http://bbb.com'
+)
+@blog.known_bug(
+    'Known Bug Description or Name',
+    'https://link-to-your-bug/1.com'
+)
+def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
 
-    with blog.step('Step 1'):
+    with blog.step('Step 1', 'Step is expected to pass'):
         data = {"a": 1, "b": 2}
+        blog.print(f'Some data: {data}')
 
-        blog.print(f'Some important data: {data}')
+        blog.link(third_link='http://ccc.com')
 
         with blog.step('Step 1.1'):
             step_param_1 = random.randint(1, 100)
@@ -40,7 +56,7 @@ def test_main_functionality():
             )
 
     with blog.step('Step 2'):
-        blog.known_bug('Fake Bug for a step', 'https://link-to-your-bug/2.com')
+        blog.known_bug('Known Bug for a step', 'https://link-to-your-bug/2.com')
 
         with blog.step('Step 2.1'):
             pass
@@ -55,18 +71,24 @@ def test_main_functionality():
                         pass
 
 
-@pytest.mark.parametrize('py_param', [111, 222])  # <-- These parameters will be added to test automatically
-def test_parametrized(py_param):
-    with blog.step('step 1'):
-        blog.print(py_param)
-
-        with blog.step('step 2'):
-            pass
+@pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (333, 444)])  # <-- These parameters will be added to test automatically
+def test_parametrized(py_param_1, py_param_2):
+    with blog.step('Step 1'):
+        with blog.step('Step 2'):
+            with blog.step('Step 3', 'Step is expected to fail'):
+                blog.print(py_param_1)
+                with blog.step('Step 4'):
+                    blog.print(py_param_2)
+                assert py_param_1 in [111, 444]
 
 
 @pytest.fixture()
 def selenium_driver():
-    driver = webdriver.Chrome()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless=new')
+
+    driver = webdriver.Chrome(options=chrome_options)
+
     driver.set_window_size(1920, 1080)
 
     # blog.set_browser(driver) can be also added here, which is preferred
@@ -76,7 +98,6 @@ def selenium_driver():
     driver.quit()
 
 
-# @pytest.mark.xfail
 @blog.description('This test will make browser screenshot as we did blog.set_browser. '
                   'We can also do it in "selenium_driver" fixture')
 @blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
@@ -90,7 +111,6 @@ def test_selenium_with_set_browser(selenium_driver):
             assert 1 == 2
 
 
-# @pytest.mark.xfail
 @blog.description('This test will also make browser screenshot as it '
                   'found driver automatically '
                   'based on the following possible browser instance fixture names: '
@@ -103,12 +123,12 @@ def test_selenium_without_set_browser(selenium_driver):  #  <-- Will be detected
         selenium_driver.get(f'https://google.com')
 
         with blog.step('Raise fake error to check error screenshot'):
-            assert 1 == 2
+            print(empty_variable)
 
 
 @pytest.fixture()
 def playwright_page(playwright: Playwright):
-    browser = playwright.chromium.launch()
+    browser = playwright.chromium.launch(headless=True)
 
     context = browser.new_context()
 
@@ -122,10 +142,14 @@ def playwright_page(playwright: Playwright):
     browser.close()
 
 
-# @pytest.mark.xfail
+@pytest.mark.xfail
 def test_playwright(playwright_page):  #  <-- Will be detected automatically
     with blog.step('Open any URL'):
         playwright_page.goto(f'https://google.com')
 
+        # playwright_page.goto(f'https://bp-dev.admortgage.net/login')
+        # playwright_page.context.browser.new_context()
+        # playwright_page.bring_to_front()
+
         with blog.step('Raise fake error to check error screenshot'):
-            print(aaa)
+            print(empty_variable)
