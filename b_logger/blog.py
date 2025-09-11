@@ -1,4 +1,7 @@
 import pytest
+
+from pathlib import Path
+from typing import Union, BinaryIO
 from contextlib import contextmanager
 
 from b_logger.entities.steps import Step
@@ -14,11 +17,11 @@ class BLogger:
         """
         Set base_url for the entire Run
 
-            Can also be added in blog.config.yaml:
-                base_url: 'https://base-url.com'
+        Can also be added in blog.config.yaml:
+            base_url: 'https://base-url.com'
 
-            Or via command line options:
-                --blog_base_url 'https://base-url.com'
+        Or via command line options:
+            --blog_base_url 'https://base-url.com'
         """
         runtime.set_base_url(base_url)
 
@@ -27,11 +30,11 @@ class BLogger:
         """
         Set env for the entire Run
 
-            Can also be added in blog.config.yaml:
-                env: 'prod'
+        Can also be added in blog.config.yaml:
+            env: 'prod'
 
-            Or via command line options:
-                --blog_env 'prod'
+        Or via command line options:
+            --blog_env 'prod'
         """
         runtime.set_env(env)
 
@@ -66,8 +69,10 @@ class BLogger:
     def description(description: str):
         """
         Add Test Description
-            Can be used as marker @blog.description() as well as function blog.description()
-            Usage inside a test expands description inside marker
+        Will be added to the Overview Tab
+
+        Can be used as marker @blog.description() as well as function blog.description()
+        Usage inside a test expands description inside marker
 
         Usage:
             @blog.description(
@@ -85,12 +90,13 @@ class BLogger:
     def info(**kwargs):
         """
         Leave any important info or note about Test or Step
-            Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
+        Will be added to the Overview Tab and Current Step
 
+        Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
             k is a name of an info block
             v supports any data type, but {} is most readable and convenient
 
-            Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
+        Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
 
         Usage:
             @blog.info(                             <-- Will be added for a Test
@@ -114,12 +120,13 @@ class BLogger:
     def link(**kwargs):
         """
         Attach links to Test or Step
-            Can be used as marker @blog.link(k=v) as well as function blog.link(k=v)
+        Will be added to the Overview Tab and Current Step
 
+        Can be used as marker @blog.link(k=v) as well as function blog.link(k=v)
             k is a name of a link
             v is a URL
 
-            Any amount of links is allowed: @blog.link(k=v, k=v, k=v, ...)
+        Any amount of links is allowed: @blog.link(k=v, k=v, k=v, ...)
 
         Usage:
             @blog.link(
@@ -137,6 +144,7 @@ class BLogger:
     def known_bug(description: str, url: str = None):
         """
         Add known bug for Test or Step
+        Will be added to the Overview Tab and Current Step
 
         Usage:
             @blog.known_bug(                            <-- Will be added for a Test
@@ -165,7 +173,7 @@ class BLogger:
         """
         Usage:
             with blog.step('Step Title', 'Expected Result'):
-            pass
+                ...
         """
         with Integrations.step(title, expected):
 
@@ -188,8 +196,7 @@ class BLogger:
     def print(data):
         """
         Print any message (str, dict, list, object, etc.)
-            It will be added to a Current Step as SubStep
-            Newlines with \n are supported
+        Will be added to a Current Step
 
         Usage:
             data = {"a": 1, "b": 2}
@@ -204,8 +211,9 @@ class BLogger:
     def screenshot(name: str = None, is_error: bool = False):
         """
         Make screenshot
-            It will be automatically attached to Test Run and Current Step
-            Will do nothing if no browser is used
+        Will be added to the Attachments Tab and Current Step
+
+        Will do nothing if no browser is used
 
         Usage:
             blog.screenshot('scr_name')
@@ -214,10 +222,10 @@ class BLogger:
         runtime.make_screenshot(name, is_error)
 
     @staticmethod
-    def attach(content, name: str = None):
+    def attach(content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: str = None):
         """
-        Attach file or screenshot
-            It will be added to Test Run and Current Step
+        Attach file or data
+        Will be added to the Attachments Tab and Current Step
 
         Usage:
             blog.attach({"a": 1, "b": 2}, 'some_data')

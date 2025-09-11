@@ -111,7 +111,9 @@ def pytest_runtest_setup(item):
 
     _apply_py_params(item)
 
-    _apply_fixtures(item)
+    _apply_py_fixtures(item)
+
+    _apply_py_markers(item)
 
     _apply_markers(item)
 
@@ -153,6 +155,17 @@ def _apply_py_params(item):
             runtime.apply_info(parameters={param_name: param_value})
 
 
+def _apply_py_fixtures(item):
+    fixtures = item.fixturenames
+    runtime.apply_info(fixtures=', '.join(fixtures))
+
+
+def _apply_py_markers(item):
+    markers = [mark.name for mark in reversed(list(item.iter_markers())) if not str(mark.name).startswith('blog_')]
+    if markers:
+        runtime.apply_info(markers=f', '.join(markers))
+
+
 def _apply_py_output(report):
     captured_output = {
         "stdout": getattr(report, "capstdout", None),
@@ -163,11 +176,6 @@ def _apply_py_output(report):
     for k, v in captured_output.items():
         if v:
             runtime.attach(content=v, name=k)
-
-
-def _apply_fixtures(item):
-    fixtures = item.fixturenames
-    runtime.apply_info(fixtures=', '.join(fixtures))
 
 
 _possible_browser_names = ['driver', 'page', 'selenium_driver', 'driver_init', 'playwright_page']

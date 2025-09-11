@@ -340,7 +340,7 @@ a { text-decoration: underline; }
   align-items: center;
   background: var(--card);
 }
-.test.test-sub { margin: 0.5rem; margin-left: 0.75rem; }
+.test.test-sub { margin: 0.5rem; margin-left: 0.75rem; margin-right: 0.75rem;}
 
 /* Test info band */
 .test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1rem; }

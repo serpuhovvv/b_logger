@@ -117,10 +117,7 @@ class RunTime:
     def handle_step_result(self, step: Step, exc=None):
         if exc:
             if not self.step_container.failed:
-                if self.browser:
-                    adapter = get_browser_adapter(self.browser)
-                    screenshot_bytes = adapter.make_screenshot()
-                    step.add_attachment(Attachment(screenshot_bytes))
+                self.make_step_err_scr(step)
 
                 step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
 
@@ -244,11 +241,25 @@ class RunTime:
 
         try:
             screenshot_bytes = adapter.make_screenshot()
-            self.attach(screenshot_bytes, scr_name)
+            if isinstance(screenshot_bytes, list):
+                for scr in screenshot_bytes:
+                    self.attach(scr, scr_name)
+            else:
+                self.attach(screenshot_bytes, scr_name)
         except Exception as e:
             print(f'[BLogger][ERROR] Unable to make screenshot: {e}')
 
-    def attach(self, content: Union[str, Path, bytes, BinaryIO, dict, list, int, float, None], name: str = None):
+    def make_step_err_scr(self, step):
+        if self.browser:
+            adapter = get_browser_adapter(self.browser)
+            screenshot_bytes = adapter.make_screenshot()
+            if isinstance(screenshot_bytes, list):
+                for scr in screenshot_bytes:
+                    step.add_attachment(Attachment(scr))
+            else:
+                step.add_attachment(Attachment(screenshot_bytes))
+
+    def attach(self, content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: str = None):
 
         attachment = Attachment(content=content, name=name)
 

@@ -38,36 +38,36 @@ class PlaywrightAdapter(BrowserAdapter):
                 print(f'[BLogger][WARN] Screenshot failed on page: {getattr(page, 'url', '?')}: {e}')
                 return None
 
-        scr = try_screenshot(self.page)
-        if scr:
-            return scr
-
-        try:
-            for context in self.page.context.browser.contexts:
-                for other_page in context.pages:
-                    if other_page == self.page:
-                        continue
-                    scr = try_screenshot(other_page)
-                    if scr:
-                        return scr
-        except Exception as e:
-            print(f'[BLogger][WARN] Fallback screenshot iteration failed: {e}')
-
-        print('[BLogger][WARN] All playwright screenshot attempts failed')
-        return None
-
-        # scr_container = []
+        # scr = try_screenshot(self.page)
+        # if scr:
+        #     return scr
         #
         # try:
         #     for context in self.page.context.browser.contexts:
-        #         for page in context.pages:
-        #             scr = try_screenshot(page)
+        #         for other_page in context.pages:
+        #             if other_page == self.page:
+        #                 continue
+        #             scr = try_screenshot(other_page)
         #             if scr:
-        #                 scr_container.append(scr)
-        #
-        #     return scr_container[0] if len(scr_container) == 1 else scr_container
+        #                 return scr
         # except Exception as e:
         #     print(f'[BLogger][WARN] Fallback screenshot iteration failed: {e}')
+        #
+        # print('[BLogger][WARN] All playwright screenshot attempts failed')
+        # return None
+
+        scr_container = []
+
+        try:
+            for context in self.page.context.browser.contexts:
+                for page in context.pages:
+                    scr = try_screenshot(page)
+                    if scr:
+                        scr_container.append(scr)
+
+            return scr_container[0] if len(scr_container) == 1 else scr_container
+        except Exception as e:
+            print(f'[BLogger][WARN] Screenshot failed: {e}')
 
     @classmethod
     def is_valid(cls, obj) -> bool:
