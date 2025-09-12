@@ -141,7 +141,7 @@ class BLogger:
         return pytest.mark.blog_link(kwargs=kwargs)
 
     @staticmethod
-    def known_bug(description: str, url: str = None):
+    def known_bug(url: str, description: str = None):
         """
         Add known bug for Test or Step
         Will be added to the Overview Tab and Current Step
@@ -163,9 +163,9 @@ class BLogger:
                         'https://link-to-your-bug/3.com'
                     )
         """
-        runtime.apply_known_bug(description, url)
+        runtime.apply_known_bug(url, description)
 
-        return pytest.mark.blog_known_bug(description=description, url=url)
+        return pytest.mark.blog_known_bug(url=url, description=description)
 
     @staticmethod
     @contextmanager

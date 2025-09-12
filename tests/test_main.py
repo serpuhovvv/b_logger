@@ -34,8 +34,8 @@ def some_fixture():
     second_link='http://bbb.com'
 )
 @blog.known_bug(
-    'Known Bug Description or Name',
-    'https://link-to-your-bug/1.com'
+    'https://link-to-your-bug/1.com',
+    'Known Bug Description or Name'
 )
 def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
@@ -56,7 +56,9 @@ def test_main_functionality(some_fixture):
             )
 
     with blog.step('Step 2'):
-        blog.known_bug('Known Bug for a step', 'https://link-to-your-bug/2.com')
+        blog.known_bug('https://link-to-your-bug/2.com',
+                       # 'Known Bug for a step'
+                       )
 
         with blog.step('Step 2.1'):
             pass

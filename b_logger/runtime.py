@@ -191,10 +191,10 @@ class RunTime:
         #
         # self.test_report.add_info(links)
 
-    def apply_known_bug(self, description: str, url: str = None):
+    def apply_known_bug(self, url: str, description: str = None):
         bug = {
-            "description": description,
-            "url": url
+            "url": url,
+            "description": description
         }
 
         current_step = self.step_container.get_current_step()

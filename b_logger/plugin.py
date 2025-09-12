@@ -233,13 +233,10 @@ def __apply_link_mark(item):
 def __apply_known_bug_mark(item):
     try:
         for bug in reversed(list(item.iter_markers(name='blog_known_bug'))):
-            description = bug.kwargs.get('description')
-            url = bug.kwargs.get('url') or None
+            url = bug.kwargs.get('url')
+            description = bug.kwargs.get('description') or None
 
-            if description:
-                runtime.apply_known_bug(description, url)
-            else:
-                print(f'[BLogger][WARN] blog.known_bug usage is incorrect: {bug}')
+            runtime.apply_known_bug(url, description)
 
     except AttributeError as e:
         pass
