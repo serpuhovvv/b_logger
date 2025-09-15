@@ -102,7 +102,8 @@
   <thead>
     <tr>
       <th>Module</th><th>Test</th><th>Error</th>
-<!--      <th>Attachments</th><th>Known Bugs</th>-->
+<!--      <th>Attachments</th>-->
+      <th>Known Bugs</th>
     </tr>
   </thead>
   <tbody>
@@ -111,13 +112,13 @@
         {% for run in test_runs %}
           {% if run.status in ["FAILED", "BROKEN"] %}
             {% set attach_count = run.attachments | length if run.attachments else 0 %}
-            {% set bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
+            {% set known_bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
             <tr class="row {{ run.status.lower() }}">
               <td>{{ module_name }}</td>
               <td>{{ run.name }}</td>
-              <td>{{ run.error }}</td>
+              <td>{{ run.error | escape }}</td>
 <!--              <td>{{ attach_count }}</td>-->
-<!--              <td>{{ bugs_count }}</td>-->
+              <td>{{ known_bugs_count }}</td>
             </tr>
           {% endif %}
         {% endfor %}

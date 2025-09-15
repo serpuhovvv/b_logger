@@ -143,12 +143,15 @@
         {% set count = counter.get(run.status, 0) + 1 %}
         {% set _ = counter.update({run.status: count}) %}
     {% endfor %}
-    {% for status, count in counter.items() %}
+    {% for status in ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'] %}
+        {% if counter.get(status, None) %}
         <div class="test-results">
-            <span class="badge {{ status.lower() }}">{{ count }}
+            <span class="badge {{ status.lower() }}">
+                {{ counter.get(status) }}
                 {{ render_status_icon(status) }}
             </span>
         </div>
+        {% endif %}
     {% endfor %}
 {% endmacro %}
 
@@ -166,7 +169,6 @@
                         {{ render_status_summary(test_runs) }}
                     </div>
                     <span class="test-name">{{ test_name }}</span>
-
                 </div>
             </div>
             <div class="test-content expanded active">
@@ -296,7 +298,7 @@
     {% endfor %}
 {% elif value is sequence and value is not string %}
     {% for sub_value in value %}
-        {{ render_info_value(sub_value) }}
+        <div>{{ render_info_value(sub_value) }}</div>
     {% endfor %}
 {% else %}
     {{ value }}
@@ -312,9 +314,9 @@
     <div class="bug-grid">
     {% for bug in known_bugs %}
         <div class="bug-item">
-            <div class="bug-desc">{{ bug.description }}</div>
-            {% if bug.url %}
             <a href="{{ bug.url }}" target="_blank">View Bug Report</a>
+            {% if bug.description %}
+            <div class="bug-desc">{{ bug.description }}</div>
             {% endif %}
         </div>
     {% endfor %}
