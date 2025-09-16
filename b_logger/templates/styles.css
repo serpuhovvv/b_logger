@@ -325,7 +325,6 @@ a { text-decoration: underline; }
    TESTS
 ================================= */
 .test {
-  border: 0px solid var(--bg-strong);
   border-left: 4px solid;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -349,7 +348,7 @@ a { text-decoration: underline; }
 }
 .test-header.expanded {
     background: var(--bg-light);
-    border-radius: 7px var(--radius) 0px 0px ;
+    border-radius: 7px var(--radius) 0px 0px;
 }
 
 .test-name { font-weight: 600; }
@@ -444,7 +443,7 @@ a { text-decoration: underline; }
 .error-icon { color: var(--failed); font-size: 0.875rem; }
 
 .error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1rem; border-radius: var(--radius); }
-.error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; }
+.error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; white-space: pre-wrap; }
 .stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem; font-weight: 550; overflow-x: auto; white-space: pre-wrap; }
 
 .no-results { text-align: center; padding: 3rem; color: var(--text-muted); }
@@ -475,7 +474,7 @@ a { text-decoration: underline; }
 
 .step-children { margin-top: 0.5rem; }
 
-.step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
+.step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; white-space: pre-wrap; }
 .step-error pre { background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.875rem; overflow-x: auto; }
 
 /* ===============================
