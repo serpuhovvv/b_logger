@@ -65,7 +65,7 @@ integrations:
 ### Set Base URL
 `blog.set_base_url(base_url: str)`
 
-Set `base_url` for the entire Test Run
+Set `base_url` for the entire Run
 
 ```python
 from b_logger import blog
@@ -88,7 +88,7 @@ pytest --blog_base_url "https://base-url.com"
 ### Set Env
 `blog.set_env(env: str)`
 
-Set `env` for the entire Test Run
+Set `env` for the entire Run
 
 ```python
 from b_logger import blog
