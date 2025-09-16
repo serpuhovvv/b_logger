@@ -163,7 +163,7 @@ def _apply_py_fixtures(item):
 def _apply_py_markers(item):
     markers = [mark.name for mark in reversed(list(item.iter_markers())) if not str(mark.name).startswith('blog_')]
     if markers:
-        runtime.apply_info(markers=f', '.join(markers))
+        runtime.apply_info(markers=markers)
 
 
 def _apply_py_output(report):

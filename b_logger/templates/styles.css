@@ -54,8 +54,8 @@ body {
 
   /* Misc */
   --shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
-  --radius: 8px;
-  --radius-sm: 4px;
+  --radius: 10px;
+  --radius-sm: 5px;
 }
 
 /* ===============================
@@ -75,11 +75,37 @@ a { text-decoration: underline; }
 .main-icon { width: 69px; height: 69px; }
 .level-0 { --level: 0; }
 
+.header {
+    display: flex;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 1rem;
+}
+
+.header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 /* Shared hover feedback for clickable blocks */
 .header:hover,
 .test-header:hover,
 .step-header:hover,
-.attachment:hover { background: var(--bg-light); opacity: 0.7; }
+.attachment:hover {
+    background: var(--bg-light);
+    opacity: 0.7;
+}
+
+.header.expanded {
+    background: var(--bg-light);
+    border-radius: var(--radius) var(--radius) 0px 0px;
+}
 
 /* Toggle icon animations */
 .header .toggle-icon,
@@ -175,7 +201,7 @@ a { text-decoration: underline; }
 }
 .sidebar .search-container:hover {
     border-color: var(--primary);
-	transition: all 0.2s;
+	transition: all 0.2s ease;
 }
 .sidebar .search-container i {
     position: absolute; left: 1rem;
@@ -200,7 +226,7 @@ a { text-decoration: underline; }
 }
 .sidebar .search-filter select:hover {
 	border-color: var(--primary);
-	transition: all 0.2s;
+	transition: all 0.2s ease;
 }
 
 .sidebar .filter-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 1rem; }
@@ -211,7 +237,7 @@ a { text-decoration: underline; }
 	border-radius: var(--radius-sm);
 	background: var(--bg-light);
 	cursor: pointer;
-	transition: all 0.2s;
+	transition: all 0.2s ease;
 	font-size: 0.875rem;
 }
 .sidebar .filter-buttons .filter-btn:hover {
@@ -233,22 +259,6 @@ a { text-decoration: underline; }
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin-bottom: 1rem;
-}
-
-.header {
-  background: var(--bg-light);
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  gap: 1rem;
-}
-.header h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
 }
 
 .content { padding: 1rem; }
@@ -305,18 +315,21 @@ a { text-decoration: underline; }
 /* ===============================
    MODULES
 ================================= */
-.module { border-left: 4px solid var(--primary); transition: 0.2s ease; }
+.module {
+    border-radius: var(--radius);
+    transition: 0.2s ease;
+}
 .module-stats { display: flex; align-items: center; gap: 0.5rem; }
 
 /* ===============================
    TESTS
 ================================= */
 .test {
-  border: 1px solid var(--bg-strong);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-  margin-bottom: 0.5rem;
+  border: 0px solid var(--bg-strong);
   border-left: 4px solid;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 0.75rem;
 }
 
 .test.passed { border-left-color: var(--passed); }
@@ -325,27 +338,38 @@ a { text-decoration: underline; }
 .test.skipped { border-left-color: var(--skipped); }
 
 .test-header {
-  padding: 0.5rem;
-  padding-left: 0.75rem;
-  display: flex;
-  border-radius: var(--radius-sm);
-  align-items: center;
-  cursor: pointer;
-  background: var(--card);
-  transition: all 0.2s;
+    display: flex;
+    background: var(--bg-card);
+    padding: 0.5rem;
+    padding-left: 0.75rem;
+    border-radius: 7px var(--radius) var(--radius) 7px;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
+.test-header.expanded {
+    background: var(--bg-light);
+    border-radius: 7px var(--radius) 0px 0px ;
+}
+
 .test-name { font-weight: 600; }
 
-.test.test-multi { border-left: 4px solid var(--primary); }
-.test-header-multi {
-  padding: 0.5rem;
-  padding-left: 0.75rem;
-  display: flex;
-  border-radius: var(--radius-sm);
-  align-items: center;
-  background: var(--card);
+.test.test-multi {
+    border-left: 4px solid var(--primary);
+    border-bottom: 1px solid var(--bg-strong);
 }
-.test.test-sub { margin: 0.5rem; margin-left: 0.75rem; margin-right: 0.75rem;}
+.test-header-multi {
+    display: flex;
+    padding: 0.5rem;
+    padding-left: 0.75rem;
+    border-radius: var(--radius);
+    align-items: center;
+    background: var(--bg-card);
+}
+.test.test-sub {
+    margin: 0.75rem;
+    margin-top: 0.5rem;
+}
 
 /* Test info band */
 .test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1rem; }
@@ -364,7 +388,7 @@ a { text-decoration: underline; }
 ================================= */
 .tab-nav { display: flex; background: var(--bg-light); border-bottom: 1px solid var(--border); }
 .tab-btn {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem;
     border: none;
     background: none;
     cursor: pointer;
@@ -372,15 +396,19 @@ a { text-decoration: underline; }
     font-size: 0.875rem;
     color: var(--text);
     border-bottom: 3px solid transparent;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 .tab-btn:hover {
     border-color: var(--primary);
     background: var(--bg-strong);
     color: var(--primary);
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
-.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg-card); }
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--bg-card);
+}
 .tab-btn.error { color: var(--failed); }
 
 .tab-content {
@@ -415,9 +443,6 @@ a { text-decoration: underline; }
 
 .error-icon { color: var(--failed); font-size: 0.875rem; }
 
-.step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
-.step-error pre { background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.875rem; overflow-x: auto; }
-
 .error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1rem; border-radius: var(--radius); }
 .error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; }
 .stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem; font-weight: 550; overflow-x: auto; white-space: pre-wrap; }
@@ -430,9 +455,8 @@ a { text-decoration: underline; }
 ================================= */
 .steps { margin: 0.5rem 0; }
 .step {
-  margin-bottom: 1rem;
-  border-radius: var(--radius-sm);
-  border-top: 0px solid;
+  margin-bottom: 0.75rem;
+  border-radius: var(--radius);
   border-left: 3px solid;
   padding-left: 1.25rem;
   margin-left: calc(var(--level, 0) * 1rem);
@@ -448,7 +472,10 @@ a { text-decoration: underline; }
 .step-badge { font-size: 0.875rem; padding: 0.5rem; align-items: center; display: flex; gap: 0.5rem; }
 .step-title { font-weight: 550; white-space: pre-wrap; }
 .step-content { margin-top: 0.5rem; padding: 0rem; background: var(--bg-card); border-radius: var(--radius-sm); }
+
 .step-children { margin-top: 0.5rem; }
+
+.step-error { background: var(--failed-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.5rem; }
 .step-error pre { background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.875rem; overflow-x: auto; }
 
 /* ===============================
@@ -465,7 +492,7 @@ a { text-decoration: underline; }
     cursor: pointer;
     text-align: center;
     width: 150px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 .attachment img { max-width: 100px; max-height: 100px; border-radius: var(--radius-sm); }
 .attachment i { font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem; }
