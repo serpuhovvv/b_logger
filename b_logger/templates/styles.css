@@ -385,27 +385,26 @@ a { text-decoration: underline; }
 /* ===============================
    TABS
 ================================= */
-.tab-nav { display: flex; background: var(--bg-light); border-bottom: 1px solid var(--border); }
+.tab-nav {
+    background: var(--bg-light);
+    display: flex;
+}
 .tab-btn {
     padding: 0.75rem;
     border: none;
-    background: none;
+    background: var(--bg-light);
     cursor: pointer;
     font-weight: 550;
     font-size: 0.875rem;
     color: var(--text);
-    border-bottom: 3px solid transparent;
     transition: all 0.2s ease;
 }
 .tab-btn:hover {
-    border-color: var(--primary);
-    background: var(--bg-strong);
-    color: var(--primary);
+    background: var(--bg);
+    opacity: 0.7;
     transition: all 0.2s ease;
 }
 .tab-btn.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
     background: var(--bg-card);
 }
 .tab-btn.error { color: var(--failed); }
@@ -425,12 +424,23 @@ a { text-decoration: underline; }
 .section { margin-bottom: 0.5rem; }
 .section h4 { margin-bottom: 0.5rem; }
 
-.description { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); white-space: pre-wrap; font-size: 0.875rem; }
+.description {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    white-space: pre-wrap;
+    font-size: 0.875rem;
+}
 
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
 .info-item { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); }
 .info-key { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; }
-.info-value { font-size: 0.875rem; }
+.info-value {
+    font-size: 0.875rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
 
 /* ===============================
    BUGS AND ERRORS
@@ -442,9 +452,38 @@ a { text-decoration: underline; }
 
 .error-icon { color: var(--failed); font-size: 0.875rem; }
 
-.error-section { background: var(--failed-bg); border: 1px solid var(--failed-light); padding: 1rem; border-radius: var(--radius); }
-.error-message { font-weight: 600; color: var(--failed); margin-bottom: 1rem; white-space: pre-wrap; }
-.stacktrace { background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem; font-weight: 550; overflow-x: auto; white-space: pre-wrap; }
+.error-section {
+    background: var(--failed-bg);
+    border: 1px solid var(--failed-light);
+    padding: 0.75rem;
+    border-radius: var(--radius);
+}
+.error-section .card {
+    margin-bottom: 0.25rem;
+}
+.error-section .header {
+    padding: 0.75rem;
+}
+.error-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.error-message {
+    font-weight: 600;
+    color: var(--failed);
+    margin-bottom: 0.75rem;
+    white-space: pre-wrap;
+}
+.stacktrace {
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 0.875rem;
+    font-weight: 550;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
 
 .no-results { text-align: center; padding: 3rem; color: var(--text-muted); }
 .no-steps { text-align: center; padding: 2rem; color: var(--text-muted); font-style: italic; }
@@ -468,7 +507,7 @@ a { text-decoration: underline; }
 
 .step-header { padding: 0.5rem; background: var(--bg-light); border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
 .step-info { display: flex; align-items: center; gap: 0.5rem; }
-.step-badge { font-size: 0.875rem; padding: 0.5rem; align-items: center; display: flex; gap: 0.5rem; }
+.step-badge { font-size: 0.875rem; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
 .step-title { font-weight: 550; white-space: pre-wrap; }
 .step-content { margin-top: 0.5rem; padding: 0rem; background: var(--bg-card); border-radius: var(--radius-sm); }
 

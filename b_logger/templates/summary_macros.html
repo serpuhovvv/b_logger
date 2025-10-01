@@ -101,7 +101,9 @@
 <table>
   <thead>
     <tr>
-      <th>Module</th><th>Test</th><th>Error</th>
+      <th>Module</th>
+      <th>Test</th>
+      <th>Error</th>
 <!--      <th>Attachments</th>-->
       <th>Known Bugs</th>
     </tr>
@@ -116,7 +118,7 @@
             <tr class="row {{ run.status.lower() }}">
               <td>{{ module_name }}</td>
               <td>{{ run.name }}</td>
-              <td>{{ run.error | escape }}</td>
+              <td class="error-td">{{ run.error.partition('Stacktrace')[0] | escape }}</td>
 <!--              <td>{{ attach_count }}</td>-->
               <td>{{ known_bugs_count }}</td>
             </tr>

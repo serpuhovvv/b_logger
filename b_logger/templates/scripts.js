@@ -169,6 +169,13 @@ function toggleTest(header) {
 }
 
 
+function toggleStacktrace(el) {
+    el.classList.toggle("expanded");
+    const body = el.nextElementSibling;
+    if (body) body.classList.toggle("active");
+}
+
+
 function toggleTestRun(header) {
     const content = header.nextElementSibling;
     if (content.classList.contains('active')) {

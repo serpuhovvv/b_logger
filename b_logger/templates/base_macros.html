@@ -347,13 +347,20 @@
                         {% if step.expected %}<span><i class="fas fa-check-double"></i></span>{% endif %}
 
                         {% if step.steps %}
-                            {% set count_steps = namespace(count=0) %}
+                            {% set count_steps = namespace(count=0, prints=0) %}
                             {% for s in step.steps %}
                                 {% if s.id.startswith('step_') %}
                                     {% set count_steps.count = count_steps.count + 1 %}
+                                {% else %}
+                                    {% set count_steps.prints = count_steps.prints + 1 %}
                                 {% endif %}
                             {% endfor %}
-                            <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
+                            {% if count_steps.count > 0 %}
+                                <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
+                            {% endif %}
+                            {% if count_steps.prints > 0 %}
+                                <span>{{ count_steps.prints }} print{{ 's' if count_steps.prints > 1 else '' }}</span>
+                            {% endif %}
                         {% endif %}
                         <span><i class="fas fa-chevron-down toggle-icon"></i></span>
                     </div>
@@ -426,8 +433,17 @@
 <div class="error-section">
     <div class="error-message">{{ exc | escape }}</div>
     {% if stacktrace %}
-    <h4>Stacktrace:</h4>
-    <pre class="stacktrace">{{ stacktrace | escape }}</pre>
+    <div class="card">
+        <div class="header" onclick="toggleStacktrace(this)">
+            <h4>
+                Stacktrace
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </h4>
+        </div>
+        <div class="content">
+            <pre class="stacktrace">{{ stacktrace | escape }}</pre>
+        </div>
+    </div>
     {% endif %}
 </div>
 {% endmacro %}

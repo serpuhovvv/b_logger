@@ -115,7 +115,7 @@ def pytest_runtest_setup(item):
 
     _apply_py_markers(item)
 
-    _apply_markers(item)
+    _apply_blog_markers(item)
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -161,7 +161,18 @@ def _apply_py_fixtures(item):
 
 
 def _apply_py_markers(item):
-    markers = [mark.name for mark in reversed(list(item.iter_markers())) if not str(mark.name).startswith('blog_')]
+    markers = []
+    for mark in reversed(list(item.iter_markers())):
+        if str(mark.name).startswith("blog_") or str(mark.name).startswith("parametrize"):
+            continue
+
+        args = [str(a) for a in mark.args] if mark.args else []
+        kwargs = [f"{k}={v}" for k, v in mark.kwargs.items()] if mark.kwargs else []
+
+        value = ", ".join(args + kwargs) if (args or kwargs) else None
+
+        markers.append({mark.name: value} if value else mark.name)
+
     if markers:
         runtime.apply_info(markers=markers)
 
@@ -192,7 +203,7 @@ def _apply_browser(item):
                     print(f'[BLogger][WARN] Error setting up browser automatically: {e}')
 
 
-def _apply_markers(item):
+def _apply_blog_markers(item):
     __apply_description_mark(item)
     __apply_info_mark(item)
     __apply_link_mark(item)
