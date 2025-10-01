@@ -120,7 +120,7 @@
             {{ module_name }}
             {% for status in ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'] %}
                 {% if module_data.results[status] %}
-                <span class="badge {{ status.lower() }}">{{ module_data.results[status] }}</span>
+                <span class="badge {{ status.lower() }}">{{ module_data.results[status]}} {{ render_status_icon(status.lower()) }}</span>
                 {% endif %}
             {% endfor %}
             <i class="fas fa-chevron-down toggle-icon"></i>
@@ -335,7 +335,11 @@
     </div>
 {% else %}
     <div class="step {{ step.status }} level-0">
+        {% if has_addons or step.steps %}
         <div class="step-header" onclick="toggleStep(this)">
+        {% else %}
+        <div class="step-header-no-addons">
+        {% endif %}
             <div class="step-info">
                 <span class="step-title">{{ step.title }}</span>
                 {% if has_addons or step.steps %}

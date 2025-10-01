@@ -79,7 +79,8 @@ a { text-decoration: underline; }
     display: flex;
     background: var(--bg-card);
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 0.75rem;
+    padding-left: 1rem;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
@@ -99,7 +100,7 @@ a { text-decoration: underline; }
 .step-header:hover,
 .attachment:hover {
     background: var(--bg-light);
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 .header.expanded {
@@ -147,7 +148,7 @@ a { text-decoration: underline; }
 }
 
 .sidebar .card { margin: 1rem; margin-top: 0; }
-.sidebar .card .header { padding: 1rem; }
+.sidebar .card .header { padding: 0.75rem; padding-left: 1rem; }
 .sidebar .card h1 { font-size: 1.25rem; line-height: 1.5rem; }
 .sidebar .meta-grid { grid-template-columns: 1fr; }
 
@@ -280,7 +281,7 @@ a { text-decoration: underline; }
 }
 .summary-card {
     text-align: center;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: var(--radius);
     border: 2px solid;
     position: relative;
@@ -294,7 +295,7 @@ a { text-decoration: underline; }
 .summary-card.skipped { border-color: var(--skipped); background: var(--skipped-bg); }
 .summary-card .number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
 .summary-card .label { font-weight: 600; margin: 0.5rem 0; }
-.summary-card .percentage { font-size: 0.875rem; opacity: 0.8; }
+.summary-card .percentage { font-size: 0.875rem; }
 
 .badge {
   display: block;
@@ -401,7 +402,7 @@ a { text-decoration: underline; }
 }
 .tab-btn:hover {
     background: var(--bg);
-    opacity: 0.7;
+    opacity: 0.6;
     transition: all 0.2s ease;
 }
 .tab-btn.active {
@@ -432,7 +433,7 @@ a { text-decoration: underline; }
     font-size: 0.875rem;
 }
 
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
 .info-item { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); }
 .info-key { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; }
 .info-value {
@@ -467,7 +468,7 @@ a { text-decoration: underline; }
 .error-section h4 {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 .error-message {
     font-weight: 600;
@@ -505,8 +506,30 @@ a { text-decoration: underline; }
 .step.broken { border-left-color: var(--broken); border-top-color: var(--broken); }
 .step.skipped { border-left-color: var(--skipped); border-top-color: var(--skipped); }
 
-.step-header { padding: 0.5rem; background: var(--bg-light); border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.step-header {
+    padding: 0.5rem;
+    background: var(--bg-light);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+.step-header-no-addons {
+    padding: 0.5rem;
+    background: var(--bg-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .step-info { display: flex; align-items: center; gap: 0.5rem; }
+
+.step .info-item { padding: 0.75rem; }
+.step .bug-item { padding: 0.75rem; }
+
 .step-badge { font-size: 0.875rem; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
 .step-title { font-weight: 550; white-space: pre-wrap; }
 .step-content { margin-top: 0.5rem; padding: 0rem; background: var(--bg-card); border-radius: var(--radius-sm); }
@@ -532,7 +555,7 @@ a { text-decoration: underline; }
     width: 150px;
     transition: all 0.2s ease;
 }
-.attachment img { max-width: 100px; max-height: 100px; border-radius: var(--radius-sm); }
+.attachment img { max-width: 125px; max-height: 125px; border-radius: var(--radius-sm); }
 .attachment i { font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem; }
 .attachment span { font-size: 0.75rem; margin-top: 0.5rem; word-break: break-word; }
 

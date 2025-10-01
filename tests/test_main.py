@@ -145,7 +145,7 @@ def playwright_page(playwright: Playwright):
     browser.close()
 
 
-# @pytest.mark.xfail
+@pytest.mark.xfail
 def test_playwright(playwright_page):  #  <-- Will be detected automatically
     with blog.step('Open any URL'):
         playwright_page.goto(f'https://google.com')
