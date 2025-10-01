@@ -257,7 +257,7 @@
 
     {% if test.error %}
     <div class="tab-content" data-tab="error">
-        {{ render_error(test.error, test.stacktrace) }}
+        {{ render_error(test.error, test.stacktrace, test.attachments) }}
     </div>
     {% endif %}
 </div>
@@ -382,12 +382,12 @@
                     </div>
                 {% endif %}
 
-                {% if step.info %}
-                    {{ render_info(step.info) }}
-                {% endif %}
-
                 {% if step.error %}
                     {{ render_error(step.error.exc, step.error.tb) }}
+                {% endif %}
+
+                {% if step.info %}
+                    {{ render_info(step.info) }}
                 {% endif %}
 
                 {% if step.attachments %}
@@ -433,7 +433,16 @@
 
 
 
-{% macro render_error(exc, stacktrace) %}
+{% macro render_error(exc, stacktrace, attachments=None) %}
+{% set ns = namespace(has_err=false) %}
+{% if attachments %}
+    {% for attachment in attachments %}
+        {% if attachment.name.startswith('err_') %}
+            {% set ns.has_err = true %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 <div class="error-section">
     <div class="error-message">{{ exc | escape }}</div>
     {% if stacktrace %}
@@ -450,4 +459,17 @@
     </div>
     {% endif %}
 </div>
+
+{% if ns.has_err %}
+<div class="attachments">
+    {% for attachment in attachments %}
+        {% if attachment.name.startswith('err_') %}
+        <div class="attachment" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
+            <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
+            <span>{{ attachment.name }}</span>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
 {% endmacro %}
