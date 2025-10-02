@@ -434,15 +434,6 @@
 
 
 {% macro render_error(exc, stacktrace, attachments=None) %}
-{% set ns = namespace(has_err=false) %}
-{% if attachments %}
-    {% for attachment in attachments %}
-        {% if attachment.name.startswith('err_') %}
-            {% set ns.has_err = true %}
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
 <div class="error-section">
     <div class="error-message">{{ exc | escape }}</div>
     {% if stacktrace %}
@@ -460,16 +451,23 @@
     {% endif %}
 </div>
 
-{% if ns.has_err %}
-<div class="attachments">
+{% if attachments %}
+    {% set ns = namespace(items=[]) %}
     {% for attachment in attachments %}
         {% if attachment.name.startswith('err_') %}
+            {% set _ = ns.items.append(attachment) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if ns.items %}
+    <div class="attachments">
+        {% for attachment in ns.items %}
         <div class="attachment" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
             <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
             <span>{{ attachment.name }}</span>
         </div>
-        {% endif %}
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 {% endif %}
 {% endmacro %}
