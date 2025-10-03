@@ -314,3 +314,23 @@ imageContainer.addEventListener('mousemove', (e) => {
 document.addEventListener('DOMContentLoaded', function() {
     initFilters();
 });
+
+const root = document.documentElement;
+const themeToggle = document.getElementById("themeToggle");
+
+const savedTheme = localStorage.getItem("theme");
+
+if (savedTheme) {
+  root.setAttribute("data-theme", savedTheme);
+} else {
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+}
+
+
+themeToggle.addEventListener("click", () => {
+  const currentTheme = root.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+});
