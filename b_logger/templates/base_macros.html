@@ -182,10 +182,13 @@
 
 
 
-{% macro render_test_block(test_run, steps, is_sub=False, onclick="toggleTest(this)") %}
+
+{% macro render_test_block(test_run, steps, is_sub=False) %}
 {% set sub_class = "test-sub" if is_sub else "" %}
-<div class="test {{ sub_class }} {{ test_run.status.lower() }}" data-test="{{ test_run.name }}" data-status="{{ test_run.status }}">
-    <div class="test-header" onclick="{{ onclick }}">
+{% set test_id = "test_" ~ test_run.name|replace(" ", "_") %}
+<div id="{{ test_id }}" class="test {{ sub_class }} {{ test_run.status.lower() }}"
+    data-test="{{ test_run.name }}" data-status="{{ test_run.status }}">
+    <div class="test-header" onclick="toggleTestAndHash(this)">
         {{ render_test_header(test_run) }}
     </div>
     <div class="test-content">

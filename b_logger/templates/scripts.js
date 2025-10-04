@@ -145,30 +145,6 @@ function filterTests() {
 }
 
 
-function toggleCard(header) {
-    const content = header.nextElementSibling;
-    if (content.classList.contains('active')) {
-        content.classList.remove('active');
-        header.classList.remove('expanded');
-    } else {
-        content.classList.add('active');
-        header.classList.add('expanded');
-    }
-}
-
-
-function toggleTest(header) {
-    const content = header.nextElementSibling;
-    if (content.classList.contains('active')) {
-        content.classList.remove('active');
-        header.classList.remove('expanded');
-    } else {
-        content.classList.add('active');
-        header.classList.add('expanded');
-    }
-}
-
-
 function toggleStacktrace(el) {
     el.classList.toggle("expanded");
     const body = el.nextElementSibling;
@@ -333,4 +309,92 @@ themeToggle.addEventListener("click", () => {
   const newTheme = currentTheme === "dark" ? "light" : "dark";
   root.setAttribute("data-theme", newTheme);
   localStorage.setItem("theme", newTheme);
+});
+
+
+// старые функции через универсальную
+function toggleTest(header) { toggleBlock(header); }
+function toggleCard(header) { toggleBlock(header); }
+
+
+// универсальная функция сворачивания/разворачивания блока
+function toggleBlock(header) {
+    const content = header.nextElementSibling;
+
+    if (!content) return;
+    content.classList.toggle('active');
+    header.classList.toggle('expanded');
+}
+
+
+// клик по тесту + обновление URL
+function toggleTestAndHash(header) {
+    const el = header.closest(".test, .card");
+    if (!el || !el.id) return;
+
+    const content = header.nextElementSibling;
+    const isOpening = !content.classList.contains("active");
+
+    toggleBlock(header); // меняем состояние
+
+    if (isOpening) {
+        // открываем → добавляем хэш
+        history.pushState({ openedId: el.id }, "", `#${el.id}`);
+    } else {
+        // сворачиваем → убираем хэш
+        history.pushState({}, "", location.pathname + location.search);
+    }
+}
+
+// раскрытие теста/карты и всех родителей
+function expandTestAndParents(el) {
+    if (!el) return;
+
+    let current = el;
+    while (current) {
+        const header = current.querySelector(
+            ":scope > .test-header, :scope > .test-header-multi, :scope > .header"
+        );
+        const content = current.querySelector(
+            ":scope > .test-content, :scope > .content"
+        );
+
+        if (header && content) {
+            content.classList.add("active");
+            header.classList.add("expanded");
+        }
+
+        current = current.parentElement.closest(".test, .card");
+    }
+}
+
+function resetAllBlocks() {
+    document.querySelectorAll(".test-content, .content").forEach(c => c.classList.remove("active"));
+    document.querySelectorAll(".test-header, .test-header-multi").forEach(h => h.classList.remove("expanded"));
+}
+
+// при загрузке страницы
+window.addEventListener("load", () => {
+    const hash = location.hash.slice(1);
+    if (hash) {
+        const el = document.getElementById(hash);
+        if (el) {
+            el.classList.add("highlight");
+            el.scrollIntoView({ behavior: "smooth" });
+            expandTestAndParents(el);
+        }
+    }
+});
+
+// поддержка кнопок Назад/Вперед
+window.addEventListener("popstate", () => {
+    const hash = location.hash.slice(1);
+    if (event.state && event.state.openedId) {
+        const el = document.getElementById(event.state.openedId);
+        if (el) {
+            el.classList.add("highlight");
+            el.scrollIntoView({ behavior: "smooth" });
+            expandTestAndParents(el);
+        }
+    }
 });
