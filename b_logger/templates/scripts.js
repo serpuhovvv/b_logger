@@ -2,21 +2,22 @@
 //  INIT
 // ======================================================
 
-document.addEventListener('DOMContentLoaded', initFilters);
+document.addEventListener('DOMContentLoaded', initPage);
 
 
 // ======================================================
 //  INIT FILTERS + SORT + SAVED STATE + HASH
 // ======================================================
 
-function initFilters() {
-    const searchInput  = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const moduleFilter = document.getElementById('moduleFilter');
-    const resetBtn = document.getElementById("reset-filters");
-    const resetExp = document.getElementById("reset-expanded");
-    const sortBtns = document.querySelectorAll('.sort-btn');
-    const filterBtns = document.querySelectorAll('.filter-btn');
+function initPage() {
+    const searchInput  = getElById('searchInput');
+    const statusFilter = getElById('statusFilter');
+    const moduleFilter = getElById('moduleFilter');
+    const resetFilters = getElById('reset-filters');
+    const resetSorting = getElById('reset-sorting');
+    const resetExp     = getElById('reset-expanded');
+    const sortBtns     = getAll('.sort-btn');
+    const filterBtns   = getAll('.filter-btn');
 
     restoreFilters();
     restoreSort();
@@ -35,30 +36,39 @@ function initFilters() {
     });
 
     filterBtns.forEach(btn => btn.addEventListener('click', () => {
-        btn.classList.toggle('active');
+        toggleClass(btn, 'active');
         saveFilters();
         filterTests();
     }));
 
     sortBtns.forEach(btn => btn.addEventListener('click', () => {
         const wasActive = btn.classList.contains('active');
-        sortBtns.forEach(b => b.classList.remove('active'));
-        if (!wasActive) btn.classList.add('active');
+        sortBtns.forEach(b => toggleClass(b, 'active', false));
+        if (!wasActive) toggleClass(btn, 'active', true);
         saveSort();
         filterTests();
     }));
 
-    resetBtn?.addEventListener("click", () => {
+    resetFilters?.addEventListener("click", () => {
         searchInput.value = "";
         clearSelect(statusFilter);
         clearSelect(moduleFilter);
 
-        filterBtns.forEach(btn => btn.classList.remove("active"));
-        document.querySelector('.filter-btn[data-filter="all"]')?.classList.add("active");
+        filterBtns.forEach(btn => toggleClass(btn, "active", false));
+        toggleClass(document.querySelector('.filter-btn[data-filter="all"]'), "active", true);
 
-        sortBtns.forEach(b => b.classList.remove("active"));
+        saveFilters();
+        saveSort();
+        filterTests();
+    });
 
-        document.querySelector('.sort-btn[data-sort="name_asc"]')?.classList.add("active");
+    resetSorting?.addEventListener("click", () => {
+        searchInput.value = "";
+        clearSelect(statusFilter);
+        clearSelect(moduleFilter);
+
+        sortBtns.forEach(b => toggleClass(b, "active", false));
+        toggleClass(document.querySelector('.sort-btn[data-sort="name_asc"]'), "active", true);
 
         saveFilters();
         saveSort();
@@ -66,7 +76,7 @@ function initFilters() {
     });
 
     resetExp?.addEventListener("click", () => {
-        const allTests = Array.from(document.querySelectorAll('.test')).filter(
+        const allTests = getAll('.test').filter(
             test => !test.querySelector(':scope > .test-content-multi')
         );
 
@@ -79,15 +89,14 @@ function initFilters() {
         const newState = !anyOpened;
 
         for (const test of allTests) {
-            const header = test.querySelector(':scope > .test-header');
+            const header  = test.querySelector(':scope > .test-header');
             const content = test.querySelector(':scope > .test-content');
 
-            // Игнорируем test-header-multi / test-content-multi
             if (!header || header.classList.contains('test-header-multi')) continue;
             if (!content || content.classList.contains('test-content-multi')) continue;
 
-            header.classList.toggle('expanded', newState);
-            content.classList.toggle('active', newState);
+            toggleClass(header, 'expanded', newState);
+            toggleClass(content, 'active', newState);
 
             if (test.id) updateExpandedState(test.id, newState);
         }
@@ -108,39 +117,47 @@ function initFilters() {
 //  FILTER + SORT STATE SAVE
 // ======================================================
 
-function saveFilters(){
-    const search = document.getElementById('searchInput')?.value||'';
-    const status = getSelectedValues(document.getElementById('statusFilter'));
-    const module = getSelectedValues(document.getElementById('moduleFilter'));
-    const buttons = Array.from(document.querySelectorAll('.filter-btn.active')).map(b=>b.dataset.filter||'');
-    localStorage.setItem("filters",JSON.stringify({search,status,module,buttons}));
+function saveFilters() {
+    const search  = getElById('searchInput')?.value || '';
+    const status  = getSelectedValues(getElById('statusFilter'));
+    const module  = getSelectedValues(getElById('moduleFilter'));
+    const buttons = getAll('.filter-btn.active').map(b => b.dataset.filter || '');
+    saveToStorage("filters", { search, status, module, buttons });
 }
 
-function restoreFilters(){
-    try{
-        const stored = JSON.parse(localStorage.getItem("filters")||"{}");
-        if(stored.search) document.getElementById('searchInput').value = stored.search;
-        if(stored.status) Array.from(document.getElementById('statusFilter').options).forEach(o=>o.selected = stored.status.includes(o.value));
-        if(stored.module) Array.from(document.getElementById('moduleFilter').options).forEach(o=>o.selected = stored.module.includes(o.value));
-        if(stored.buttons) stored.buttons.forEach(f=>{
-            const btn = document.querySelector(`.filter-btn[data-filter="${f}"]`);
-            if(btn) btn.classList.add("active");
-        });
-    }catch{}
+function restoreFilters() {
+    try {
+        const stored = loadFromStorage("filters", {});
+        if (stored.search) getElById('searchInput').value = stored.search;
+
+        if (stored.status) {
+            Array.from(getElById('statusFilter').options).forEach(o => o.selected = stored.status.includes(o.value));
+        }
+
+        if (stored.module) {
+            Array.from(getElById('moduleFilter').options).forEach(o => o.selected = stored.module.includes(o.value));
+        }
+
+        if (stored.buttons) {
+            stored.buttons.forEach(f => {
+                const btn = getElBySelector(`.filter-btn[data-filter="${f}"]`);
+                toggleClass(btn, "active", true);
+            });
+        }
+    } catch {}
 }
 
-function saveSort(){
-    const active = document.querySelector('.sort-btn.active')?.dataset.sort||'';
-    localStorage.setItem("sort",active);
+function saveSort() {
+    const active = getElBySelector('.sort-btn.active')?.dataset.sort || '';
+    saveToStorage("sort", active);
 }
 
-function restoreSort(){
-    const sortValue = localStorage.getItem("sort")||"name_asc";
-    document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove("active"));
-    const btn = document.querySelector(`.sort-btn[data-sort="${sortValue}"]`);
-    if(btn) btn.classList.add("active");
+function restoreSort() {
+    const sortValue = loadFromStorage("sort", "name_asc");
+    getAll('.sort-btn').forEach(b => b.classList.remove("active"));
+    const btn = getElBySelector(`.sort-btn[data-sort="${sortValue}"]`);
+    if (btn) btn.classList.add("active");
 }
-
 
 // ======================================================
 //  FILTER UTILS
@@ -151,7 +168,7 @@ function getSelectedValues(select) {
     const values = select.multiple
         ? Array.from(select.selectedOptions).map(o => o.value)
         : select.value ? [select.value] : [];
-    return values.map(v => (v??'').toString().trim()).filter(v => v && v.toLowerCase() !== 'all');
+    return values.map(v => (v ?? '').toString().trim()).filter(v => v && v.toLowerCase() !== 'all');
 }
 
 function clearSelect(select) {
@@ -164,7 +181,7 @@ function clearSelect(select) {
     }
 }
 
-function normalizeStatus(s) { return (s??'').toString().trim().toUpperCase(); }
+function normalizeStatus(s) { return (s ?? '').toString().trim().toUpperCase(); }
 
 function matchesFilters(nameLC, statusRaw, moduleName, filters) {
     const statusU = normalizeStatus(statusRaw);
@@ -175,13 +192,12 @@ function matchesFilters(nameLC, statusRaw, moduleName, filters) {
     return true;
 }
 
-
 // ======================================================
 //  SORT UTILS
 // ======================================================
 
 function getSortOptions() {
-    const activeBtn = document.querySelector('.sort-btn.active');
+    const activeBtn = getElBySelector('.sort-btn.active');
     if (!activeBtn) return { field: 'name', order: 'asc' };
     const ds = (activeBtn.dataset.sort || 'none').toString();
     if (!ds || ds === 'none') return { field: 'name', order: 'asc' };
@@ -189,53 +205,52 @@ function getSortOptions() {
     return { field, order: order === 'desc' ? 'desc' : 'asc' };
 }
 
-function compareTests(a, b, field, order='asc') {
+function compareTests(a, b, field, order = 'asc') {
     let valA, valB;
-    switch(field) {
+    switch (field) {
         case 'name':
-            valA = (a.dataset.test||'').toLowerCase();
-            valB = (b.dataset.test||'').toLowerCase();
+            valA = (a.dataset.test || '').toLowerCase();
+            valB = (b.dataset.test || '').toLowerCase();
             break;
         case 'duration':
-            valA = parseFloat(a.dataset.duration||'0')||0;
-            valB = parseFloat(b.dataset.duration||'0')||0;
+            valA = parseFloat(a.dataset.duration || '0') || 0;
+            valB = parseFloat(b.dataset.duration || '0') || 0;
             break;
         case 'status':
-            valA = (a.dataset.status||'').toUpperCase();
-            valB = (b.dataset.status||'').toUpperCase();
+            valA = (a.dataset.status || '').toUpperCase();
+            valB = (b.dataset.status || '').toUpperCase();
             break;
         default: return 0;
     }
-    if (valA < valB) return order==='asc'? -1:1;
-    if (valA > valB) return order==='asc'? 1:-1;
+    if (valA < valB) return order === 'asc' ? -1 : 1;
+    if (valA > valB) return order === 'asc' ? 1 : -1;
     return 0;
 }
-
 
 // ======================================================
 //  FILTER + SORT
 // ======================================================
 
 function filterTests() {
-    const search = (document.getElementById('searchInput')?.value||'').toLowerCase().trim();
-    const statusSelected = getSelectedValues(document.getElementById('statusFilter')).map(v=>v.toUpperCase());
-    const moduleSelected = getSelectedValues(document.getElementById('moduleFilter'));
-    const activeButtons = Array.from(document.querySelectorAll('.filter-btn.active'))
+    const search = (getElById('searchInput')?.value||'').toLowerCase().trim();
+    const statusSelected = getSelectedValues(getElById('statusFilter')).map(v=>v.toUpperCase());
+    const moduleSelected = getSelectedValues(getElById('moduleFilter'));
+    const activeButtons = getAll('.filter-btn.active')
         .map(b => (b.dataset.filter||'').toLowerCase().trim())
         .filter(f => f && f !== 'all');
 
     const {field: sortField, order: sortOrder} = getSortOptions();
     const filters = {search, status: statusSelected, module: moduleSelected, buttonStatuses: activeButtons};
 
-    const modules = document.querySelectorAll('.module');
+    const modules = getAll('.module');
     let modulesVisible = 0;
 
     modules.forEach(moduleEl => {
         const moduleName = moduleEl.dataset.module;
-        const container = moduleEl.querySelector('.tests-list');
+        const container = getElBySelector('.tests-list', moduleEl);
         if (!container) return;
 
-        const topTests = Array.from(container.querySelectorAll(':scope > .test'));
+        const topTests = getAll(':scope > .test', container);
 
         // 1) сортировка
         if(sortField){
@@ -252,7 +267,7 @@ function filterTests() {
 
             if(isGroup){
                 let subVisible = 0;
-                test.querySelectorAll('.test-sub').forEach(sub=>{
+                getAll('.test-sub', test).forEach(sub=>{
                     const subName = (sub.dataset.test||'').toLowerCase();
                     const subStatus = sub.dataset.status;
                     const show = matchesFilters(subName, subStatus, moduleName, filters);
@@ -268,19 +283,19 @@ function filterTests() {
             if(visible) moduleHasVisible = true;
         });
 
-        moduleEl.style.display = moduleHasVisible?'block':'none';
+        toggleClass(moduleEl, 'hidden', !moduleHasVisible);
         if(moduleHasVisible) modulesVisible++;
     });
 
     // no results
-    let noResults = document.getElementById('noResults');
+    let noResults = getElById('noResults');
     if(modulesVisible===0){
         if(!noResults){
             noResults = document.createElement('div');
             noResults.id='noResults';
             noResults.className='no-results';
             noResults.innerHTML='<i class="fas fa-search"></i><br>No tests match your filters';
-            document.querySelector('.main-content')?.appendChild(noResults);
+            getElBySelector('.main-content')?.appendChild(noResults);
         }
     } else { noResults?.remove(); }
 }
@@ -304,22 +319,17 @@ function toggleBlock(header){
 }
 
 function toggleAllTests() {
-    const tests = document.querySelectorAll('.test-content');
+    const tests = getAll('.test-content');
     if (tests.length === 0) return;
 
-    const hasOpen = Array.from(tests).some(t => t.classList.contains('active'));
+    const hasOpen = tests.some(t => t.classList.contains('active'));
 
     tests.forEach(t => {
         const header = t.previousElementSibling;
         if (!header) return;
 
-        if (hasOpen) {
-            t.classList.remove('active');
-            header.classList.remove('expanded');
-        } else {
-            t.classList.add('active');
-            header.classList.add('expanded');
-        }
+        toggleClass(t, 'active', !hasOpen);
+        toggleClass(header, 'expanded', !hasOpen);
 
         if (hasOpen && window.location.hash) {
             history.replaceState(null, null, ' ');
@@ -328,35 +338,35 @@ function toggleAllTests() {
 }
 
 //function toggleStacktrace(el) {
-//    el.classList.toggle("expanded");
-//    el.nextElementSibling?.classList.toggle("active");
+//    toggleClass(el, "expanded");
+//    el.nextElementSibling && toggleClass(el.nextElementSibling, "active");
 //}
 
 function toggleStep(header) {
     const step = header.closest('.step');
     if (!step) return;
 
-    const body = step.querySelector('.step-body');
-    const content = step.querySelector('.step-content');
+    const body = getElBySelector('.step-body', step);
+    const content = getElBySelector('.step-content', step);
     const isActive = header.classList.contains('expanded');
 
-    body?.classList.toggle('active', !isActive);
-    header.classList.toggle('expanded', !isActive);
-    content?.classList.toggle('expanded', !isActive);
-    content?.classList.toggle('active', !isActive);
+    toggleClass(body, 'active', !isActive);
+    toggleClass(header, 'expanded', !isActive);
+    toggleClass(content, 'expanded', !isActive);
+    toggleClass(content, 'active', !isActive);
 }
 
 function switchTab(btn, tabName) {
     const tabsContainer = btn.closest('.tabs');
     if (!tabsContainer) return;
 
-    tabsContainer.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
-    tabsContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    getAll('.tab-btn', tabsContainer).forEach(tab => toggleClass(tab, 'active', false));
+    getAll('.tab-content', tabsContainer).forEach(content => toggleClass(content, 'active', false));
 
-    btn.classList.add('active');
-    tabsContainer.querySelector(`[data-tab="${tabName}"]`)?.classList.add('active');
+    toggleClass(btn, 'active', true);
+    const tabContent = getElBySelector(`[data-tab="${tabName}"]`, tabsContainer);
+    toggleClass(tabContent, 'active', true);
 }
-
 
 // ======================================================
 //  Navigation / Hash
@@ -369,32 +379,29 @@ function toggleTestAndHash(header){
     const isOpening = !content.classList.contains("active");
     toggleBlock(header);
     updateExpandedState(el.id, isOpening);
-    history.pushState(isOpening?{openedId:el.id}:{},"",isOpening?`#${el.id}`:location.pathname+location.search);
+    history.pushState(isOpening ? {openedId: el.id} : {}, "", isOpening ? `#${el.id}` : location.pathname + location.search);
 }
 
 function updateExpandedState(id,isOpen){
-    let state={};
-    try{ state=JSON.parse(localStorage.getItem("expandedTests")||"{}"); }catch{}
-    state[id]=isOpen;
-    localStorage.setItem("expandedTests",JSON.stringify(state));
+    let state = {};
+    try { state = JSON.parse(localStorage.getItem("expandedTests") || "{}"); } catch {}
+    state[id] = isOpen;
+    localStorage.setItem("expandedTests", JSON.stringify(state));
 }
 
 function restoreExpandedState(){
-    let state={};
-    try{ state=JSON.parse(localStorage.getItem("expandedTests")||"{}"); }catch{}
-    Object.keys(state).forEach(id=>{
-        const el = document.getElementById(id);
+    let state = {};
+    try { state = JSON.parse(localStorage.getItem("expandedTests") || "{}"); } catch {}
+    Object.keys(state).forEach(id => {
+        const el = getElById(id);
         if(!el) return;
-        const header = el.querySelector(":scope > .header, :scope > .test-header, :scope > .test-header-multi");
-        const content = el.querySelector(":scope > .content, :scope > .test-content");
+
+        const header = getElBySelector(":scope > .header, :scope > .test-header, :scope > .test-header-multi", el);
+        const content = getElBySelector(":scope > .content, :scope > .test-content", el);
         if(!header||!content) return;
-        if(state[id]){
-            header.classList.add("expanded");
-            content.classList.add("active");
-        } else {
-            header.classList.remove("expanded");
-            content.classList.remove("active");
-        }
+
+        toggleClass(header, "expanded", state[id]);
+        toggleClass(content, "active", state[id]);
     });
 }
 
@@ -402,27 +409,27 @@ function expandTestAndParents(el){
     if(!el) return;
     let current = el;
     while(current){
-        const header = current.querySelector(":scope > .test-header, :scope > .test-header-multi, :scope > .header");
-        const content = current.querySelector(":scope > .test-content, :scope > .content");
-        header?.classList.add("expanded");
-        content?.classList.add("active");
-        if(current.id) updateExpandedState(current.id,true);
+        const header = getElBySelector(":scope > .test-header, :scope > .test-header-multi, :scope > .header", current);
+        const content = getElBySelector(":scope > .test-content, :scope > .content", current);
+        toggleClass(header, "expanded", true);
+        toggleClass(content, "active", true);
+        if(current.id) updateExpandedState(current.id, true);
         current = current.parentElement?.closest(".test, .card");
     }
 }
 
 function resetAllBlocks(){
-    document.querySelectorAll(".test-content").forEach(c=>c.classList.remove("active"));
-    document.querySelectorAll(".test-header").forEach(h=>h.classList.remove("expanded"));
+    getAll(".test-content").forEach(c => toggleClass(c, "active", false));
+    getAll(".test-header").forEach(h => toggleClass(h, "expanded", false));
     localStorage.removeItem("expandedTests");
 }
 
 // ===================== HASH HANDLING =====================
-window.addEventListener("load",()=>{
+window.addEventListener("load", () => {
     restoreExpandedState();
     const hash = location.hash.slice(1);
     if(hash){
-        const el = document.getElementById(hash);
+        const el = getElById(hash);
         if(el){
             el.classList.add("highlight");
             el.scrollIntoView({behavior:"smooth"});
@@ -431,11 +438,11 @@ window.addEventListener("load",()=>{
     }
 });
 
-window.addEventListener("popstate",event=>{
+window.addEventListener("popstate", event => {
     restoreExpandedState();
     const id = event.state?.openedId;
     if(id){
-        const el = document.getElementById(id);
+        const el = getElById(id);
         if(el){
             el.classList.add("highlight");
             el.scrollIntoView({behavior:"smooth"});
@@ -449,13 +456,13 @@ window.addEventListener("popstate",event=>{
 //  Attachment Modal
 // ======================================================
 
-const modal          = document.getElementById('attachmentModal');
-const titleEl        = document.getElementById('modalTitle');
-const image          = document.getElementById('modalImage');
-const imageContainer = document.getElementById('imageContainer');
-const textPreview    = document.getElementById('modalText');
-const pdfContainer   = document.getElementById('modalPDF');
-const download       = document.getElementById('modalDownload');
+const modal          = getElById('attachmentModal');
+const titleEl        = getElById('modalTitle');
+const image          = getElById('modalImage');
+const imageContainer = getElById('imageContainer');
+const textPreview    = getElById('modalText');
+const pdfContainer   = getElById('modalPDF');
+const download       = getElById('modalDownload');
 
 let scale = 1;
 
@@ -482,12 +489,16 @@ function openAttachment(name, type) {
         fetch(path)
             .then(res => res.text())
             .then(text => {
-                if (textPreview) textPreview.textContent = text;
-                if (textPreview) textPreview.style.display = 'block';
+                if (textPreview) {
+                    textPreview.textContent = text;
+                    textPreview.style.display = 'block';
+                }
             })
             .catch(() => {
-                if (textPreview) textPreview.textContent = '[Ошибка загрузки текста]';
-                if (textPreview) textPreview.style.display = 'block';
+                if (textPreview) {
+                    textPreview.textContent = '[Ошибка загрузки текста]';
+                    textPreview.style.display = 'block';
+                }
             });
     } else {
         if (download) {
@@ -506,11 +517,11 @@ function closeModal(event) {
     }
 }
 
-// Zoom + Drag (защита, если контейнера нет)
+// Zoom + Drag
 if (imageContainer) {
     imageContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
-        scale = Math.min(Math.max(scale + e.deltaY * -0.001, 0.5), 5);
+        scale = Math.min(Math.max(scale - e.deltaY * 0.001, 0.5), 5);
         if (image) image.style.transform = `scale(${scale})`;
     });
 
@@ -541,11 +552,11 @@ if (imageContainer) {
 
 
 // ======================================================
-//  Theme
+//  THEME
 // ======================================================
 
 const root = document.documentElement;
-const themeToggle = document.getElementById("themeToggle");
+const themeToggle = getElById("themeToggle");
 const savedTheme = localStorage.getItem("theme");
 
 if (root) {
@@ -561,3 +572,34 @@ themeToggle?.addEventListener("click", () => {
     root.setAttribute("data-theme", next);
     localStorage.setItem("theme", next);
 });
+
+
+// ======================================================
+//  HELPER FUNCTIONS
+// ======================================================
+
+function getElById(id) {
+    return document.getElementById(id);
+}
+
+function getAll(selector, parent = document) {
+    return Array.from(parent.querySelectorAll(selector));
+}
+
+function getElBySelector(selector, parent = document) {
+    return parent.querySelector(selector);
+}
+
+function toggleClass(el, className, force) {
+    if (!el) return;
+    el.classList.toggle(className, force);
+}
+
+function saveToStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function loadFromStorage(key, defaultValue = null) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : defaultValue;
+}

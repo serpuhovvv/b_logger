@@ -337,7 +337,9 @@ main::-webkit-scrollbar-thumb:hover {
 	border-color: var(--primary);
 }
 
+
 .sidebar .reset-btn {
+    flex: 1 1 45%;
     color: var(--text);
     background: var(--bg-accent);
 	padding: 0.5rem 1rem;
