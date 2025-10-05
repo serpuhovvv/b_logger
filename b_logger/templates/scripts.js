@@ -58,19 +58,13 @@ function initPage() {
         toggleClass(document.querySelector('.filter-btn[data-filter="all"]'), "active", true);
 
         saveFilters();
-        saveSort();
         filterTests();
     });
 
     resetSorting?.addEventListener("click", () => {
-        searchInput.value = "";
-        clearSelect(statusFilter);
-        clearSelect(moduleFilter);
-
         sortBtns.forEach(b => toggleClass(b, "active", false));
         toggleClass(document.querySelector('.sort-btn[data-sort="name_asc"]'), "active", true);
 
-        saveFilters();
         saveSort();
         filterTests();
     });
@@ -205,6 +199,9 @@ function getSortOptions() {
     return { field, order: order === 'desc' ? 'desc' : 'asc' };
 }
 
+const STATUS_ORDER_ASC  = ['FAILED', 'BROKEN', 'PASSED', 'SKIPPED'];
+const STATUS_ORDER_DESC = ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'];
+
 function compareTests(a, b, field, order = 'asc') {
     let valA, valB;
     switch (field) {
@@ -219,8 +216,10 @@ function compareTests(a, b, field, order = 'asc') {
         case 'status':
             valA = (a.dataset.status || '').toUpperCase();
             valB = (b.dataset.status || '').toUpperCase();
-            break;
-        default: return 0;
+            const orderArr = order === 'asc' ? STATUS_ORDER_ASC : STATUS_ORDER_DESC;
+            return orderArr.indexOf(valA) - orderArr.indexOf(valB);
+        default:
+            return 0;
     }
     if (valA < valB) return order === 'asc' ? -1 : 1;
     if (valA > valB) return order === 'asc' ? 1 : -1;
