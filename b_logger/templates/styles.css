@@ -45,8 +45,8 @@ body {
     --broken-light: rgba(251, 191, 36, 0.3);
 
     --skipped: #9CA3AF;
-    --skipped-bg: rgba(156, 163, 175, 0.1);
-    --skipped-light: rgba(156, 163, 175, 0.2);
+    --skipped-bg: rgba(156, 163, 175, 0.3);
+    --skipped-light: rgba(156, 163, 175, 0.3);
 
     --print: #A78BFA;
     --print-bg: rgba(167, 139, 250, 0.15);
@@ -301,7 +301,38 @@ main::-webkit-scrollbar-thumb:hover {
 }
 
 .sidebar .filter-buttons, .sort-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 1rem; }
-.sidebar .filter-buttons .filter-btn, .sort-btn {
+
+.sidebar .filter-buttons button { flex: 1 1 45%; }
+
+.sidebar .filter-buttons .filter-btn {
+    color: var(--text);
+	padding: 0.5rem 1rem;
+	border: 1px solid;
+    border-radius: var(--radius-sm);
+    border-color: var(--bg-card);
+    font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.sidebar .filter-buttons .filter-btn.passed { background: var(--passed-bg); }
+.sidebar .filter-buttons .filter-btn.failed { background: var(--failed-bg); }
+.sidebar .filter-buttons .filter-btn.broken { background: var(--broken-bg); }
+.sidebar .filter-buttons .filter-btn.skipped { background: var(--skipped-bg); }
+
+.sidebar .filter-buttons .filter-btn.passed.active { border-color: var(--passed); }
+.sidebar .filter-buttons .filter-btn.failed.active { border-color: var(--failed); }
+.sidebar .filter-buttons .filter-btn.broken.active { border-color: var(--broken); }
+.sidebar .filter-buttons .filter-btn.skipped.active { border-color: var(--skipped); }
+
+.sidebar .filter-buttons .filter-btn:hover {
+    opacity: 0.7;
+}
+
+.sidebar .sort-buttons button { flex: 1 1 45%; }
+
+.sidebar .sort-buttons .sort-btn {
     color: var(--text);
     background: var(--bg-accent);
 	padding: 0.5rem 1rem;
@@ -312,20 +343,6 @@ main::-webkit-scrollbar-thumb:hover {
 	transition: all 0.2s ease;
 	font-size: 0.875rem;
 }
-
-.sidebar .filter-buttons button { flex: 1 1 45%; }
-.sidebar .filter-buttons .filter-btn:hover {
-	background: var(--primary);
-	color: var(--bg);
-	border-color: var(--primary);
-}
-.sidebar .filter-buttons .filter-btn.active {
-	background: var(--primary);
-	color: var(--bg);
-	border-color: var(--primary);
-}
-
-.sidebar .sort-buttons button { flex: 1 1 45%; }
 .sidebar .sort-buttons .sort-btn:hover {
 	background: var(--primary);
 	color: var(--bg);

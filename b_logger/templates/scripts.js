@@ -199,9 +199,6 @@ function getSortOptions() {
     return { field, order: order === 'desc' ? 'desc' : 'asc' };
 }
 
-const STATUS_ORDER_ASC  = ['FAILED', 'BROKEN', 'PASSED', 'SKIPPED'];
-const STATUS_ORDER_DESC = ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'];
-
 function compareTests(a, b, field, order = 'asc') {
     let valA, valB;
     switch (field) {
@@ -216,10 +213,8 @@ function compareTests(a, b, field, order = 'asc') {
         case 'status':
             valA = (a.dataset.status || '').toUpperCase();
             valB = (b.dataset.status || '').toUpperCase();
-            const orderArr = order === 'asc' ? STATUS_ORDER_ASC : STATUS_ORDER_DESC;
-            return orderArr.indexOf(valA) - orderArr.indexOf(valB);
-        default:
-            return 0;
+            break;
+        default: return 0;
     }
     if (valA < valB) return order === 'asc' ? -1 : 1;
     if (valA > valB) return order === 'asc' ? 1 : -1;
