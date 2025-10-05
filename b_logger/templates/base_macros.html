@@ -24,6 +24,7 @@
             <input type="text" id="searchInput" placeholder="Search tests...">
         </div>
     </div>
+
     <select id="statusFilter" class="hidden">
         <option value="all">All Statuses</option>
         <option value="PASSED">Passed</option>
@@ -31,12 +32,14 @@
         <option value="BROKEN">Broken</option>
         <option value="SKIPPED">Skipped</option>
     </select>
+
     <select id="moduleFilter">
         <option value="all">All Modules</option>
         {% for module_path in report.modules.keys() %}
         <option value="{{ module_path }}">{{ module_path.split('\\')[-1] or module_path }}</option>
         {% endfor %}
     </select>
+
     <div class="filter-buttons">
         <button type="button" data-filter="all" class="filter-btn active hidden">All</button>
         <button type="button" data-filter="passed" class="filter-btn">✓ Passed</button>
@@ -45,13 +48,23 @@
         <button type="button" data-filter="skipped" class="filter-btn">→ Skipped</button>
         <button type="button" id="reset-filters" class="filter-btn reset-btn">Reset Filters</button>
     </div>
+
+    <div class="sort-buttons">
+        <button type="button" class="sort-btn" data-sort="name_asc">Name ↑</button>
+        <button type="button" class="sort-btn" data-sort="name_desc">Name ↓</button>
+        <button type="button" class="sort-btn" data-sort="duration_asc">Duration ↑</button>
+        <button type="button" class="sort-btn" data-sort="duration_desc">Duration ↓</button>
+        <button type="button" class="sort-btn" data-sort="status_asc">Status ↑</button>
+        <button type="button" class="sort-btn" data-sort="status_desc">Status ↓</button>
+    </div>
 </div>
 {% endmacro %}
 
 
+
 {% macro render_report_header(report) %}
 <div class="card">
-    <div class="header expanded" onclick="toggleCard(this)">
+    <div class="header expanded" onclick="toggleBlock(this)">
         <h3><i class="fas fa-chart-line"></i> {{ report.proj_name }}</h3>
         <i class="fas fa-chevron-down toggle-icon"></i>
     </div>
@@ -85,7 +98,7 @@
 {% set skipped = report.run_results.SKIPPED %}
 {% set total = passed + failed + broken + skipped %}
 <div class="card">
-    <div class="header expanded" onclick="toggleCard(this)">
+    <div class="header expanded" onclick="toggleBlock(this)">
         <h3><i class="fas fa-chart-pie"></i> Test Results Summary</h3>
         <i class="fas fa-chevron-down toggle-icon"></i>
     </div>
@@ -115,18 +128,19 @@
 
 {% macro render_module(module_name, module_data, steps) %}
 <div class="card module" data-module="{{ module_name }}">
-    <div class="header" onclick="toggleCard(this)">
+    <div class="header" onclick="toggleBlock(this)">
         <h3><i class="fas fa-file-code"></i>
             {{ module_name }}
             {% for status in ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'] %}
                 {% if module_data.results[status] %}
-                <span class="badge {{ status.lower() }}">{{ module_data.results[status]}} {{ render_status_icon(status.lower()) }}</span>
+                <span class="badge {{ status.lower() }}">{{ module_data.results[status] }} {{ render_status_icon(status.lower()) }}</span>
                 {% endif %}
             {% endfor %}
             <i class="fas fa-chevron-down toggle-icon"></i>
         </h3>
     </div>
-    <div class="content">
+
+    <div class="content tests-list">
         {% for test_name, test_runs in module_data.tests.items() %}
             {{ render_test(test_name, test_runs, steps) }}
         {% endfor %}
@@ -138,21 +152,42 @@
 
 
 {% macro render_status_summary(test_runs) %}
-    {% set counter = {} %}
+    {% set ns = namespace(passed=0, failed=0, broken=0, skipped=0) %}
     {% for run in test_runs %}
-        {% set count = counter.get(run.status, 0) + 1 %}
-        {% set _ = counter.update({run.status: count}) %}
-    {% endfor %}
-    {% for status in ['PASSED', 'FAILED', 'BROKEN', 'SKIPPED'] %}
-        {% if counter.get(status, None) %}
-        <div class="test-results">
-            <span class="badge {{ status.lower() }}">
-                {{ counter.get(status) }}
-                {{ render_status_icon(status) }}
-            </span>
-        </div>
+        {% if run.status == 'PASSED' %}
+            {% set ns.passed = ns.passed + 1 %}
+        {% elif run.status == 'FAILED' %}
+            {% set ns.failed = ns.failed + 1 %}
+        {% elif run.status == 'BROKEN' %}
+            {% set ns.broken = ns.broken + 1 %}
+        {% elif run.status == 'SKIPPED' %}
+            {% set ns.skipped = ns.skipped + 1 %}
         {% endif %}
     {% endfor %}
+
+    {% if ns.passed %}
+    <div class="test-results">
+        <span class="badge passed">{{ ns.passed }} {{ render_status_icon('PASSED') }}</span>
+    </div>
+    {% endif %}
+
+    {% if ns.failed %}
+    <div class="test-results">
+        <span class="badge failed">{{ ns.failed }} {{ render_status_icon('FAILED') }}</span>
+    </div>
+    {% endif %}
+
+    {% if ns.broken %}
+    <div class="test-results">
+        <span class="badge broken">{{ ns.broken }} {{ render_status_icon('BROKEN') }}</span>
+    </div>
+    {% endif %}
+
+    {% if ns.skipped %}
+    <div class="test-results">
+        <span class="badge skipped">{{ ns.skipped }} {{ render_status_icon('SKIPPED') }}</span>
+    </div>
+    {% endif %}
 {% endmacro %}
 
 
@@ -162,7 +197,28 @@
     {% if test_runs|length == 1 %}
         {{ render_test_block(test_runs[0], steps) }}
     {% else %}
-        <div class="test test-multi" data-test="{{ test_name }}" data-status="group">
+        {% set ns = namespace(max_dur=0, has_failed=False, has_broken=False, has_skipped=False, has_passed=False) %}
+        {% for run in test_runs %}
+            {% set dur = (run.duration or 0) %}
+            {% set ns.max_dur = dur if dur > ns.max_dur else ns.max_dur %}
+            {% if run.status == 'FAILED' %}{% set ns.has_failed = True %}{% endif %}
+            {% if run.status == 'BROKEN' %}{% set ns.has_broken = True %}{% endif %}
+            {% if run.status == 'SKIPPED' %}{% set ns.has_skipped = True %}{% endif %}
+            {% if run.status == 'PASSED' %}{% set ns.has_passed = True %}{% endif %}
+        {% endfor %}
+
+        {# приоритет статусов для группы: FAILED > BROKEN > SKIPPED > PASSED #}
+        {% if ns.has_failed %}
+            {% set agg_status = 'FAILED' %}
+        {% elif ns.has_broken %}
+            {% set agg_status = 'BROKEN' %}
+        {% elif ns.has_skipped %}
+            {% set agg_status = 'SKIPPED' %}
+        {% else %}
+            {% set agg_status = 'PASSED' %}
+        {% endif %}
+
+        <div class="test test-multi" data-test="{{ test_name }}" data-status="{{ agg_status }}" data-duration="{{ ns.max_dur }}">
             <div class="test-header-multi">
                 <div class="test-info">
                     <div class="test-results">
@@ -171,6 +227,7 @@
                     <span class="test-name">{{ test_name }}</span>
                 </div>
             </div>
+
             <div class="test-content expanded active">
                 {% for run in test_runs %}
                     {{ render_test_block(run, steps, is_sub=True) }}
@@ -185,9 +242,9 @@
 
 {% macro render_test_block(test_run, steps, is_sub=False) %}
 {% set sub_class = "test-sub" if is_sub else "" %}
-{% set test_id = "test_" ~ test_run.name|replace(" ", "_") %}
+{% set test_id = "test_" ~ (test_run.name|replace(" ", "_")) %}
 <div id="{{ test_id }}" class="test {{ sub_class }} {{ test_run.status.lower() }}"
-    data-test="{{ test_run.name }}" data-status="{{ test_run.status }}">
+    data-test="{{ test_run.name }}" data-status="{{ test_run.status }}" data-duration="{{ test_run.duration or 0 }}">
     <div class="test-header" onclick="toggleTestAndHash(this)">
         {{ render_test_header(test_run) }}
     </div>

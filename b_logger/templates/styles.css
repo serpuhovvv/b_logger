@@ -298,9 +298,8 @@ main::-webkit-scrollbar-thumb:hover {
     font-weight: 600;
 }
 
-.sidebar .filter-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 1rem; }
-.sidebar .filter-buttons button { flex: 1 1 45%; }
-.sidebar .filter-buttons .filter-btn {
+.sidebar .filter-buttons, .sort-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 1rem; }
+.sidebar .filter-buttons .filter-btn, .sort-btn {
     color: var(--text);
     background: var(--bg-accent);
 	padding: 0.5rem 1rem;
@@ -311,12 +310,26 @@ main::-webkit-scrollbar-thumb:hover {
 	transition: all 0.2s ease;
 	font-size: 0.875rem;
 }
+
+.sidebar .filter-buttons button { flex: 1 1 45%; }
 .sidebar .filter-buttons .filter-btn:hover {
 	background: var(--primary);
 	color: var(--bg);
 	border-color: var(--primary);
 }
 .sidebar .filter-buttons .filter-btn.active {
+	background: var(--primary);
+	color: var(--bg);
+	border-color: var(--primary);
+}
+
+.sidebar .sort-buttons button { flex: 1 1 45%; }
+.sidebar .sort-buttons .sort-btn:hover {
+	background: var(--primary);
+	color: var(--bg);
+	border-color: var(--primary);
+}
+.sidebar .sort-buttons .sort-btn.active {
 	background: var(--primary);
 	color: var(--bg);
 	border-color: var(--primary);
@@ -446,7 +459,7 @@ main::-webkit-scrollbar-thumb:hover {
 /* Test info band */
 .test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1rem; }
 
-.test-results { display: grid; grid-auto-flow: column; column-gap: 0.5rem; align-items: center; }
+.test-results { display: grid; grid-auto-flow: column; column-gap: 0.75rem; align-items: center; }
 
 .test-status.passed { background-color: #d4edda; color: var(--passed); background: var(--passed-light); }
 .test-status.failed { background-color: #f8d7da; color: var(--failed); background: var(--failed-light); }

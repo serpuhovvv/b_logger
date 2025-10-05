@@ -1,58 +1,98 @@
 // ======================================================
-//  Filters
+//  Filters + Sorting (постоянное хранение состояния)
 // ======================================================
+
+document.addEventListener('DOMContentLoaded', initFilters);
 
 function initFilters() {
     const searchInput  = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
     const moduleFilter = document.getElementById('moduleFilter');
-    const resetBtn     = document.getElementById("reset-filters");
+    const resetBtn     = document.getElementById('reset-filters');
+    const sortBtns     = Array.from(document.querySelectorAll('.sort-btn'));
+    const filterBtns   = Array.from(document.querySelectorAll('.filter-btn'));
 
-    // --- события фильтров ---
+    // --- Восстановление состояния из localStorage ---
+    // Сортировка
+    const savedSort = localStorage.getItem('selectedSort') || 'name_asc';
+    sortBtns.forEach(b => b.classList.toggle('active', b.dataset.sort === savedSort));
+
+    // Активные фильтры по статусам
+    try {
+        const savedFilters = JSON.parse(localStorage.getItem('activeFilters') || '[]');
+        if (Array.isArray(savedFilters) && savedFilters.length) {
+            filterBtns.forEach(b => b.classList.toggle('active', savedFilters.includes(b.dataset.filter)));
+        }
+    } catch (e) {
+        // ignore parse errors
+    }
+
+    // --- Слушатели для элементов управления ---
     searchInput?.addEventListener('input', filterTests);
     statusFilter?.addEventListener('change', filterTests);
     moduleFilter?.addEventListener('change', filterTests);
+    searchInput?.addEventListener('keydown', e => { if (e.key === 'Escape') { searchInput.value = ''; filterTests(); } });
 
-    // Esc очищает поиск
-    searchInput?.addEventListener('keydown', e => {
-        if (e.key === 'Escape') {
-            searchInput.value = '';
-            filterTests();
-        }
-    });
-
-    // фильтр-кнопки
-    document.querySelectorAll('.filter-btn').forEach(btn =>
+    // filter buttons (toggle + save)
+    filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             btn.classList.toggle('active');
+            // сохраняем активные фильтры
+            const active = filterBtns.filter(b => b.classList.contains('active'))
+                                     .map(b => b.dataset.filter)
+                                     .filter(Boolean);
+            if (active.length) localStorage.setItem('activeFilters', JSON.stringify(active));
+            else localStorage.removeItem('activeFilters');
             filterTests();
-        })
-    );
+        });
+    });
 
-    // сброс всех фильтров
-    resetBtn?.addEventListener("click", () => {
-        searchInput.value = "";
+    // sort buttons (one active)
+    sortBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // включаем только эту кнопку
+            sortBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // сохраняем выбранную сортировку
+            if (btn.dataset.sort) localStorage.setItem('selectedSort', btn.dataset.sort);
+            filterTests();
+        });
+    });
+
+    // reset
+    resetBtn?.addEventListener('click', () => {
+        // очистка UI
+        if (searchInput) searchInput.value = '';
         clearSelect(statusFilter);
         clearSelect(moduleFilter);
 
-        document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-        document.querySelector('.filter-btn[data-filter="all"]')?.classList.add("active");
+        filterBtns.forEach(b => b.classList.remove('active'));
+        document.querySelector('.filter-btn[data-filter="all"]')?.classList.add('active');
+
+        sortBtns.forEach(b => b.classList.remove('active'));
+        // установим дефолтную сортировку A–Z
+        const defaultSort = 'name_asc';
+        const defaultBtn = document.querySelector(`.sort-btn[data-sort="${defaultSort}"]`);
+        if (defaultBtn) defaultBtn.classList.add('active');
+
+        // очистка localStorage
+        localStorage.removeItem('activeFilters');
+        localStorage.setItem('selectedSort', defaultSort);
 
         filterTests();
     });
 
+    // Первичный прогон (восстановленные состояния уже применены)
     filterTests();
 }
 
+/* ----------------- HELPERS ----------------- */
 function getSelectedValues(select) {
     if (!select) return [];
     const values = select.multiple
         ? Array.from(select.selectedOptions).map(o => o.value)
         : select.value ? [select.value] : [];
-
-    return values
-        .map(v => v.toString().trim())
-        .filter(v => v && v.toLowerCase() !== 'all');
+    return values.map(v => (v ?? '').toString().trim()).filter(v => v && v.toLowerCase() !== 'all');
 }
 
 function clearSelect(select) {
@@ -71,46 +111,118 @@ function normalizeStatus(s) {
 
 function matchesFilters(nameLC, statusRaw, moduleName, filters) {
     const statusU = normalizeStatus(statusRaw);
-    return !(
-        (filters.search && !nameLC.includes(filters.search)) ||
-        (filters.status.length && !filters.status.includes(statusU)) ||
-        (filters.module.length && !filters.module.includes(moduleName)) ||
-        (filters.buttonStatuses.length && !filters.buttonStatuses.includes(statusU.toLowerCase()))
-    );
+    if (filters.search && !nameLC.includes(filters.search)) return false;
+    if (filters.status.length && !filters.status.includes(statusU)) return false;
+    if (filters.module.length && !filters.module.includes(moduleName)) return false;
+    if (filters.buttonStatuses.length && !filters.buttonStatuses.includes(statusU.toLowerCase())) return false;
+    return true;
 }
 
+/* ----------------- СОРТИРОВКА ----------------- */
+function getSortOptions() {
+    const activeBtn = document.querySelector('.sort-btn.active');
+    const defaultDs = 'name_asc';
+    const ds = (activeBtn?.dataset?.sort) || defaultDs;
+    const [field, order] = ds.split('_');
+    return { field: field || 'name', order: order === 'desc' ? 'desc' : 'asc' };
+}
+
+function compareTests(a, b, field, order = 'asc') {
+    // status priority: меньший = выше в списке при order='asc'
+    const statusOrder = { FAILED: 1, BROKEN: 2, SKIPPED: 3, PASSED: 4 };
+
+    let A, B;
+    switch (field) {
+        case 'name':
+            A = (a.dataset.test || '').toLowerCase();
+            B = (b.dataset.test || '').toLowerCase();
+            break;
+        case 'duration':
+            A = parseFloat(a.dataset.duration || '0') || 0;
+            B = parseFloat(b.dataset.duration || '0') || 0;
+            break;
+        case 'status':
+            A = statusOrder[(a.dataset.status || '').toUpperCase()] || 99;
+            B = statusOrder[(b.dataset.status || '').toUpperCase()] || 99;
+            break;
+        default:
+            A = (a.dataset.test || '').toLowerCase();
+            B = (b.dataset.test || '').toLowerCase();
+    }
+
+    if (A < B) return order === 'asc' ? -1 : 1;
+    if (A > B) return order === 'asc' ? 1 : -1;
+    return 0;
+}
+
+/* ----------------- ФИЛЬТРАЦИЯ + СОРТИРОВКА ----------------- */
 function filterTests() {
     const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
     const statusSelected = getSelectedValues(document.getElementById('statusFilter')).map(v => v.toUpperCase());
     const moduleSelected = getSelectedValues(document.getElementById('moduleFilter'));
     const activeButtons = Array.from(document.querySelectorAll('.filter-btn.active'))
-        .map(b => b.dataset.filter?.toLowerCase().trim())
+        .map(b => (b.dataset.filter || '').toLowerCase().trim())
         .filter(f => f && f !== 'all');
 
+    const { field: sortField, order: sortOrder } = getSortOptions();
     const filters = { search, status: statusSelected, module: moduleSelected, buttonStatuses: activeButtons };
 
+    const modules = document.querySelectorAll('.module');
     let modulesVisible = 0;
-    document.querySelectorAll('.module').forEach(moduleEl => {
+
+    modules.forEach(moduleEl => {
         const moduleName = moduleEl.dataset.module;
+        const container = moduleEl.querySelector('.tests-list');
+        if (!container) return;
+
+        // Топ-уровневые тесты (не захватываем .test-sub)
+        const topTests = Array.from(container.querySelectorAll(':scope > .test'));
+
+        // 1) Сортируем topTests (по всем, даже скрытым)
+        if (sortField) {
+            topTests.sort((a, b) => compareTests(a, b, sortField, sortOrder));
+            topTests.forEach(t => container.appendChild(t));
+        }
+
+        // 2) Для каждого test-multi: сортируем его под-тесты (если есть)
+        topTests.forEach(test => {
+            if (test.classList.contains('test-multi')) {
+                const subContainer = test.querySelector(':scope > .test-content');
+                if (subContainer) {
+                    const subTests = Array.from(subContainer.querySelectorAll(':scope > .test-sub'));
+                    if (sortField) {
+                        subTests.sort((a, b) => compareTests(a, b, sortField, sortOrder));
+                        subTests.forEach(st => subContainer.appendChild(st));
+                    }
+                }
+            }
+        });
+
+        // 3) Применяем фильтры (показываем/скрываем)
         let moduleHasVisible = false;
 
-        moduleEl.querySelectorAll('.test').forEach(test => {
+        topTests.forEach(test => {
+            const isGroup = test.classList.contains('test-multi');
             const testName = (test.dataset.test || '').toLowerCase();
-            const isGroup  = test.classList.contains('test-multi');
             let visible = false;
 
             if (isGroup) {
+                const subContainer = test.querySelector(':scope > .test-content');
+                const subTests = subContainer ? Array.from(subContainer.querySelectorAll(':scope > .test-sub')) : [];
+
                 let subVisible = 0;
-                test.querySelectorAll('.test-sub').forEach(sub => {
+                subTests.forEach(sub => {
                     const subName = (sub.dataset.test || '').toLowerCase();
                     const subStatus = sub.dataset.status;
                     const show = matchesFilters(subName, subStatus, moduleName, filters);
                     sub.style.display = show ? 'block' : 'none';
                     if (show) subVisible++;
                 });
+
                 visible = subVisible > 0;
             } else {
-                visible = matchesFilters(testName, test.dataset.status, moduleName, filters);
+                const testStatus = test.dataset.status;
+                visible = matchesFilters(testName, testStatus, moduleName, filters);
             }
 
             test.style.display = visible ? 'block' : 'none';
@@ -121,7 +233,7 @@ function filterTests() {
         if (moduleHasVisible) modulesVisible++;
     });
 
-    const main = document.querySelector('.main-content');
+    // no-results
     let noResults = document.getElementById('noResults');
     if (modulesVisible === 0) {
         if (!noResults) {
@@ -129,7 +241,7 @@ function filterTests() {
             noResults.id = 'noResults';
             noResults.className = 'no-results';
             noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
-            main.appendChild(noResults);
+            document.querySelector('.main-content')?.appendChild(noResults);
         }
     } else {
         noResults?.remove();
@@ -184,7 +296,7 @@ function switchTab(btn, tabName) {
 // ======================================================
 
 const modal          = document.getElementById('attachmentModal');
-const title          = document.getElementById('modalTitle');
+const titleEl        = document.getElementById('modalTitle');
 const image          = document.getElementById('modalImage');
 const imageContainer = document.getElementById('imageContainer');
 const textPreview    = document.getElementById('modalText');
@@ -198,73 +310,80 @@ function openAttachment(name, type) {
 
     // Сброс состояния
     scale = 1;
-    [image, pdfContainer, textPreview].forEach(el => el.src = '');
-    [imageContainer, textPreview, pdfContainer, download].forEach(el => el.style.display = 'none');
-    image.style.transform = 'scale(1)';
-    title.textContent = name;
+    if (image) image.style.transform = 'scale(1)';
+    if (image) image.src = '';
+    if (pdfContainer) pdfContainer.src = '';
+    if (textPreview) textPreview.textContent = '';
+    [imageContainer, textPreview, pdfContainer, download].forEach(el => { if (el) el.style.display = 'none'; });
 
-    if (type.startsWith('image/')) {
-        image.src = path;
-        imageContainer.style.display = 'block';
+    if (titleEl) titleEl.textContent = name;
+
+    if (type && type.startsWith('image/')) {
+        if (image) image.src = path;
+        if (imageContainer) imageContainer.style.display = 'block';
     } else if (type === 'application/pdf') {
-        pdfContainer.src = path;
-        pdfContainer.style.display = 'block';
-    } else if (type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
+        if (pdfContainer) pdfContainer.src = path;
+        if (pdfContainer) pdfContainer.style.display = 'block';
+    } else if (type && type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
         fetch(path)
             .then(res => res.text())
             .then(text => {
-                textPreview.textContent = text;
-                textPreview.style.display = 'block';
+                if (textPreview) textPreview.textContent = text;
+                if (textPreview) textPreview.style.display = 'block';
             })
             .catch(() => {
-                textPreview.textContent = '[Ошибка загрузки текста]';
-                textPreview.style.display = 'block';
+                if (textPreview) textPreview.textContent = '[Ошибка загрузки текста]';
+                if (textPreview) textPreview.style.display = 'block';
             });
     } else {
-        download.href = path;
-        download.style.display = 'inline-block';
+        if (download) {
+            download.href = path;
+            download.style.display = 'inline-block';
+        }
     }
 
-    modal.style.display = 'block';
+    if (modal) modal.style.display = 'block';
 }
 
 function closeModal(event) {
-    if (event.target.id === 'attachmentModal' || event.target.classList.contains('close')) {
+    if (!modal) return;
+    if (event.target.id === modal.id || event.target.classList.contains('close')) {
         modal.style.display = 'none';
     }
 }
 
-// --- Zoom + Drag ---
-imageContainer.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    scale = Math.min(Math.max(scale + e.deltaY * -0.001, 0.5), 5);
-    image.style.transform = `scale(${scale})`;
-});
+// Zoom + Drag (защита, если контейнера нет)
+if (imageContainer) {
+    imageContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        scale = Math.min(Math.max(scale + e.deltaY * -0.001, 0.5), 5);
+        if (image) image.style.transform = `scale(${scale})`;
+    });
 
-let isDragging = false, startX, startY, scrollLeft, scrollTop;
+    let isDragging = false, startX = 0, startY = 0, scrollLeft = 0, scrollTop = 0;
 
-imageContainer.addEventListener('mousedown', e => {
-    isDragging = true;
-    startX = e.pageX;
-    startY = e.pageY;
-    scrollLeft = imageContainer.scrollLeft;
-    scrollTop = imageContainer.scrollTop;
-    imageContainer.style.cursor = 'grabbing';
-});
+    imageContainer.addEventListener('mousedown', e => {
+        isDragging = true;
+        startX = e.pageX;
+        startY = e.pageY;
+        scrollLeft = imageContainer.scrollLeft;
+        scrollTop = imageContainer.scrollTop;
+        imageContainer.style.cursor = 'grabbing';
+    });
 
-imageContainer.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    imageContainer.scrollLeft = scrollLeft - (e.pageX - startX);
-    imageContainer.scrollTop  = scrollTop - (e.pageY - startY);
-});
+    imageContainer.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        imageContainer.scrollLeft = scrollLeft - (e.pageX - startX);
+        imageContainer.scrollTop  = scrollTop - (e.pageY - startY);
+    });
 
-['mouseup', 'mouseleave'].forEach(evt =>
-    imageContainer.addEventListener(evt, () => {
-        isDragging = false;
-        imageContainer.style.cursor = 'grab';
-    })
-);
-
+    ['mouseup', 'mouseleave'].forEach(evt =>
+        imageContainer.addEventListener(evt, () => {
+            isDragging = false;
+            imageContainer.style.cursor = 'grab';
+        })
+    );
+}
 
 // ======================================================
 //  Theme
@@ -274,25 +393,28 @@ const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
 const savedTheme = localStorage.getItem("theme");
 
-root.setAttribute(
-    "data-theme",
-    savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-);
+if (root) {
+    root.setAttribute(
+        "data-theme",
+        savedTheme || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    );
+}
 
 themeToggle?.addEventListener("click", () => {
-    const newTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
+    const current = root.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
 });
 
 
 // ======================================================
-//  Navigation
+//  Navigation / Hash
 // ======================================================
 
 function toggleTestAndHash(header) {
     const el = header.closest(".test, .card");
-    if (!el?.id) return;
+    if (!el || !el.id) return;
 
     const content = header.nextElementSibling;
     const isOpening = !content.classList.contains("active");
@@ -307,13 +429,14 @@ function toggleTestAndHash(header) {
 }
 
 function expandTestAndParents(el) {
+    if (!el) return;
     let current = el;
     while (current) {
         const header = current.querySelector(":scope > .test-header, :scope > .test-header-multi, :scope > .header");
         const content = current.querySelector(":scope > .test-content, :scope > .content");
         header?.classList.add("expanded");
         content?.classList.add("active");
-        current = current.parentElement.closest(".test, .card");
+        current = current.parentElement?.closest(".test, .card");
     }
 }
 
