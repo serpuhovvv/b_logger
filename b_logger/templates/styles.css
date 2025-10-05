@@ -154,6 +154,7 @@ a { color: var(--text-muted); text-decoration: underline; }
 /* Unified show/hide API via .active */
 .content,
 .test-content,
+.test-content-multi,
 .step-content,
 .step-body,
 .attachment-body,
@@ -161,6 +162,7 @@ a { color: var(--text-muted); text-decoration: underline; }
 
 .content.active,
 .test-content.active,
+.test-content-multi,
 .step-content.active,
 .step-body.active,
 .attachment-body.active,
@@ -331,6 +333,23 @@ main::-webkit-scrollbar-thumb:hover {
 }
 .sidebar .sort-buttons .sort-btn.active {
 	background: var(--primary);
+	color: var(--bg);
+	border-color: var(--primary);
+}
+
+.sidebar .reset-btn {
+    color: var(--text);
+    background: var(--bg-accent);
+	padding: 0.5rem 1rem;
+	border: none;
+	font-weight: 600;
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-size: 0.875rem;
+}
+.sidebar .reset-btn:hover {
+    background: var(--primary);
 	color: var(--bg);
 	border-color: var(--primary);
 }

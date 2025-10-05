@@ -46,7 +46,7 @@
         <button type="button" data-filter="failed" class="filter-btn">✗ Failed</button>
         <button type="button" data-filter="broken" class="filter-btn">⚠ Broken</button>
         <button type="button" data-filter="skipped" class="filter-btn">→ Skipped</button>
-        <button type="button" id="reset-filters" class="filter-btn reset-btn">Reset Filters</button>
+        <button type="button" id="reset-filters" class="reset-btn">Reset Filters</button>
     </div>
 
     <div class="sort-buttons">
@@ -56,6 +56,7 @@
         <button type="button" class="sort-btn" data-sort="duration_desc">Duration ↓</button>
         <button type="button" class="sort-btn" data-sort="status_asc">Status ↑</button>
         <button type="button" class="sort-btn" data-sort="status_desc">Status ↓</button>
+        <button type="button" id="reset-expanded" class="reset-btn">Collapse / Expand All</button>
     </div>
 </div>
 {% endmacro %}
@@ -127,7 +128,7 @@
 
 
 {% macro render_module(module_name, module_data, steps) %}
-<div class="card module" data-module="{{ module_name }}">
+<div id="module_{{ module_name|replace('\\','_') }}" class="card module" data-module="{{ module_name }}">
     <div class="header" onclick="toggleBlock(this)">
         <h3><i class="fas fa-file-code"></i>
             {{ module_name }}
@@ -207,7 +208,6 @@
             {% if run.status == 'PASSED' %}{% set ns.has_passed = True %}{% endif %}
         {% endfor %}
 
-        {# приоритет статусов для группы: FAILED > BROKEN > SKIPPED > PASSED #}
         {% if ns.has_failed %}
             {% set agg_status = 'FAILED' %}
         {% elif ns.has_broken %}
@@ -228,7 +228,7 @@
                 </div>
             </div>
 
-            <div class="test-content expanded active">
+            <div class="test-content-multi expanded active">
                 {% for run in test_runs %}
                     {{ render_test_block(run, steps, is_sub=True) }}
                 {% endfor %}
@@ -507,7 +507,7 @@
     <div class="error-message">{{ exc | escape }}</div>
     {% if stacktrace %}
     <div class="card">
-        <div class="header" onclick="toggleStacktrace(this)">
+        <div class="header" onclick="toggleBlock(this)">
             <h4>
                 Stacktrace
                 <i class="fas fa-chevron-down toggle-icon"></i>
