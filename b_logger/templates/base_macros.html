@@ -285,7 +285,7 @@
         {% for key, value in info.items() %}
         <div class="info-item">
             <div class="info-key">{{ key }}</div>
-            <div class="info-value">{{ render_info_value(value) }}</div>
+            <div class="info-value">{{ render_info_value(value, False) }}</div>
         </div>
         {% endfor %}
     </div>
@@ -294,14 +294,23 @@
 
 
 
-{% macro render_info_value(value) %}
+{% macro render_info_value(value, is_sub=False) %}
+{% set indent = 15 if is_sub else 0 %}
 {% if value is mapping %}
     {% for sub_key, sub_value in value.items() %}
-        <div><span><strong>{{ sub_key }}:</strong></span> {{ render_info_value(sub_value) }}</div>
+        <div style="padding-left: {{ indent }}px;">
+        🞂 <span><strong>{{ sub_key }}:</strong> {{ render_info_value(sub_value, True) }}</span>
+        </div>
     {% endfor %}
 {% elif value is sequence and value is not string %}
     {% for sub_value in value %}
-        <div>{{ render_info_value(sub_value) }}</div>
+        {% if sub_value is mapping %}
+            {{ render_info_value(sub_value, is_sub) }}
+        {% else %}
+        <div style="padding-left: {{ indent }}px;">
+            ● {{ render_info_value(sub_value, True) }}
+        </div>
+        {% endif %}
     {% endfor %}
 {% else %}
     {{ value }}

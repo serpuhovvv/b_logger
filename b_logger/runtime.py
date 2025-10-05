@@ -175,23 +175,18 @@ class RunTime:
 
             Integrations.link(v, key)
 
-        self.apply_info(links=links)
+        current_step = self.step_container.get_current_step()
 
-        # links = {}
-        #
-        # for k, v in kwargs.items():
-        #     key = k.replace('_', ' ').capitalize().upper()
-        #
-        #     links[key] = f'<a href={v}>{v}</a>'
-        #
-        # current_step = self.step_container.get_current_step()
-        #
-        # if current_step:
-        #     current_step.add_info(links)
-        #
-        # self.test_report.add_info(links)
+        if current_step:
+            current_step.add_links(links)
 
-    def apply_known_bug(self, url: str, description: str = None):
+        self.test_report.add_links(links)
+
+    def apply_known_bug(self, url: str = None, description: str = None):
+        if not url and not description:
+            print('[BLogger][WARN] blog.known_bug() requires at least url or description')
+            return
+
         bug = {
             "url": url,
             "description": description

@@ -76,6 +76,16 @@ class Step(BaseDataModel):
             else:
                 self.info[key] = value
 
+    def add_links(self, links: dict):
+        existing_links = self.info.get('links', {})
+        if existing_links:
+            for key, value in links.items():
+                existing_links[key] = value
+        else:
+            self.info['links'] = {}
+            for key, value in links.items():
+                self.info['links'][key] = value
+
     def add_known_bug(self, bug):
         self.known_bugs.append(bug)
 

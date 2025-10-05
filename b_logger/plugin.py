@@ -169,9 +169,9 @@ def _apply_py_markers(item):
         args = [str(a) for a in mark.args] if mark.args else []
         kwargs = [f"{k}={v}" for k, v in mark.kwargs.items()] if mark.kwargs else []
 
-        value = ", ".join(args + kwargs) if (args or kwargs) else None
+        value = ", ".join(args + kwargs) if (args or kwargs) else '...'
 
-        markers.append({mark.name: value} if value else mark.name)
+        markers.append({mark.name: value})
 
     if markers:
         runtime.apply_info(markers=markers)
@@ -244,7 +244,7 @@ def __apply_link_mark(item):
 def __apply_known_bug_mark(item):
     try:
         for bug in reversed(list(item.iter_markers(name='blog_known_bug'))):
-            url = bug.kwargs.get('url')
+            url = bug.kwargs.get('url') or None
             description = bug.kwargs.get('description') or None
 
             runtime.apply_known_bug(url, description)

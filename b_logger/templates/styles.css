@@ -20,7 +20,7 @@ body {
 
     --bg: #212121;
     --bg-card: #1e1f22;
-    --bg-light: #2b2d30;
+    --bg-accent: #2b2d30;
     --bg-transparent: #212121B3;
 
     --text: #cbc9c7;
@@ -57,9 +57,9 @@ body {
     /* Base colors */
     --primary: #0F172A;
 
-    --bg: #F8FAFC;
+    --bg: #e6e7e8;
     --bg-card: #FFFFFF;
-    --bg-light: #e6ebed;
+    --bg-accent: #e6ebed;
     --bg-transparent: #F8FAFCB3;
 
     --text: #0F172A;
@@ -133,12 +133,12 @@ a { color: var(--text-muted); text-decoration: underline; }
 .test-header:hover,
 .step-header:hover,
 .attachment:hover {
-    background: var(--bg-light);
+    background: var(--bg-accent);
     opacity: 0.6;
 }
 
 .header.expanded {
-    background: var(--bg-light);
+    background: var(--bg-accent);
     border-radius: var(--radius) var(--radius) 0px 0px;
 }
 
@@ -249,7 +249,7 @@ main::-webkit-scrollbar-thumb:hover {
     position: relative;
     width: 100%;
     border: 1px solid;
-    border-color: var(--bg-light);
+    border-color: var(--bg-accent);
     border-radius: var(--radius-sm);
 }
 .sidebar .search-container:hover {
@@ -268,7 +268,7 @@ main::-webkit-scrollbar-thumb:hover {
     font-size: 1rem;
     border: none;
     border-radius: var(--radius-sm);
-    background: var(--bg-light);
+    background: var(--bg-accent);
 }
 #searchInput {
   color: var(--text);
@@ -282,9 +282,9 @@ main::-webkit-scrollbar-thumb:hover {
     width: 100%;
     padding: 0.75rem;
     color: var(--text);
-    background: var(--bg-light);
+    background: var(--bg-accent);
     border: 1px solid;
-    border-color: var(--bg-light);
+    border-color: var(--bg-accent);
     border-radius: var(--radius-sm);
 }
 .sidebar .search-filter select:hover {
@@ -302,7 +302,7 @@ main::-webkit-scrollbar-thumb:hover {
 .sidebar .filter-buttons button { flex: 1 1 45%; }
 .sidebar .filter-buttons .filter-btn {
     color: var(--text);
-    background: var(--bg-light);
+    background: var(--bg-accent);
 	padding: 0.5rem 1rem;
 	border: none;
 	font-weight: 600;
@@ -419,7 +419,7 @@ main::-webkit-scrollbar-thumb:hover {
     transition: all 0.2s ease;
 }
 .test-header.expanded {
-    background: var(--bg-light);
+    background: var(--bg-accent);
     border-radius: 7px var(--radius) 0px 0px;
 }
 
@@ -453,19 +453,19 @@ main::-webkit-scrollbar-thumb:hover {
 .test-status.skipped { background-color: #fff3cd; color: var(--skipped); background: var(--skipped-light); }
 
 .test-duration { color: var(--text-muted); font-size: 0.875rem; background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); text-align: center; }
-.test-steps li { padding: 0.75rem; margin-bottom: 0.5rem; border-radius: var(--radius-sm); background: var(--bg-light); }
+.test-steps li { padding: 0.75rem; margin-bottom: 0.5rem; border-radius: var(--radius-sm); background: var(--bg-accent); }
 
 /* ===============================
    TABS
 ================================= */
 .tab-nav {
-    background: var(--bg-light);
+    background: var(--bg-accent);
     display: flex;
 }
 .tab-btn {
     padding: 0.75rem;
     border: none;
-    background: var(--bg-light);
+    background: var(--bg-accent);
     cursor: pointer;
     font-weight: 550;
     font-size: 0.875rem;
@@ -498,7 +498,7 @@ main::-webkit-scrollbar-thumb:hover {
 .section h4 { margin-bottom: 0.5rem; }
 
 .description {
-    background: var(--bg-light);
+    background: var(--bg-accent);
     padding: 1rem;
     border-radius: var(--radius-sm);
     white-space: pre-wrap;
@@ -506,7 +506,7 @@ main::-webkit-scrollbar-thumb:hover {
 }
 
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
-.info-item { background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); }
+.info-item { background: var(--bg-accent); padding: 1rem; border-radius: var(--radius-sm); }
 .info-key { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; }
 .info-value {
     font-size: 0.875rem;
@@ -520,8 +520,8 @@ main::-webkit-scrollbar-thumb:hover {
 ================================= */
 .bug-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
 .bug-item { background: var(--failed-bg); padding: 1rem; border-radius: var(--radius-sm); }
-.bug-desc { font-weight: 600; color: var(--failed); }
-.bug-item a { color: var(--failed); font-size: 1rem; }
+.bug-desc { font-size: 1rem; color: var(--failed); }
+.bug-item a { font-size: 1rem; color: var(--failed); }
 
 .error-icon { color: var(--failed); font-size: 0.875rem; }
 
@@ -580,7 +580,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .step-header {
     padding: 0.5rem;
-    background: var(--bg-light);
+    background: var(--bg-accent);
     border-radius: var(--radius-sm);
     cursor: pointer;
     display: flex;
@@ -590,7 +590,7 @@ main::-webkit-scrollbar-thumb:hover {
 }
 .step-header-no-addons {
     padding: 0.5rem;
-    background: var(--bg-light);
+    background: var(--bg-accent);
     border-radius: var(--radius-sm);
     display: flex;
     justify-content: space-between;
@@ -620,7 +620,7 @@ main::-webkit-scrollbar-thumb:hover {
     flex-direction: column;
     align-items: center;
     padding: 1rem;
-    background: var(--bg-light);
+    background: var(--bg-accent);
     border-radius: var(--radius-sm);
     cursor: pointer;
     text-align: center;
@@ -633,7 +633,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 /* Attachment modal */
 .modal { display: none; position: fixed; z-index: 999; inset: 0; background: var(--bg-transparent); overflow: auto; padding: 2vh 2vw; }
-.modal-content { position: relative; margin: auto; background: var(--bg-light); border-radius: 8px; max-width: 90vw; max-height: 90vh; padding: 1rem; box-sizing: border-box; }
+.modal-content { position: relative; margin: auto; background: var(--bg-accent); border-radius: 8px; max-width: 90vw; max-height: 90vh; padding: 1rem; box-sizing: border-box; }
 .attachment-body { max-height: 80vh; overflow: auto; margin-top: 1rem; text-align: center; }
 .download-link { margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: #fff; border-radius: 5px; text-decoration: underline; }
 .download-link:hover { background: #0056b3; }

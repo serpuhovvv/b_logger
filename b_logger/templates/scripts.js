@@ -151,19 +151,6 @@ function toggleStacktrace(el) {
     if (body) body.classList.toggle("active");
 }
 
-
-function toggleTestRun(header) {
-    const content = header.nextElementSibling;
-    if (content.classList.contains('active')) {
-        content.classList.remove('active');
-        header.classList.remove('expanded');
-    } else {
-        content.classList.add('active');
-        header.classList.add('expanded');
-    }
-}
-
-
 function toggleStep(header) {
     const step = header.closest('.step');
     if (!step) return;
@@ -172,7 +159,6 @@ function toggleStep(header) {
     if (!body) return;
 
     const content = step.querySelector('.step-content');
-<!--            const children = step.querySelector('.step-children');-->
 
     const isActive = header.classList.contains('expanded');
     body.classList.toggle('active', !isActive);
@@ -312,12 +298,11 @@ themeToggle.addEventListener("click", () => {
 });
 
 
-// старые функции через универсальную
 function toggleTest(header) { toggleBlock(header); }
 function toggleCard(header) { toggleBlock(header); }
+function toggleTestRun(header) { toggleBlock(header); }
 
 
-// универсальная функция сворачивания/разворачивания блока
 function toggleBlock(header) {
     const content = header.nextElementSibling;
 
@@ -327,7 +312,6 @@ function toggleBlock(header) {
 }
 
 
-// клик по тесту + обновление URL
 function toggleTestAndHash(header) {
     const el = header.closest(".test, .card");
     if (!el || !el.id) return;
@@ -346,7 +330,7 @@ function toggleTestAndHash(header) {
     }
 }
 
-// раскрытие теста/карты и всех родителей
+
 function expandTestAndParents(el) {
     if (!el) return;
 
@@ -368,12 +352,13 @@ function expandTestAndParents(el) {
     }
 }
 
+
 function resetAllBlocks() {
     document.querySelectorAll(".test-content, .content").forEach(c => c.classList.remove("active"));
     document.querySelectorAll(".test-header, .test-header-multi").forEach(h => h.classList.remove("expanded"));
 }
 
-// при загрузке страницы
+
 window.addEventListener("load", () => {
     const hash = location.hash.slice(1);
     if (hash) {
@@ -386,7 +371,7 @@ window.addEventListener("load", () => {
     }
 });
 
-// поддержка кнопок Назад/Вперед
+
 window.addEventListener("popstate", () => {
     const hash = location.hash.slice(1);
     if (event.state && event.state.openedId) {
