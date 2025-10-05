@@ -72,15 +72,15 @@ body {
 
     /* Status colors */
     --passed: #10B981;
-    --passed-bg: rgba(22, 163, 74, 0.1);
+    --passed-bg: rgba(22, 163, 74, 0.2);
     --passed-light: rgba(22, 163, 74, 0.4);
 
     --failed: #DC2626;
-    --failed-bg: rgba(220, 38, 38, 0.1);
+    --failed-bg: rgba(220, 38, 38, 0.2);
     --failed-light: rgba(220, 38, 38, 0.4);
 
     --broken: #D97706;
-    --broken-bg: rgba(217, 119, 6, 0.1);
+    --broken-bg: rgba(217, 119, 6, 0.2);
     --broken-light: rgba(217, 119, 6, 0.4);
 
     --skipped: #6B7280;
@@ -432,10 +432,10 @@ main::-webkit-scrollbar-thumb:hover {
   font-weight: 600;
   text-transform: uppercase;
 }
-.badge.passed { background: var(--passed-light); color: var(--passed); }
-.badge.failed { background: var(--failed-light); color: var(--failed); }
-.badge.broken { background: var(--broken-light); color: var(--broken); }
-.badge.skipped { background: var(--skipped-light); color: var(--skipped); }
+.badge.passed { background: var(--passed-bg); color: var(--passed); }
+.badge.failed { background: var(--failed-bg); color: var(--failed); }
+.badge.broken { background: var(--broken-bg); color: var(--broken); }
+.badge.skipped { background: var(--skipped-bg); color: var(--skipped); }
 .badge.print { background: var(--print-light); color: var(--print); }
 
 /* ===============================
