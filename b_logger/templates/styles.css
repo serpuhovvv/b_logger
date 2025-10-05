@@ -46,7 +46,7 @@ body {
 
     --skipped: #9CA3AF;
     --skipped-bg: rgba(156, 163, 175, 0.3);
-    --skipped-light: rgba(156, 163, 175, 0.3);
+    --skipped-light: rgba(156, 163, 175, 0.6);
 
     --print: #A78BFA;
     --print-bg: rgba(167, 139, 250, 0.15);
@@ -72,20 +72,20 @@ body {
 
     /* Status colors */
     --passed: #10B981;
-    --passed-bg: #ECFDF5;
-    --passed-light: #D1FAE5;
+    --passed-bg: rgba(22, 163, 74, 0.1);
+    --passed-light: rgba(22, 163, 74, 0.4);
 
-    --failed: #EF4444;
-    --failed-bg: #FEF2F2;
-    --failed-light: #FECACA;
+    --failed: #DC2626;
+    --failed-bg: rgba(220, 38, 38, 0.1);
+    --failed-light: rgba(220, 38, 38, 0.4);
 
-    --broken: #F59E0B;
-    --broken-bg: #FFFBEB;
-    --broken-light: #FEF3C7;
+    --broken: #D97706;
+    --broken-bg: rgba(217, 119, 6, 0.1);
+    --broken-light: rgba(217, 119, 6, 0.4);
 
     --skipped: #6B7280;
-    --skipped-bg: #F9FAFB;
-    --skipped-light: #F3F4F6;
+    --skipped-bg: rgba(107, 114, 128, 0.3);
+    --skipped-light: rgba(107, 114, 128, 0.5);
 
     --print: #8B5CF6;
     --print-bg: #F5F3FF;
@@ -326,9 +326,12 @@ main::-webkit-scrollbar-thumb:hover {
 .sidebar .filter-buttons .filter-btn.broken.active { border-color: var(--broken); }
 .sidebar .filter-buttons .filter-btn.skipped.active { border-color: var(--skipped); }
 
-.sidebar .filter-buttons .filter-btn:hover {
-    opacity: 0.7;
-}
+.sidebar .filter-buttons .filter-btn.passed:hover { background: var(--passed-light); }
+.sidebar .filter-buttons .filter-btn.failed:hover { background: var(--failed-light); }
+.sidebar .filter-buttons .filter-btn.broken:hover { background: var(--broken-light); }
+.sidebar .filter-buttons .filter-btn.skipped:hover { background: var(--skipped-light); }
+
+
 
 .sidebar .sort-buttons button { flex: 1 1 45%; }
 
