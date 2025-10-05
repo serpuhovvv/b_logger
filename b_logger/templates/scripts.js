@@ -1,12 +1,19 @@
+// ======================================================
+//  Filters
+// ======================================================
+
 function initFilters() {
     const searchInput  = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
     const moduleFilter = document.getElementById('moduleFilter');
+    const resetBtn     = document.getElementById("reset-filters");
 
+    // --- события фильтров ---
     searchInput?.addEventListener('input', filterTests);
     statusFilter?.addEventListener('change', filterTests);
     moduleFilter?.addEventListener('change', filterTests);
 
+    // Esc очищает поиск
     searchInput?.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             searchInput.value = '';
@@ -14,22 +21,21 @@ function initFilters() {
         }
     });
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            this.classList.toggle('active');
+    // фильтр-кнопки
+    document.querySelectorAll('.filter-btn').forEach(btn =>
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('active');
             filterTests();
-        });
-    });
+        })
+    );
 
-    document.getElementById("reset-filters").addEventListener("click", () => {
+    // сброс всех фильтров
+    resetBtn?.addEventListener("click", () => {
         searchInput.value = "";
-
         clearSelect(statusFilter);
         clearSelect(moduleFilter);
 
-        document.querySelectorAll(".filter-btn").forEach(btn => {
-            btn.classList.remove("active");
-        });
+        document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
         document.querySelector('.filter-btn[data-filter="all"]')?.classList.add("active");
 
         filterTests();
@@ -38,79 +44,65 @@ function initFilters() {
     filterTests();
 }
 
-
 function getSelectedValues(select) {
     if (!select) return [];
-    let values = [];
-    if (select.multiple) {
-        values = Array.from(select.selectedOptions).map(o => o.value);
-    } else {
-        if (select.value) values = [select.value];
-    }
+    const values = select.multiple
+        ? Array.from(select.selectedOptions).map(o => o.value)
+        : select.value ? [select.value] : [];
+
     return values
-        .map(v => (v ?? '').toString().trim())
+        .map(v => v.toString().trim())
         .filter(v => v && v.toLowerCase() !== 'all');
 }
-
 
 function clearSelect(select) {
     if (!select) return;
     if (select.multiple) {
-        Array.from(select.options).forEach(o => (o.selected = false));
+        Array.from(select.options).forEach(o => o.selected = false);
     } else {
         const hasAll = Array.from(select.options).some(o => o.value.toLowerCase() === 'all');
         select.value = hasAll ? 'all' : '';
     }
 }
 
-
 function normalizeStatus(s) {
     return (s ?? '').toString().trim().toUpperCase();
 }
 
-
 function matchesFilters(nameLC, statusRaw, moduleName, filters) {
     const statusU = normalizeStatus(statusRaw);
-    if (filters.search && !nameLC.includes(filters.search)) return false;
-    if (filters.status.length && !filters.status.includes(statusU)) return false;
-    if (filters.module.length && !filters.module.includes(moduleName)) return false;
-    if (filters.buttonStatuses.length && !filters.buttonStatuses.includes(statusU.toLowerCase())) return false;
-    return true;
+    return !(
+        (filters.search && !nameLC.includes(filters.search)) ||
+        (filters.status.length && !filters.status.includes(statusU)) ||
+        (filters.module.length && !filters.module.includes(moduleName)) ||
+        (filters.buttonStatuses.length && !filters.buttonStatuses.includes(statusU.toLowerCase()))
+    );
 }
-
 
 function filterTests() {
     const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
     const statusSelected = getSelectedValues(document.getElementById('statusFilter')).map(v => v.toUpperCase());
     const moduleSelected = getSelectedValues(document.getElementById('moduleFilter'));
     const activeButtons = Array.from(document.querySelectorAll('.filter-btn.active'))
-        .map(b => (b.dataset.filter || '').toLowerCase().trim())
+        .map(b => b.dataset.filter?.toLowerCase().trim())
         .filter(f => f && f !== 'all');
 
-    const filters = {
-        search,
-        status: statusSelected,
-        module: moduleSelected,
-        buttonStatuses: activeButtons
-    };
+    const filters = { search, status: statusSelected, module: moduleSelected, buttonStatuses: activeButtons };
 
-    const modules = document.querySelectorAll('.module');
     let modulesVisible = 0;
-
-    modules.forEach(moduleEl => {
+    document.querySelectorAll('.module').forEach(moduleEl => {
         const moduleName = moduleEl.dataset.module;
-        const tests = moduleEl.querySelectorAll('.test');
         let moduleHasVisible = false;
 
-        tests.forEach(test => {
-            const isGroup  = test.classList.contains('test-multi');
+        moduleEl.querySelectorAll('.test').forEach(test => {
             const testName = (test.dataset.test || '').toLowerCase();
+            const isGroup  = test.classList.contains('test-multi');
             let visible = false;
 
             if (isGroup) {
                 let subVisible = 0;
                 test.querySelectorAll('.test-sub').forEach(sub => {
-                    const subName   = (sub.dataset.test || '').toLowerCase();
+                    const subName = (sub.dataset.test || '').toLowerCase();
                     const subStatus = sub.dataset.status;
                     const show = matchesFilters(subName, subStatus, moduleName, filters);
                     sub.style.display = show ? 'block' : 'none';
@@ -118,8 +110,7 @@ function filterTests() {
                 });
                 visible = subVisible > 0;
             } else {
-                const testStatus = test.dataset.status;
-                visible = matchesFilters(testName, testStatus, moduleName, filters);
+                visible = matchesFilters(testName, test.dataset.status, moduleName, filters);
             }
 
             test.style.display = visible ? 'block' : 'none';
@@ -130,6 +121,7 @@ function filterTests() {
         if (moduleHasVisible) modulesVisible++;
     });
 
+    const main = document.querySelector('.main-content');
     let noResults = document.getElementById('noResults');
     if (modulesVisible === 0) {
         if (!noResults) {
@@ -137,18 +129,28 @@ function filterTests() {
             noResults.id = 'noResults';
             noResults.className = 'no-results';
             noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
-            document.querySelector('.main-content').appendChild(noResults);
+            main.appendChild(noResults);
         }
-    } else if (noResults) {
-        noResults.remove();
+    } else {
+        noResults?.remove();
     }
 }
 
 
+// ======================================================
+//  UI-Toggles
+// ======================================================
+
+function toggleBlock(header) {
+    const content = header.nextElementSibling;
+    if (!content) return;
+    content.classList.toggle('active');
+    header.classList.toggle('expanded');
+}
+
 function toggleStacktrace(el) {
     el.classList.toggle("expanded");
-    const body = el.nextElementSibling;
-    if (body) body.classList.toggle("active");
+    el.nextElementSibling?.classList.toggle("active");
 }
 
 function toggleStep(header) {
@@ -156,230 +158,195 @@ function toggleStep(header) {
     if (!step) return;
 
     const body = step.querySelector('.step-body');
-    if (!body) return;
-
     const content = step.querySelector('.step-content');
-
     const isActive = header.classList.contains('expanded');
-    body.classList.toggle('active', !isActive);
-    header.classList.toggle('expanded', !isActive);
-    content.classList.toggle('expanded', !isActive);
-    content.classList.toggle('active', !isActive);
-}
 
+    body?.classList.toggle('active', !isActive);
+    header.classList.toggle('expanded', !isActive);
+    content?.classList.toggle('expanded', !isActive);
+    content?.classList.toggle('active', !isActive);
+}
 
 function switchTab(btn, tabName) {
     const tabsContainer = btn.closest('.tabs');
-    const tabs = tabsContainer.querySelectorAll('.tab-btn');
-    const contents = tabsContainer.querySelectorAll('.tab-content');
+    if (!tabsContainer) return;
 
-    tabs.forEach(tab => tab.classList.remove('active'));
-    contents.forEach(content => content.classList.remove('active'));
+    tabsContainer.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+    tabsContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
     btn.classList.add('active');
-    const targetContent = tabsContainer.querySelector(`[data-tab="${tabName}"]`);
-    if (targetContent) targetContent.classList.add('active');
+    tabsContainer.querySelector(`[data-tab="${tabName}"]`)?.classList.add('active');
 }
 
-const modal = document.getElementById('attachmentModal');
-const title = document.getElementById('modalTitle');
-const image = document.getElementById('modalImage');
+
+// ======================================================
+//  Attachment Modal
+// ======================================================
+
+const modal          = document.getElementById('attachmentModal');
+const title          = document.getElementById('modalTitle');
+const image          = document.getElementById('modalImage');
 const imageContainer = document.getElementById('imageContainer');
-const textPreview = document.getElementById('modalText');
-const pdfContainer = document.getElementById('modalPDF');
-const download = document.getElementById('modalDownload');
+const textPreview    = document.getElementById('modalText');
+const pdfContainer   = document.getElementById('modalPDF');
+const download       = document.getElementById('modalDownload');
 
 let scale = 1;
 
-
 function openAttachment(name, type) {
-  const path = `./attachments/${name}`;
+    const path = `./attachments/${name}`;
 
-  // Reset state
-  scale = 1;
-  image.style.transform = 'scale(1)';
-  image.src = '';
-  pdfContainer.src = '';
-  textPreview.textContent = '';
-  [imageContainer, textPreview, pdfContainer, download].forEach(el => el.style.display = 'none');
+    // Сброс состояния
+    scale = 1;
+    [image, pdfContainer, textPreview].forEach(el => el.src = '');
+    [imageContainer, textPreview, pdfContainer, download].forEach(el => el.style.display = 'none');
+    image.style.transform = 'scale(1)';
+    title.textContent = name;
 
-  title.textContent = name;
+    if (type.startsWith('image/')) {
+        image.src = path;
+        imageContainer.style.display = 'block';
+    } else if (type === 'application/pdf') {
+        pdfContainer.src = path;
+        pdfContainer.style.display = 'block';
+    } else if (type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
+        fetch(path)
+            .then(res => res.text())
+            .then(text => {
+                textPreview.textContent = text;
+                textPreview.style.display = 'block';
+            })
+            .catch(() => {
+                textPreview.textContent = '[Ошибка загрузки текста]';
+                textPreview.style.display = 'block';
+            });
+    } else {
+        download.href = path;
+        download.style.display = 'inline-block';
+    }
 
-  if (type.startsWith('image/')) {
-    image.src = path;
-    imageContainer.style.display = 'block';
-
-  } else if (type === 'application/pdf') {
-    pdfContainer.src = path;
-    pdfContainer.style.display = 'block';
-
-  } else if (type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
-    fetch(path)
-      .then(res => res.text())
-      .then(text => {
-        textPreview.textContent = text;
-        textPreview.style.display = 'block';
-      })
-      .catch(() => {
-        textPreview.textContent = '[Ошибка загрузки текста]';
-        textPreview.style.display = 'block';
-      });
-
-  } else {
-    download.href = path;
-    download.style.display = 'inline-block';
-  }
-
-  modal.style.display = 'block';
+    modal.style.display = 'block';
 }
-
 
 function closeModal(event) {
-  if (event.target.id === 'attachmentModal' || event.target.classList.contains('close')) {
-    modal.style.display = 'none';
-  }
+    if (event.target.id === 'attachmentModal' || event.target.classList.contains('close')) {
+        modal.style.display = 'none';
+    }
 }
 
-// Zoom + drag
+// --- Zoom + Drag ---
 imageContainer.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  scale += e.deltaY * -0.001;
-  scale = Math.min(Math.max(scale, 0.5), 5);
-  image.style.transform = `scale(${scale})`;
+    e.preventDefault();
+    scale = Math.min(Math.max(scale + e.deltaY * -0.001, 0.5), 5);
+    image.style.transform = `scale(${scale})`;
 });
 
-let isDragging = false;
-let startX, startY, scrollLeft, scrollTop;
+let isDragging = false, startX, startY, scrollLeft, scrollTop;
 
-imageContainer.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  startX = e.pageX;
-  startY = e.pageY;
-  scrollLeft = imageContainer.scrollLeft;
-  scrollTop = imageContainer.scrollTop;
-  imageContainer.style.cursor = 'grabbing';
+imageContainer.addEventListener('mousedown', e => {
+    isDragging = true;
+    startX = e.pageX;
+    startY = e.pageY;
+    scrollLeft = imageContainer.scrollLeft;
+    scrollTop = imageContainer.scrollTop;
+    imageContainer.style.cursor = 'grabbing';
 });
 
-imageContainer.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  imageContainer.scrollLeft = scrollLeft - (e.pageX - startX);
-  imageContainer.scrollTop = scrollTop - (e.pageY - startY);
+imageContainer.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    imageContainer.scrollLeft = scrollLeft - (e.pageX - startX);
+    imageContainer.scrollTop  = scrollTop - (e.pageY - startY);
 });
 
 ['mouseup', 'mouseleave'].forEach(evt =>
-  imageContainer.addEventListener(evt, () => {
-    isDragging = false;
-    imageContainer.style.cursor = 'grab';
-  })
+    imageContainer.addEventListener(evt, () => {
+        isDragging = false;
+        imageContainer.style.cursor = 'grab';
+    })
 );
 
-document.addEventListener('DOMContentLoaded', function() {
-    initFilters();
-});
+
+// ======================================================
+//  Theme
+// ======================================================
 
 const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
-
 const savedTheme = localStorage.getItem("theme");
 
-if (savedTheme) {
-  root.setAttribute("data-theme", savedTheme);
-} else {
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  root.setAttribute("data-theme", prefersDark ? "dark" : "light");
-}
+root.setAttribute(
+    "data-theme",
+    savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+);
 
-
-themeToggle.addEventListener("click", () => {
-  const currentTheme = root.getAttribute("data-theme");
-  const newTheme = currentTheme === "dark" ? "light" : "dark";
-  root.setAttribute("data-theme", newTheme);
-  localStorage.setItem("theme", newTheme);
+themeToggle?.addEventListener("click", () => {
+    const newTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
 });
 
 
-function toggleTest(header) { toggleBlock(header); }
-function toggleCard(header) { toggleBlock(header); }
-function toggleTestRun(header) { toggleBlock(header); }
-
-
-function toggleBlock(header) {
-    const content = header.nextElementSibling;
-
-    if (!content) return;
-    content.classList.toggle('active');
-    header.classList.toggle('expanded');
-}
-
+// ======================================================
+//  Navigation
+// ======================================================
 
 function toggleTestAndHash(header) {
     const el = header.closest(".test, .card");
-    if (!el || !el.id) return;
+    if (!el?.id) return;
 
     const content = header.nextElementSibling;
     const isOpening = !content.classList.contains("active");
 
-    toggleBlock(header); // меняем состояние
+    toggleBlock(header);
 
-    if (isOpening) {
-        // открываем → добавляем хэш
-        history.pushState({ openedId: el.id }, "", `#${el.id}`);
-    } else {
-        // сворачиваем → убираем хэш
-        history.pushState({}, "", location.pathname + location.search);
-    }
+    history.pushState(
+        isOpening ? { openedId: el.id } : {},
+        "",
+        isOpening ? `#${el.id}` : location.pathname + location.search
+    );
 }
 
-
 function expandTestAndParents(el) {
-    if (!el) return;
-
     let current = el;
     while (current) {
-        const header = current.querySelector(
-            ":scope > .test-header, :scope > .test-header-multi, :scope > .header"
-        );
-        const content = current.querySelector(
-            ":scope > .test-content, :scope > .content"
-        );
-
-        if (header && content) {
-            content.classList.add("active");
-            header.classList.add("expanded");
-        }
-
+        const header = current.querySelector(":scope > .test-header, :scope > .test-header-multi, :scope > .header");
+        const content = current.querySelector(":scope > .test-content, :scope > .content");
+        header?.classList.add("expanded");
+        content?.classList.add("active");
         current = current.parentElement.closest(".test, .card");
     }
 }
-
 
 function resetAllBlocks() {
     document.querySelectorAll(".test-content, .content").forEach(c => c.classList.remove("active"));
     document.querySelectorAll(".test-header, .test-header-multi").forEach(h => h.classList.remove("expanded"));
 }
 
-
 window.addEventListener("load", () => {
     const hash = location.hash.slice(1);
-    if (hash) {
-        const el = document.getElementById(hash);
-        if (el) {
-            el.classList.add("highlight");
-            el.scrollIntoView({ behavior: "smooth" });
-            expandTestAndParents(el);
-        }
+    if (!hash) return;
+    const el = document.getElementById(hash);
+    if (el) {
+        el.classList.add("highlight");
+        el.scrollIntoView({ behavior: "smooth" });
+        expandTestAndParents(el);
+    }
+});
+
+window.addEventListener("popstate", event => {
+    const id = event.state?.openedId;
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add("highlight");
+        el.scrollIntoView({ behavior: "smooth" });
+        expandTestAndParents(el);
     }
 });
 
 
-window.addEventListener("popstate", () => {
-    const hash = location.hash.slice(1);
-    if (event.state && event.state.openedId) {
-        const el = document.getElementById(event.state.openedId);
-        if (el) {
-            el.classList.add("highlight");
-            el.scrollIntoView({ behavior: "smooth" });
-            expandTestAndParents(el);
-        }
-    }
-});
+// ======================================================
+//  Init
+// ======================================================
+
+document.addEventListener('DOMContentLoaded', initFilters);
