@@ -498,7 +498,7 @@ main::-webkit-scrollbar-thumb:hover {
 }
 .test.test-sub {
     margin: 0.75rem;
-    margin-left: 1rem;
+    margin-left: 1.75rem;
     margin-top: 0.15rem;
     margin-bottom: 0.15rem;
 }
