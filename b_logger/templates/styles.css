@@ -307,7 +307,7 @@ main::-webkit-scrollbar-thumb:hover {
 .sidebar .filter-buttons .filter-btn {
     color: var(--text);
 	padding: 0.5rem 1rem;
-	border: 1px solid;
+	border: 2px solid;
     border-radius: var(--radius-sm);
     border-color: var(--bg-card);
     font-size: 0.875rem;

@@ -18,7 +18,7 @@
 {% macro render_search_filter(report) %}
 <div class="search-filter">
     <div>
-        <img src="./static/icon.svg" alt="main-icon" class="main-icon" id="themeToggle"/>
+        <img src="./static/icon.svg" alt="main-icon" class="main-icon" id="themeToggle" title="Click to switch theme"/>
         <div class="search-container">
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Search tests...">
@@ -41,26 +41,27 @@
     </select>
 
     <div class="filter-buttons">
-        <button type="button" data-filter="all" class="filter-btn active hidden">All</button>
-        <button type="button" data-filter="passed" class="filter-btn passed">✓ Passed</button>
-        <button type="button" data-filter="failed" class="filter-btn failed">✗ Failed</button>
-        <button type="button" data-filter="broken" class="filter-btn broken">⚠ Broken</button>
-        <button type="button" data-filter="skipped" class="filter-btn skipped">→ Skipped</button>
-        <button type="button" id="reset-filters" class="reset-btn">Reset Filters</button>
+        <button type="button" class="filter-btn active hidden" data-filter="all">All</button>
+        <button type="button" class="filter-btn passed" data-filter="passed">✓ Passed</button>
+        <button type="button" class="filter-btn failed" data-filter="failed">✗ Failed</button>
+        <button type="button" class="filter-btn broken" data-filter="broken">⚠ Broken</button>
+        <button type="button" class="filter-btn skipped" data-filter="skipped">→ Skipped</button>
+        <button type="button" class="reset-btn" id="reset-filters">Reset Filters</button>
     </div>
 
     <div class="sort-buttons">
-        <button type="button" class="sort-btn active hidden" data-sort="default" >Default</button>
+        <button type="button" class="sort-btn active" data-sort="starttime_asc">Start Time ↑</button>
+        <button type="button" class="sort-btn" data-sort="starttime_desc">Start Time ↓</button>
         <button type="button" class="sort-btn" data-sort="name_asc">Name ↑</button>
         <button type="button" class="sort-btn" data-sort="name_desc">Name ↓</button>
         <button type="button" class="sort-btn" data-sort="duration_asc">Duration ↑</button>
         <button type="button" class="sort-btn" data-sort="duration_desc">Duration ↓</button>
         <button type="button" class="sort-btn" data-sort="status_asc">Status ↑</button>
         <button type="button" class="sort-btn" data-sort="status_desc">Status ↓</button>
-        <button type="button" id="reset-sorting" class="reset-btn">Reset Sorting</button>
+        <button type="button" class="reset-btn" id="reset-sorting">Reset Sorting</button>
     </div>
 
-    <button type="button" id="reset-expanded" class="reset-btn">Collapse / Expand All</button>
+    <button type="button" class="reset-btn" id="reset-expanded">Collapse / Expand All</button>
 </div>
 {% endmacro %}
 
@@ -201,8 +202,9 @@
     {% if test_runs|length == 1 %}
         {{ render_test_block(test_runs[0], steps) }}
     {% else %}
-        {% set ns = namespace(max_dur=0, has_failed=False, has_broken=False, has_skipped=False, has_passed=False) %}
+        {% set ns = namespace(max_dur=0, min_start=none, has_failed=False, has_broken=False, has_skipped=False, has_passed=False) %}
         {% for run in test_runs %}
+            {% set ns.min_start = run.start_time if ns.min_start is none else (run.start_time if run.start_time < ns.min_start else ns.min_start) %}
             {% set dur = (run.duration or 0) %}
             {% set ns.max_dur = dur if dur > ns.max_dur else ns.max_dur %}
             {% if run.status == 'FAILED' %}{% set ns.has_failed = True %}{% endif %}
@@ -221,7 +223,8 @@
             {% set agg_status = 'PASSED' %}
         {% endif %}
 
-        <div class="test test-multi" data-test="{{ test_name }}" data-status="{{ agg_status }}" data-duration="{{ ns.max_dur }}">
+        <div class="test test-multi" data-test="{{ test_name }}" data-status="{{ agg_status }}"
+            data-start-time="{{ ns.min_start }}" data-duration="{{ ns.max_dur }}">
             <div class="test-header-multi">
                 <div class="test-info">
                     <div class="test-results">
@@ -247,7 +250,8 @@
 {% set sub_class = "test-sub" if is_sub else "" %}
 {% set test_id = "test_" ~ (test_run.name|replace(" ", "_")) %}
 <div id="{{ test_id }}" class="test {{ sub_class }} {{ test_run.status.lower() }}"
-    data-test="{{ test_run.name }}" data-status="{{ test_run.status }}" data-duration="{{ test_run.duration or 0 }}">
+    data-test="{{ test_run.name }}" data-status="{{ test_run.status }}"
+    data-start-time="{{ test_run.start_time }}" data-duration="{{ test_run.duration or 0 }}">
     <div class="test-header" onclick="toggleTestAndHash(this)">
         {{ render_test_header(test_run) }}
     </div>

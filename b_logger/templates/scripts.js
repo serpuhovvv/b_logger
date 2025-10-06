@@ -63,7 +63,7 @@ function initPage() {
 
     resetSorting?.addEventListener("click", () => {
         sortBtns.forEach(b => toggleClass(b, "active", false));
-        toggleClass(document.querySelector('.sort-btn[data-sort="name_asc"]'), "active", true);
+        toggleClass(document.querySelector('.sort-btn[data-sort="starttime_asc"]'), "active", true);
 
         saveSort();
         filterTests();
@@ -142,15 +142,20 @@ function restoreFilters() {
 }
 
 function saveSort() {
-    const active = getElBySelector('.sort-btn.active')?.dataset.sort || '';
+    const active = getElBySelector('.sort-btn.active')?.dataset.sort || 'starttime_asc';
     saveToStorage("sort", active);
 }
 
 function restoreSort() {
-    const sortValue = loadFromStorage("sort", "name_asc");
+    const sortValue = loadFromStorage("sort", "starttime_asc");
     getAll('.sort-btn').forEach(b => b.classList.remove("active"));
     const btn = getElBySelector(`.sort-btn[data-sort="${sortValue}"]`);
-    if (btn) btn.classList.add("active");
+    if (btn) {
+        btn.classList.add("active");
+    } else {
+        const def = getElBySelector(`.sort-btn[data-sort="starttime_asc"]`);
+        if (def) def.classList.add("active");
+    }
 }
 
 // ======================================================
@@ -192,10 +197,15 @@ function matchesFilters(nameLC, statusRaw, moduleName, filters) {
 
 function getSortOptions() {
     const activeBtn = getElBySelector('.sort-btn.active');
-    if (!activeBtn) return { field: 'name', order: 'asc' };
-    const ds = (activeBtn.dataset.sort || 'none').toString();
-    if (!ds || ds === 'none') return { field: 'name', order: 'asc' };
+    if (!activeBtn)
+        return { field: 'starttime', order: 'asc' };
+
+    const ds = (activeBtn.dataset.sort || 'start_time_asc').toString();
+    if (!ds || ds === 'none')
+        return { field: 'starttime', order: 'asc' };
+
     const [field, order] = ds.split('_');
+
     return { field, order: order === 'desc' ? 'desc' : 'asc' };
 }
 
@@ -205,6 +215,10 @@ function compareTests(a, b, field, order = 'asc') {
         case 'name':
             valA = (a.dataset.test || '').toLowerCase();
             valB = (b.dataset.test || '').toLowerCase();
+            break;
+        case 'starttime':
+            valA = Number(a.dataset.startTime);
+            valB = Number(b.dataset.startTime);
             break;
         case 'duration':
             valA = parseFloat(a.dataset.duration || '0') || 0;
@@ -244,17 +258,26 @@ function filterTests() {
         const container = getElBySelector('.tests-list', moduleEl);
         if (!container) return;
 
-        const topTests = getAll(':scope > .test', container);
+        const allTests = getAll(':scope > .test', container);
 
-        // 1) сортировка
-        if(sortField){
-            topTests.sort((a,b)=>compareTests(a,b,sortField,sortOrder));
-            topTests.forEach(t=>container.appendChild(t));
+        // 1) sorting
+        if (sortField) {
+            allTests.sort((a, b) => compareTests(a, b, sortField, sortOrder));
+            allTests.forEach(t => container.appendChild(t));
         }
 
-        // 2) фильтры
+        // 2) sorting test-multi
+        allTests.forEach(test => {
+            if (test.classList.contains('test-multi')) {
+                const subTests = getAll('.test-sub', test);
+                subTests.sort((a, b) => compareTests(a, b, sortField, sortOrder));
+                subTests.forEach(sub => test.appendChild(sub));
+            }
+        });
+
+        // 2) filters
         let moduleHasVisible = false;
-        topTests.forEach(test => {
+        allTests.forEach(test => {
             const isGroup = test.classList.contains('test-multi');
             const testName = (test.dataset.test||'').toLowerCase();
             let visible = false;
@@ -273,12 +296,15 @@ function filterTests() {
                 visible = matchesFilters(testName, test.dataset.status, moduleName, filters);
             }
 
-            test.style.display = visible?'block':'none';
-            if(visible) moduleHasVisible = true;
+            test.style.display = visible ? 'block' : 'none';
+            if (visible) moduleHasVisible = true;
         });
 
         toggleClass(moduleEl, 'hidden', !moduleHasVisible);
         if(moduleHasVisible) modulesVisible++;
+
+        moduleEl.style.display = moduleHasVisible ? 'block' : 'none';
+        if (moduleHasVisible) modulesVisible++;
     });
 
     // no results

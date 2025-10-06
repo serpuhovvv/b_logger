@@ -1,3 +1,4 @@
+import time
 import uuid
 from typing import Any
 
@@ -32,6 +33,7 @@ class TestReport(BaseDataModel):
         self.name: str = name
         self.originalname: str = originalname
         self.status: TestStatus = TestStatus.NONE
+        self.start_time = round(time.time(), 4)
         self.duration: float | None = None
         self.description: str | None = None
         self.info = {}
