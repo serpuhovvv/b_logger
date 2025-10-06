@@ -452,7 +452,7 @@ main::-webkit-scrollbar-thumb:hover {
 .test {
   border-left: 4px solid;
   border-radius: var(--radius);
-  margin-bottom: 0.1rem;
+  margin-bottom: 0rem;
 }
 
 .test.passed { border-left-color: var(--passed); }
@@ -465,17 +465,17 @@ main::-webkit-scrollbar-thumb:hover {
     background: var(--bg-card);
     padding: 0.5rem;
     padding-left: 0.75rem;
-    border-radius: 7px var(--radius) var(--radius) 7px;
+    border-radius: var(--radius);
     align-items: center;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 .test-header:hover {
-    border-radius: var(--radius)
+    border-radius: 10px var(--radius) var(--radius) 10px;
 }
 .test-header.expanded {
     background: var(--bg-accent);
-    border-radius: 7px var(--radius) 0px 0px;
+    border-radius: 10px var(--radius) 0px 0px;
 }
 
 .test-name { font-weight: 600; }
@@ -484,8 +484,8 @@ main::-webkit-scrollbar-thumb:hover {
     border-left: none;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0);
-    margin-top: 0.1rem;
-    margin-bottom: 0.1rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
 }
 .test-header-multi {
     display: flex;
@@ -498,8 +498,8 @@ main::-webkit-scrollbar-thumb:hover {
 .test.test-sub {
     margin: 0.75rem;
     margin-left: 1rem;
-    margin-top: 0.1rem;
-    margin-bottom: 0.1rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
 }
 
 /* Test info band */
