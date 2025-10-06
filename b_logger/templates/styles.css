@@ -610,6 +610,23 @@ main::-webkit-scrollbar-thumb:hover {
     font-weight: 550;
     overflow-x: auto;
     white-space: pre-wrap;
+    tab-size: 4;
+    position: relative;
+
+    background-image:
+        repeating-linear-gradient(
+            to right,
+            rgba(101, 101, 101, 0.1) 0 2px,
+            transparent 2px 1.9rem
+        ),
+        repeating-linear-gradient(
+            to bottom,
+            rgba(101, 101, 101, 0.1) 0 2px,
+            transparent 2px 1.22rem
+        );
+
+    background-size: 1.9rem 100%, 100% 2.44rem;
+    background-repeat: repeat, repeat;
 }
 
 .no-results { text-align: center; padding: 3rem; color: var(--text-muted); }

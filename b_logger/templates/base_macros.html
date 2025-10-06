@@ -510,23 +510,6 @@
 
 
 {% macro render_error(exc, stacktrace, attachments=None) %}
-<div class="error-section">
-    <div class="error-message">{{ exc | escape }}</div>
-    {% if stacktrace %}
-    <div class="card">
-        <div class="header" onclick="toggleBlock(this)">
-            <h4>
-                Stacktrace
-                <i class="fas fa-chevron-down toggle-icon"></i>
-            </h4>
-        </div>
-        <div class="content">
-            <pre class="stacktrace">{{ stacktrace | escape }}</pre>
-        </div>
-    </div>
-    {% endif %}
-</div>
-
 {% if attachments %}
     {% set ns = namespace(items=[]) %}
     {% for attachment in attachments %}
@@ -546,4 +529,21 @@
     </div>
     {% endif %}
 {% endif %}
+
+<div class="error-section">
+    <div class="error-message">{{ exc | escape }}</div>
+    {% if stacktrace %}
+    <div class="card">
+        <div class="header" onclick="toggleBlock(this)">
+            <h4>
+                Stacktrace
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </h4>
+        </div>
+        <div class="content">
+            <pre class="stacktrace">{{ stacktrace | escape }}</pre>
+        </div>
+    </div>
+    {% endif %}
+</div>
 {% endmacro %}
