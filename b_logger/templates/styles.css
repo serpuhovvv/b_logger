@@ -454,7 +454,7 @@ main::-webkit-scrollbar-thumb:hover {
   border-left: 4px solid;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.15rem;
 }
 
 .test.passed { border-left-color: var(--passed); }
@@ -472,6 +472,9 @@ main::-webkit-scrollbar-thumb:hover {
     cursor: pointer;
     transition: all 0.2s ease;
 }
+.test-header:hover {
+    border-radius: var(--radius)
+}
 .test-header.expanded {
     background: var(--bg-accent);
     border-radius: 7px var(--radius) 0px 0px;
@@ -481,6 +484,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .test.test-multi {
     border-left: none;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0);
 }
 .test-header-multi {
@@ -494,7 +498,8 @@ main::-webkit-scrollbar-thumb:hover {
 .test.test-sub {
     margin: 0.75rem;
     margin-left: 1rem;
-    margin-top: 0.5rem;
+    margin-top: 0.15rem;
+    margin-bottom: 0.15rem;
 }
 
 /* Test info band */

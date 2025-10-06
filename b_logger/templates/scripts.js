@@ -404,14 +404,14 @@ function toggleTestAndHash(header){
 
 function updateExpandedState(id,isOpen){
     let state = {};
-    try { state = JSON.parse(localStorage.getItem("expandedTests") || "{}"); } catch {}
+    try { state = loadFromStorage("expandedTests", {}); } catch {}
     state[id] = isOpen;
-    localStorage.setItem("expandedTests", JSON.stringify(state));
+    saveToStorage("expandedTests", state)
 }
 
 function restoreExpandedState(){
     let state = {};
-    try { state = JSON.parse(localStorage.getItem("expandedTests") || "{}"); } catch {}
+    try { state = loadFromStorage("expandedTests", {}); } catch {}
     Object.keys(state).forEach(id => {
         const el = getElById(id);
         if(!el) return;
@@ -441,7 +441,7 @@ function expandTestAndParents(el){
 function resetAllBlocks(){
     getAll(".test-content").forEach(c => toggleClass(c, "active", false));
     getAll(".test-header").forEach(h => toggleClass(h, "expanded", false));
-    localStorage.removeItem("expandedTests");
+    sessionStorage.removeItem("expandedTests");
 }
 
 // ===================== HASH HANDLING =====================
@@ -577,7 +577,7 @@ if (imageContainer) {
 
 const root = document.documentElement;
 const themeToggle = getElById("themeToggle");
-const savedTheme = localStorage.getItem("theme");
+const savedTheme = loadFromStorage("theme");
 
 if (root) {
     root.setAttribute(
@@ -590,7 +590,7 @@ themeToggle?.addEventListener("click", () => {
     const current = root.getAttribute("data-theme");
     const next = current === "dark" ? "light" : "dark";
     root.setAttribute("data-theme", next);
-    localStorage.setItem("theme", next);
+    saveToStorage("theme", next);
 });
 
 
@@ -616,10 +616,10 @@ function toggleClass(el, className, force) {
 }
 
 function saveToStorage(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+    sessionStorage.setItem(key, JSON.stringify(value));
 }
 
 function loadFromStorage(key, defaultValue = null) {
-    const data = localStorage.getItem(key);
+    const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : defaultValue;
 }
