@@ -21,9 +21,12 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 ### Sample Report
 [Download sample_b_logs.zip](readme_content/sample_b_logs.zip)
 ### blog_report.html
+Click on main icon (pepper) to switch themes
+
 ![img.png](readme_content/report_overview_1.png)
 ![img.png](readme_content/report_overview_2.png)
 ![img.png](readme_content/report_overview_3.png)
+![img.png](readme_content/report_overview_4.png)
 ### blog_summary.html
 ![img.png](readme_content/summary_overview.png)
 
