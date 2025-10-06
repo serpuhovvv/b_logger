@@ -497,7 +497,7 @@ main::-webkit-scrollbar-thumb:hover {
     background: var(--bg-card);
 }
 .test.test-sub {
-    margin-left: 0.5rem;
+    margin-left: 0.75rem;
     margin-right: 0.5rem;
 }
 
