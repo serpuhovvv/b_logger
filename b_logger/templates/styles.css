@@ -483,13 +483,12 @@ main::-webkit-scrollbar-thumb:hover {
 .test.test-multi {
     border-left: none;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0);
     margin-top: 0rem;
     margin-bottom: 0rem;
 }
 .test-header-multi {
     display: flex;
-    padding: 0.75rem;
+    padding: 0.5rem;
     padding-left: 1rem;
     border-radius: var(--radius);
     align-items: center;
