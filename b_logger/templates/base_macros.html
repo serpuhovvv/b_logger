@@ -227,10 +227,10 @@
             data-start-time="{{ ns.min_start }}" data-duration="{{ ns.max_dur }}">
             <div class="test-header-multi">
                 <div class="test-info">
+                    <span class="test-name">{{ test_name }}</span>
                     <div class="test-results">
                         {{ render_status_summary(test_runs) }}
                     </div>
-                    <span class="test-name">{{ test_name }}</span>
                 </div>
             </div>
 

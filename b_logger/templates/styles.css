@@ -28,6 +28,7 @@ body {
 
     /* Misc */
     --shadow: 0px 0px 4px rgba(180, 180, 180, 0.4);
+    --shadow-test: 0px 0px 2px rgba(180, 180, 180, 0.5);
     --radius: 12px;
     --radius-sm: 6px;
 
@@ -67,6 +68,7 @@ body {
 
     /* Misc */
     --shadow: 0px 0px 4px rgba(32, 32, 32, 0.4);
+    --shadow-test: 0px 0px 2px rgba(32, 32, 32, 0.5);
     --radius: 10px;
     --radius-sm: 5px;
 
@@ -450,9 +452,11 @@ main::-webkit-scrollbar-thumb:hover {
    TESTS
 ================================= */
 .test {
-  border-left: 4px solid;
-  border-radius: var(--radius);
-  margin-bottom: 0rem;
+    border-left: 3px solid;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-test);
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .test.passed { border-left-color: var(--passed); }
@@ -463,7 +467,7 @@ main::-webkit-scrollbar-thumb:hover {
 .test-header {
     display: flex;
     background: var(--bg-card);
-    padding: 0.5rem;
+    padding: 0.4rem;
     padding-left: 0.75rem;
     border-radius: var(--radius);
     align-items: center;
@@ -482,23 +486,19 @@ main::-webkit-scrollbar-thumb:hover {
 
 .test.test-multi {
     border-left: none;
-    padding-bottom: 0.5rem;
-    margin-top: 0rem;
-    margin-bottom: 0rem;
+    padding: 0.25rem;
 }
 .test-header-multi {
     display: flex;
-    padding: 0.5rem;
-    padding-left: 1rem;
+    padding: 0.25rem;
+    padding-left: 0.75rem;
     border-radius: var(--radius);
     align-items: center;
     background: var(--bg-card);
 }
 .test.test-sub {
-    margin: 0.75rem;
-    margin-left: 1rem;
-    margin-top: 0rem;
-    margin-bottom: 0rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 /* Test info band */
@@ -542,7 +542,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .tab-content {
 	display: none;
-	padding: 0.75rem;
+	padding: 1rem;
 }
 
 .tab-content.active {
@@ -641,10 +641,10 @@ main::-webkit-scrollbar-thumb:hover {
 ================================= */
 .steps { margin: 0.5rem 0; }
 .step {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   border-radius: var(--radius);
   border-left: 3px solid;
-  padding-left: 1.25rem;
+  padding-left: 1rem;
   margin-left: calc(var(--level, 0) * 1rem);
 }
 .step.print { padding: 0.5rem; background: var(--print-bg); border-left: 3px solid var(--print); border-top: none; }
@@ -654,7 +654,8 @@ main::-webkit-scrollbar-thumb:hover {
 .step.skipped { border-left-color: var(--skipped); border-top-color: var(--skipped); }
 
 .step-header {
-    padding: 0.5rem;
+    padding: 0.25rem;
+    padding-left: 0.5rem;
     background: var(--bg-accent);
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -664,7 +665,8 @@ main::-webkit-scrollbar-thumb:hover {
     transition: all 0.2s ease;
 }
 .step-header-no-addons {
-    padding: 0.5rem;
+    padding: 0.25rem;
+    padding-left: 0.5rem;
     background: var(--bg-accent);
     border-radius: var(--radius-sm);
     display: flex;
