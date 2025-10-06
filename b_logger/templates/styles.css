@@ -233,7 +233,7 @@ main::-webkit-scrollbar-thumb:hover {
 .sidebar .search-filter {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
   margin: 1rem;
   padding: 1rem;
   background: var(--bg-card);
@@ -300,7 +300,7 @@ main::-webkit-scrollbar-thumb:hover {
     font-weight: 600;
 }
 
-.sidebar .filter-buttons, .sort-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 1rem; }
+.sidebar .filter-buttons, .sort-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 0.5rem; }
 
 .sidebar .filter-buttons button { flex: 1 1 45%; }
 
@@ -330,7 +330,6 @@ main::-webkit-scrollbar-thumb:hover {
 .sidebar .filter-buttons .filter-btn.failed:hover { background: var(--failed-light); }
 .sidebar .filter-buttons .filter-btn.broken:hover { background: var(--broken-light); }
 .sidebar .filter-buttons .filter-btn.skipped:hover { background: var(--skipped-light); }
-
 
 
 .sidebar .sort-buttons button { flex: 1 1 45%; }
@@ -486,10 +485,12 @@ main::-webkit-scrollbar-thumb:hover {
     border-left: none;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0);
+    margin-top: 0.15rem;
+    margin-bottom: 0.15rem;
 }
 .test-header-multi {
     display: flex;
-    padding: 0.5rem;
+    padding: 0.75rem;
     padding-left: 1rem;
     border-radius: var(--radius);
     align-items: center;
