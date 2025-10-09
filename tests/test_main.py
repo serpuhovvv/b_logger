@@ -13,12 +13,12 @@ blog.set_base_url('https://base-url.url')
 @pytest.fixture()
 def some_fixture():
     with blog.step('aaa'):
-        pass
+        blog.print('aaa')
 
     yield
 
     with blog.step('bbb'):
-        pass
+        blog.print('bbb')
 
 
 @blog.description(

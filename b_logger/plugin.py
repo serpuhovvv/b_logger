@@ -135,17 +135,18 @@ def pytest_runtest_makereport(call, item):
 
     report = (yield).get_result()
 
-    if call.when not in ["setup", "call"]:
-        return
+    if call.when in ["setup", "call"]:
 
-    runtime.process_test_result(report, call, item)
+        runtime.process_test_result(report, call, item)
 
-    if report.when == 'setup' and report.outcome == 'passed':
-        return
+        if report.when == 'setup' and report.outcome == 'passed':
+            return
 
-    _apply_py_output(report)
+        runtime.process_test_status(report, call, item)
 
-    runtime.process_test_status(report, call, item)
+    if call.when in ["teardown"]:
+
+        _apply_py_output(report)
 
 
 def _apply_py_params(item):

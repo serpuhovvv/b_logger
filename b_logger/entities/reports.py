@@ -11,7 +11,7 @@ from b_logger.entities.statuses import TestStatus
 from b_logger.entities.tests import TestReport
 from b_logger.entities.steps import StepContainer
 from b_logger.utils.basedatamodel import BaseDataModel
-from b_logger.utils.paths import b_logs_path, b_logs_tmp_path, b_logs_tmp_steps_path, b_logs_tmp_reports_path
+from b_logger.utils.paths import b_logs_tmp_steps_path, b_logs_tmp_reports_path
 
 
 class RunResults(BaseDataModel):
@@ -36,7 +36,7 @@ class RunReport(BaseDataModel):
         self.base_url = blog_config.base_url
         self.env = blog_config.env
         self.worker = None
-        self.start_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.end_time = None
         self.duration = None
         self.report_ids = {}
@@ -58,7 +58,7 @@ class RunReport(BaseDataModel):
         self.worker = worker
 
     def set_end_time(self):
-        self.end_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        self.end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def count_duration(self):
         if isinstance(self.start_time, str) or isinstance(self.end_time, str):
