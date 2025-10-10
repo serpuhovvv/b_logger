@@ -31,7 +31,7 @@ class StepStatus(str, Enum):
 class StepError(BaseDataModel):
     def __init__(self, exc, tb=None):
         self.exc = format_exc(exc)
-        self.tb = tb or format_tb(traceback.format_exc(4))
+        self.tb = format_tb(tb) or format_tb(traceback.format_exc(4))
 
 
 class Step(BaseDataModel):

@@ -1,14 +1,6 @@
 import uuid
-from enum import Enum
 
 from b_logger.utils.basedatamodel import BaseDataModel
-
-
-# class PrintStatus(str, Enum):
-#     PASSED = 'passed'
-#     FAILED = 'failed'
-#     WARNING = 'warning'
-#     NONE = 'none'
 
 
 class Print(BaseDataModel):

@@ -7,6 +7,5 @@ def format_tb(tb):
     tb = ('\n' +
           str(tb)
           .partition('Stacktrace')[0]
-          # .partition('Other element would receive the click:')[0]
           + '\n')
     return tb

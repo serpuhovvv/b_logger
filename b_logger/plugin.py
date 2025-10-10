@@ -146,14 +146,19 @@ def pytest_runtest_makereport(call, item):
 
     if call.when in ["teardown"]:
 
+        runtime.apply_integrations()
+
         _apply_py_output(report)
 
 
 def _apply_py_params(item):
     if hasattr(item, "callspec"):
-        params = item.callspec.params
-        for param_name, param_value in params.items():
-            runtime.apply_info(parameters={param_name: param_value})
+        params = {}
+        py_params = item.callspec.params
+        for param_name, param_value in py_params.items():
+            params[param_name] = param_value
+
+        runtime.apply_info(parameters=params)
 
 
 def _apply_py_fixtures(item):

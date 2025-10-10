@@ -1,6 +1,5 @@
 import json
 import traceback
-from datetime import datetime
 from pathlib import Path
 from typing import Union, BinaryIO
 
@@ -12,12 +11,6 @@ from b_logger.entities.steps import Step, StepStatus, StepError, StepContainer
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.integrations import Integrations
 from b_logger.utils.browser_adapters import get_browser_adapter
-from b_logger.utils.formatters import format_tb
-from b_logger.utils.paths import attachments_path
-
-
-class TestRun:
-    pass
 
 
 class RunTime:
@@ -119,7 +112,7 @@ class RunTime:
             if not self.step_container.failed:
                 self.make_step_err_scr(step)
 
-                step.set_error(StepError(exc, format_tb(traceback.format_exc(4))))
+                step.set_error(StepError(exc, traceback.format_exc(4)))
 
                 self.step_container.failed = True
 
@@ -199,8 +192,6 @@ class RunTime:
 
         self.test_report.add_known_bug(bug)
 
-        Integrations.link(bug.get('url'), bug.get('description'))
-
     def print_message(self, message):
         if isinstance(message, (dict, list)):
             data = json.dumps(message, indent=2, ensure_ascii=False)
@@ -248,6 +239,7 @@ class RunTime:
         if self.browser:
             adapter = get_browser_adapter(self.browser)
             screenshot_bytes = adapter.make_screenshot()
+
             if isinstance(screenshot_bytes, list):
                 for scr in screenshot_bytes:
                     step.add_attachment(Attachment(scr))
@@ -264,4 +256,14 @@ class RunTime:
 
         self.test_report.add_attachment(attachment)
 
-        Integrations.attach(content, attachment.name, attachment.type_)
+        if name not in ['stdout', 'stderr', 'log']:
+            Integrations.attach(content, attachment.name, attachment.type_)
+
+    def apply_integrations(self):
+        i = self.test_report.info
+        if i:
+            Integrations.attach(json.dumps(i, indent=4), 'blog_info', 'text/html')
+
+        kb = self.test_report.known_bugs
+        if kb:
+            Integrations.attach(json.dumps(kb, indent=4), 'blog_known_bugs', 'text/html')

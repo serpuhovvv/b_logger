@@ -43,9 +43,10 @@ class BLogger:
         """
         Set browser in a browser init fixture or in a test
 
-        If browser init fixture name is in
-            ["driver", "page", "selenium_driver", "driver_init", "playwright_page"]
-        then it will be detected automatically
+        If browser init fixture name is "driver", "page", "selenium_driver", "driver_init", "playwright_page"
+            then it will be detected and applied automatically.
+
+        If browser is set it will also automatically make error screenshots on test fails and attach them to current step and error info.
 
         Usage:
             @pytest.fixture()
@@ -93,8 +94,9 @@ class BLogger:
         Will be added to the Overview Tab and Current Step
 
         Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)
-            k is a name of an info block
-            v supports any data type, but {} is most readable and convenient
+
+        k is a name of an info block
+        v supports any data type, but {} is most readable and convenient
 
         Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
 
@@ -123,8 +125,9 @@ class BLogger:
         Will be added to the Overview Tab and Current Step
 
         Can be used as marker @blog.link(k=v) as well as function blog.link(k=v)
-            k is a name of a link
-            v is a URL
+
+        k is a name of a link
+        v is a URL
 
         Any amount of links is allowed: @blog.link(k=v, k=v, k=v, ...)
 
@@ -147,21 +150,15 @@ class BLogger:
         Will be added to the Overview Tab and Current Step
 
         Usage:
-            @blog.known_bug(                            <-- Will be added for a Test
-                'Test Bug 1',
-                'https://link-to-your-bug/1.com'
+            @blog.known_bug(
+                'https://link-to-your-bug/1.com',
+                'Test Bug 1'
             )
             def test_main_functionality():
-                blog.known_bug(                         <-- Will be added for a Test
-                    'Test Bug 2',
-                    'https://link-to-your-bug/2.com'
-                )
+                blog.known_bug(description='Test Bug 2')
 
-                with blog.step('Step Title'):           <-- Will be added for a Test and a Step
-                    blog.known_bug(
-                        'Step Bug',
-                        'https://link-to-your-bug/3.com'
-                    )
+                with blog.step('Step Title'):
+                    blog.known_bug('https://link-to-your-bug/3.com')
         """
         runtime.apply_known_bug(url, description)
 
@@ -171,6 +168,11 @@ class BLogger:
     @contextmanager
     def step(title: str, expected: str = None):
         """
+        Wrap a code block into a step.
+        Will be displayed in Setup, Steps and Teardown blocks depending on a test stage.
+
+        Info, Known Bugs, Links, Screenshots, Prints, Attachments will be added to a current step if made inside a step context.
+
         Usage:
             with blog.step('Step Title', 'Expected Result'):
                 ...
@@ -196,7 +198,7 @@ class BLogger:
     def print(data):
         """
         Print any message (str, dict, list, object, etc.)
-        Will be added to a Current Step
+        Will be added to a Current Step and stdout.txt
 
         Usage:
             data = {"a": 1, "b": 2}
@@ -211,9 +213,11 @@ class BLogger:
     def screenshot(name: str = None, is_error: bool = False):
         """
         Make screenshot
-        Will be added to the Attachments Tab and Current Step
 
+        Will be added to the Attachments Tab and Current Step
         Will do nothing if no browser is used
+
+        is_error flag adds "err_scr_" prefix to a scr name
 
         Usage:
             blog.screenshot('scr_name')
@@ -229,5 +233,7 @@ class BLogger:
 
         Usage:
             blog.attach({"a": 1, "b": 2}, 'some_data')
+            blog.attach(Path('path_to_your_file'))
+            blog.attach('Any text')
         """
         runtime.attach(content, name)

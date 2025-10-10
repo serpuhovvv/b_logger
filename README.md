@@ -286,7 +286,7 @@ Make screenshot
 Will be added to the Attachments Tab and Current Step \
 Will do nothing if no browser is used
 
-is_error flag adds "err_scr_" pre fix to a scr name
+is_error flag adds "err_scr_" prefix to a scr name
 
 ```python
 from b_logger import blog

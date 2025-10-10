@@ -3,8 +3,8 @@ class BlogPyAddons:
 
     @staticmethod
     def add_blog_options(parser, group):
-        group.addoption('--blog_base_url', default=None, action='store', help='')
-        group.addoption('--blog_env', default=None, action='store', help='')
+        group.addoption('--blog_base_url', default=None, action='store', help='Set base_url for the entire Run')
+        group.addoption('--blog_env', default=None, action='store', help='Set env for the entire Run')
 
     @staticmethod
     def add_blog_markers(config):

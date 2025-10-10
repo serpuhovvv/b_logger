@@ -35,7 +35,7 @@ def some_fixture():
 )
 @blog.known_bug(
     'https://link-to-your-bug/1.com',
-    'Known Bug Description or Name'
+    'Test Bug 1'
 )
 def test_main_functionality(some_fixture):
     blog.description('This description will also be added')
@@ -43,8 +43,6 @@ def test_main_functionality(some_fixture):
     with blog.step('Step 1', 'Step is expected to pass'):
         data = {"a": 1, "b": 2}
         blog.print(f'Some data: {data}')
-
-        blog.link(third_link='http://ccc.com')
 
         with blog.step('Step 1.1'):
             step_param_1 = random.randint(1, 100)
@@ -56,12 +54,11 @@ def test_main_functionality(some_fixture):
             )
 
     with blog.step('Step 2'):
-        blog.known_bug('https://link-to-your-bug/2.com',
-                       # 'Known Bug for a step'
-                       )
+        blog.link(third_link='http://ccc.com')
 
         with blog.step('Step 2.1'):
-            pass
+            blog.known_bug(description='Test Bug 2')
+            blog.known_bug('https://link-to-your-bug/3.com')
 
             with blog.step('Step 2.11'):
                 pass
