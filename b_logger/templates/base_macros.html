@@ -390,7 +390,9 @@
     <div class="bug-grid">
     {% for bug in known_bugs %}
         <div class="bug-item">
-            <a href="{{ bug.url }}" target="_blank">View Bug Report</a>
+            {% if bug.url %}
+            <a href="{{ bug.url }}" target="_blank" title="{{ bug.url }}">View Bug Report</a>
+            {% endif %}
             {% if bug.description %}
             <div class="bug-desc">{{ bug.description }}</div>
             {% endif %}

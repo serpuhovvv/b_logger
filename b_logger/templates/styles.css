@@ -578,8 +578,17 @@ main::-webkit-scrollbar-thumb:hover {
 ================================= */
 .bug-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
 .bug-item { background: var(--failed-bg); padding: 1rem; border-radius: var(--radius-sm); }
-.bug-desc { font-size: 1rem; color: var(--failed); }
-.bug-item a { font-size: 1rem; color: var(--failed); }
+.bug-desc {
+    font-size: 0.875rem;
+    color: var(--failed);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+.bug-item a {
+    font-size: 0.875rem;
+    color: var(--failed);
+}
 
 .error-icon { color: var(--failed); font-size: 0.875rem; }
 
