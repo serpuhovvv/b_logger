@@ -473,7 +473,7 @@ main::-webkit-scrollbar-thumb:hover {
 .test-header {
     display: flex;
     background: var(--bg-card);
-    padding: 0.4rem;
+    padding: 0.25rem;
     padding-left: 0.75rem;
     border-radius: var(--radius);
     align-items: center;
@@ -488,6 +488,30 @@ main::-webkit-scrollbar-thumb:hover {
     border-radius: 10px var(--radius) 0px 0px;
 }
 
+.test-name-block {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.copy-name-btn {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.copy-name-btn:hover {
+  color: var(--text);
+  border: 1px solid var(--text);
+}
+.copy-name-btn.copied {
+  color: var(--text);
+  transform: scale(1.1);
+}
 .test-name { font-size: 1rem; font-weight: 600; }
 
 .test.test-multi {
@@ -522,6 +546,7 @@ main::-webkit-scrollbar-thumb:hover {
     font-weight: 700;
     background: var(--bg-card);
     padding: 0.25rem 0.5rem;
+    border: 1px solid var(--bg-card);
     border-radius: var(--radius-sm);
     text-align: center;
 }

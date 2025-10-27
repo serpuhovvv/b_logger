@@ -271,7 +271,16 @@
             {{ render_status_icon(test_run.status) }}
         </span>
     </div>
-    <span class="test-name">{{ test_run.name }}</span>
+
+    <div class="test-name-block">
+        <span class="test-name">{{ test_run.name }}</span>
+        <button class="copy-name-btn"
+                title="Copy name to clipboard"
+                onclick="copyTestName('{{ test_run.name|escape }}', event)">
+            <i class="fas fa-copy"></i>
+        </button>
+    </div>
+
     <div class="test-results">
         <span class="test-duration">{{ test_run.duration or 0 }}s</span>
         <span><i class="fas fa-chevron-down toggle-icon"></i></span>

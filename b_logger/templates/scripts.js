@@ -357,6 +357,17 @@ function toggleAllTests() {
     });
 }
 
+function copyTestName(name, event) {
+  event.stopPropagation();
+  const btn = event.currentTarget;
+
+  navigator.clipboard.writeText(name).then(() => {
+    btn.classList.add("copied");
+    setTimeout(() => btn.classList.remove("copied"), 1000);
+  }).catch(err => console.error("Clipboard error:", err));
+}
+
+
 //function toggleStacktrace(el) {
 //    toggleClass(el, "expanded");
 //    el.nextElementSibling && toggleClass(el.nextElementSibling, "active");
