@@ -357,17 +357,6 @@ function toggleAllTests() {
     });
 }
 
-function copyTestName(name, event) {
-  event.stopPropagation();
-  const btn = event.currentTarget;
-
-  navigator.clipboard.writeText(name).then(() => {
-    btn.classList.add("copied");
-    setTimeout(() => btn.classList.remove("copied"), 1000);
-  }).catch(err => console.error("Clipboard error:", err));
-}
-
-
 //function toggleStacktrace(el) {
 //    toggleClass(el, "expanded");
 //    el.nextElementSibling && toggleClass(el.nextElementSibling, "active");
@@ -398,6 +387,17 @@ function switchTab(btn, tabName) {
     const tabContent = getElBySelector(`[data-tab="${tabName}"]`, tabsContainer);
     toggleClass(tabContent, 'active', true);
 }
+
+function copyTestName(name, event) {
+  event.stopPropagation();
+  const btn = event.currentTarget;
+
+  navigator.clipboard.writeText(name).then(() => {
+    btn.classList.add("copied");
+    setTimeout(() => btn.classList.remove("copied"), 1000);
+  }).catch(err => console.error("Clipboard error:", err));
+}
+
 
 // ======================================================
 //  Navigation / Hash
@@ -496,89 +496,96 @@ const pdfContainer   = getElById('modalPDF');
 const download       = getElById('modalDownload');
 
 let scale = 1;
+let isDragging = false;
+let startX = 0, startY = 0, scrollLeft = 0, scrollTop = 0;
 
 function openAttachment(name, type) {
     const path = `./attachments/${name}`;
 
-    // Сброс состояния
+    resetModal();
+
+    if (titleEl) titleEl.textContent = name;
+
+    if (type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(name)) {
+        if (image) {
+            image.src = path;
+            imageContainer.style.display = 'block';
+        }
+    } else if (type === 'application/pdf' || /\.pdf$/i.test(name)) {
+        pdfContainer.src = path;
+        pdfContainer.style.display = 'block';
+    } else if (type?.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
+        fetch(path)
+            .then(res => res.text())
+            .then(text => {
+                textPreview.textContent = text;
+                textPreview.style.display = 'block';
+            })
+            .catch(() => {
+                textPreview.textContent = '[Error Loading Content]';
+                textPreview.style.display = 'block';
+            });
+    } else {
+        download.href = path;
+        download.style.display = 'inline-block';
+    }
+
+    modal.style.display = 'flex';
+}
+
+function closeModal(event) {
+    if (event.target.id === modal.id || event.target.classList.contains('close')) {
+        modal.style.display = 'none';
+        resetModal();
+    }
+}
+
+function resetModal() {
     scale = 1;
     if (image) image.style.transform = 'scale(1)';
     if (image) image.src = '';
     if (pdfContainer) pdfContainer.src = '';
     if (textPreview) textPreview.textContent = '';
-    [imageContainer, textPreview, pdfContainer, download].forEach(el => { if (el) el.style.display = 'none'; });
 
-    if (titleEl) titleEl.textContent = name;
-
-    if (type && type.startsWith('image/')) {
-        if (image) image.src = path;
-        if (imageContainer) imageContainer.style.display = 'block';
-    } else if (type === 'application/pdf') {
-        if (pdfContainer) pdfContainer.src = path;
-        if (pdfContainer) pdfContainer.style.display = 'block';
-    } else if (type && type.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
-        fetch(path)
-            .then(res => res.text())
-            .then(text => {
-                if (textPreview) {
-                    textPreview.textContent = text;
-                    textPreview.style.display = 'block';
-                }
-            })
-            .catch(() => {
-                if (textPreview) {
-                    textPreview.textContent = '[Ошибка загрузки текста]';
-                    textPreview.style.display = 'block';
-                }
-            });
-    } else {
-        if (download) {
-            download.href = path;
-            download.style.display = 'inline-block';
-        }
-    }
-
-    if (modal) modal.style.display = 'block';
+    [imageContainer, textPreview, pdfContainer, download].forEach(el => {
+        if (el) el.style.display = 'none';
+    });
 }
 
-function closeModal(event) {
-    if (!modal) return;
-    if (event.target.id === modal.id || event.target.classList.contains('close')) {
-        modal.style.display = 'none';
-    }
-}
-
-// Zoom + Drag
 if (imageContainer) {
     imageContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
-        scale = Math.min(Math.max(scale - e.deltaY * 0.001, 0.5), 5);
-        if (image) image.style.transform = `scale(${scale})`;
+        const delta = -e.deltaY * 0.001;
+        scale = Math.min(Math.max(scale + delta, 0.5), 5);
+        image.style.transform = `scale(${scale})`;
     });
 
-    let isDragging = false, startX = 0, startY = 0, scrollLeft = 0, scrollTop = 0;
-
-    imageContainer.addEventListener('mousedown', e => {
+    imageContainer.addEventListener('mousedown', (e) => {
         isDragging = true;
-        startX = e.pageX;
-        startY = e.pageY;
+        startX = e.pageX - imageContainer.offsetLeft;
+        startY = e.pageY - imageContainer.offsetTop;
         scrollLeft = imageContainer.scrollLeft;
         scrollTop = imageContainer.scrollTop;
         imageContainer.style.cursor = 'grabbing';
     });
 
-    imageContainer.addEventListener('mousemove', e => {
+    imageContainer.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        imageContainer.scrollLeft = scrollLeft - (e.pageX - startX);
-        imageContainer.scrollTop  = scrollTop - (e.pageY - startY);
+        e.preventDefault();
+        const x = e.pageX - imageContainer.offsetLeft;
+        const y = e.pageY - imageContainer.offsetTop;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+        imageContainer.scrollLeft = scrollLeft - walkX;
+        imageContainer.scrollTop  = scrollTop - walkY;
     });
 
-    ['mouseup', 'mouseleave'].forEach(evt =>
+    ['mouseup', 'mouseleave'].forEach(evt => {
         imageContainer.addEventListener(evt, () => {
             isDragging = false;
             imageContainer.style.cursor = 'grab';
-        })
-    );
+        });
+    });
 }
 
 

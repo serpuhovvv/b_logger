@@ -231,9 +231,11 @@ class BLogger:
         Attach file or data
         Will be added to the Attachments Tab and Current Step
 
+        Add extension to file name to save as a particular type. Example: 'excel_file.xlsx'
+
         Usage:
             blog.attach({"a": 1, "b": 2}, 'some_data')
             blog.attach(Path('path_to_your_file'))
-            blog.attach('Any text')
+            blog.attach(excel_data, 'excel_file.xlsx')
         """
         runtime.attach(content, name)
