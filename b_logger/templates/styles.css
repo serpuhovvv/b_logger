@@ -6,6 +6,7 @@
 html, body {
     margin: 0;
     font-family: 'Inter', sans-serif;
+    font-size: 16px;
     font-weight: 500;
     line-height: 1.4;
     background: var(--bg);
@@ -434,7 +435,7 @@ main::-webkit-scrollbar-thumb:hover {
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -487,7 +488,7 @@ main::-webkit-scrollbar-thumb:hover {
     border-radius: 10px var(--radius) 0px 0px;
 }
 
-.test-name { font-weight: 600; }
+.test-name { font-size: 1rem; font-weight: 600; }
 
 .test.test-multi {
     border-left: none;
@@ -515,7 +516,15 @@ main::-webkit-scrollbar-thumb:hover {
 .test-status.failed { background-color: #f8d7da; color: var(--failed); background: var(--failed-light); }
 .test-status.skipped { background-color: #fff3cd; color: var(--skipped); background: var(--skipped-light); }
 
-.test-duration { color: var(--text-muted); font-size: 0.875rem; background: var(--bg-card); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); text-align: center; }
+.test-duration {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 700;
+    background: var(--bg-card);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
 .test-steps li { padding: 0.75rem; margin-bottom: 0.5rem; border-radius: var(--radius-sm); background: var(--bg-accent); }
 
 /* ===============================
@@ -532,8 +541,8 @@ main::-webkit-scrollbar-thumb:hover {
     border: none;
     background: var(--bg-accent);
     cursor: pointer;
-    font-weight: 600;
     font-size: 0.875rem;
+    font-weight: 700;
     color: var(--text);
     transition: all 0.2s ease;
 }
@@ -564,15 +573,29 @@ main::-webkit-scrollbar-thumb:hover {
 
 .description {
     background: var(--bg-accent);
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: var(--radius-sm);
     white-space: pre-wrap;
     font-size: 0.875rem;
 }
 
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
-.info-item { background: var(--bg-accent); padding: 1rem; border-radius: var(--radius-sm); }
-.info-key { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; }
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+.info-item {
+    background: var(--bg-accent);
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+}
+.info-key {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
 .info-value {
     font-size: 0.875rem;
     overflow-wrap: break-word;
@@ -584,7 +607,11 @@ main::-webkit-scrollbar-thumb:hover {
    BUGS AND ERRORS
 ================================= */
 .bug-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-.bug-item { background: var(--failed-bg); padding: 1rem; border-radius: var(--radius-sm); }
+.bug-item {
+    background: var(--failed-bg);
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+}
 .bug-desc {
     font-size: 0.875rem;
     color: var(--failed);
@@ -659,14 +686,14 @@ main::-webkit-scrollbar-thumb:hover {
 .step {
   margin-bottom: 0.5rem;
   border-radius: var(--radius);
-  border-left: 3px solid;
+  border-left: 2px solid;
   padding-left: 1rem;
   margin-left: calc(var(--level, 0) * 1rem);
 }
 .step.print {
     padding: 0.5rem;
     background: var(--print-bg);
-    border: 1px solid var(--print);
+    border: 0px solid var(--print);
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
@@ -702,8 +729,14 @@ main::-webkit-scrollbar-thumb:hover {
 .step .info-item { padding: 0.75rem; }
 .step .bug-item { padding: 0.75rem; }
 
-.step-badge { font-size: 0.875rem; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
-.step-title { font-weight: 500; white-space: pre-wrap; }
+.step-badge { font-size: 0.875rem; font-weight: 700; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
+.step-title {
+    font-weight: 500;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
 .step-content { margin-top: 0.5rem; padding: 0rem; background: var(--bg-card); border-radius: var(--radius-sm); }
 
 .step-children { margin-top: 0.5rem; }
@@ -729,7 +762,7 @@ main::-webkit-scrollbar-thumb:hover {
 }
 .attachment img { max-width: 125px; max-height: 125px; border-radius: var(--radius-sm); }
 .attachment i { font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-.attachment span { font-size: 0.75rem; margin-top: 0.5rem; word-break: break-word; }
+.attachment span { font-size: 0.875rem; margin-top: 0.5rem; word-break: break-word; }
 
 /* Attachment modal */
 .modal { display: none; position: fixed; z-index: 999; inset: 0; background: var(--bg-transparent); overflow: auto; padding: 2vh 2vw; }
