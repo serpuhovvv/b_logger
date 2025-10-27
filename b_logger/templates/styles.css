@@ -3,12 +3,18 @@
 ================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.4;
+html, body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    line-height: 1.4;
+    background: var(--bg);
+    color: var(--text);
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
 }
 
 /* ===============================
@@ -187,7 +193,6 @@ a { color: var(--text-muted); text-decoration: underline; }
 
 .sidebar .card { margin: 1rem; margin-top: 0; }
 .sidebar .card .header { padding: 0.75rem; padding-left: 1rem; }
-.sidebar .card h1 { font-size: 1.25rem; line-height: 1.5rem; }
 .sidebar .meta-grid { grid-template-columns: 1fr; }
 
 .main-content { flex: 1; overflow-y: auto; padding: 1rem; background: var(--bg); }
@@ -261,7 +266,9 @@ main::-webkit-scrollbar-thumb:hover {
 	transition: all 0.2s ease;
 }
 .sidebar .search-container i {
-    position: absolute; left: 1rem;
+    position: absolute;
+    left: 0.75rem;
+    font-size: 0.875rem;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text);
@@ -269,7 +276,7 @@ main::-webkit-scrollbar-thumb:hover {
 .sidebar .search-container input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
-    font-size: 1rem;
+    font-size: 0.875rem;
     border: none;
     border-radius: var(--radius-sm);
     background: var(--bg-accent);
@@ -296,10 +303,10 @@ main::-webkit-scrollbar-thumb:hover {
 	transition: all 0.2s ease;
 }
 .sidebar .search-filter select option {
-    font-weight: 600;
+    font-size: 0.875rem;
 }
 #moduleFilter {
-    font-weight: 600;
+    font-size: 0.875rem;
 }
 
 .sidebar .filter-buttons, .sort-buttons { width: 100%; flex-wrap: wrap; display: flex; gap: 0.5rem; }
@@ -393,8 +400,6 @@ main::-webkit-scrollbar-thumb:hover {
 .meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
 .meta-item span { font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
 .meta-item strong {
-    font-size: 1rem;
-    font-weight: 600;
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
@@ -419,7 +424,7 @@ main::-webkit-scrollbar-thumb:hover {
 .summary-card.failed { border-color: var(--failed); background: var(--failed-bg); }
 .summary-card.broken { border-color: var(--broken); background: var(--broken-bg); }
 .summary-card.skipped { border-color: var(--skipped); background: var(--skipped-bg); }
-.summary-card .number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+.summary-card .number { font-size: 2.5rem; font-weight: 600; line-height: 1; }
 .summary-card .label { font-weight: 600; margin: 0.5rem 0; }
 .summary-card .percentage { font-size: 0.875rem; }
 
@@ -521,11 +526,13 @@ main::-webkit-scrollbar-thumb:hover {
     display: flex;
 }
 .tab-btn {
-    padding: 0.75rem;
+    padding: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
     border: none;
     background: var(--bg-accent);
     cursor: pointer;
-    font-weight: 550;
+    font-weight: 600;
     font-size: 0.875rem;
     color: var(--text);
     transition: all 0.2s ease;
@@ -565,7 +572,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
 .info-item { background: var(--bg-accent); padding: 1rem; border-radius: var(--radius-sm); }
-.info-key { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; }
+.info-key { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; }
 .info-value {
     font-size: 0.875rem;
     overflow-wrap: break-word;
@@ -620,7 +627,7 @@ main::-webkit-scrollbar-thumb:hover {
     border-radius: var(--radius-sm);
     font-family: Consolas, 'Courier New', monospace;
     font-size: 0.875rem;
-    font-weight: 550;
+    font-weight: 500;
     overflow-x: auto;
     white-space: pre-wrap;
     tab-size: 4;
@@ -656,7 +663,14 @@ main::-webkit-scrollbar-thumb:hover {
   padding-left: 1rem;
   margin-left: calc(var(--level, 0) * 1rem);
 }
-.step.print { padding: 0.5rem; background: var(--print-bg); border-left: 3px solid var(--print); border-top: none; }
+.step.print {
+    padding: 0.5rem;
+    background: var(--print-bg);
+    border: 1px solid var(--print);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
 .step.passed { border-left-color: var(--passed); border-top-color: var(--passed); }
 .step.failed { border-left-color: var(--failed); border-top-color: var(--failed); }
 .step.broken { border-left-color: var(--broken); border-top-color: var(--broken); }
@@ -689,7 +703,7 @@ main::-webkit-scrollbar-thumb:hover {
 .step .bug-item { padding: 0.75rem; }
 
 .step-badge { font-size: 0.875rem; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
-.step-title { font-weight: 550; white-space: pre-wrap; }
+.step-title { font-weight: 500; white-space: pre-wrap; }
 .step-content { margin-top: 0.5rem; padding: 0rem; background: var(--bg-card); border-radius: var(--radius-sm); }
 
 .step-children { margin-top: 0.5rem; }

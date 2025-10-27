@@ -129,8 +129,12 @@ class StepContainer(BaseDataModel, dict):
 
     @staticmethod
     def _recursive_search(step: Step, step_id: str) -> Step | None:
+        if step.id.startswith('print_'):
+            return
+
         if step.id == step_id:
             return step
+
         for sub_step in step.steps:
             if not sub_step.id.startswith('print_'):
                 found = StepContainer._recursive_search(sub_step, step_id)

@@ -114,7 +114,7 @@ def test_selenium_with_set_browser(selenium_driver):
                   'found driver automatically '
                   'based on the following possible browser instance fixture names: '
                   '["driver", "page", "selenium_driver", "driver_init", "playwright_page"]')
-@pytest.mark.smoke('weed', every='day')
+@pytest.mark.smoke('420', every='day')
 def test_selenium_without_set_browser(selenium_driver):  #  <-- Will be detected automatically
     blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 
