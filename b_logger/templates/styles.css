@@ -65,9 +65,9 @@ button, input, select, textarea {
     /* Base colors */
     --primary: #0F172A;
 
-    --bg: #e6e7e8;
-    --bg-card: #FFFFFF;
-    --bg-accent: #e6ebed;
+    --bg: #c7c9c9;
+    --bg-card: #ebeced;
+    --bg-accent: #d2d2d2;
     --bg-transparent: #F8FAFCB3;
 
     --text: #0F172A;
@@ -96,9 +96,9 @@ button, input, select, textarea {
     --skipped-bg: rgba(107, 114, 128, 0.3);
     --skipped-light: rgba(107, 114, 128, 0.5);
 
-    --print: #8B5CF6;
-    --print-bg: #F5F3FF;
-    --print-light: #E0E7FF;
+    --print: #A78BFA;
+    --print-bg: rgba(167, 139, 250, 0.15);
+    --print-light: rgba(167, 139, 250, 0.3);
 }
 
 /* ===============================
@@ -287,7 +287,8 @@ main::-webkit-scrollbar-thumb:hover {
   caret-color: var(--primary);
 }
 #searchInput::placeholder {
-  color: var(--text);
+    font-size: 0.875rem;
+    color: var(--text);
 }
 
 .sidebar .search-filter select {
@@ -397,7 +398,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .content { padding: 1rem; }
 
-.meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
 .meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
 .meta-item span { font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
 .meta-item strong {
@@ -532,7 +533,7 @@ main::-webkit-scrollbar-thumb:hover {
 }
 
 /* Test info band */
-.test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1.25rem; }
+.test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1rem; }
 
 .test-results { display: grid; grid-auto-flow: column; column-gap: 0.75rem; align-items: center; }
 
@@ -749,7 +750,7 @@ main::-webkit-scrollbar-thumb:hover {
     align-items: center;
 }
 
-.step-info { display: flex; align-items: center; gap: 0.5rem; }
+.step-info { display: flex; align-items: center; gap: 1.5rem; }
 
 .step .info-item { padding: 0.75rem; }
 .step .bug-item { padding: 0.75rem; }
@@ -827,14 +828,15 @@ main::-webkit-scrollbar-thumb:hover {
     transition: color 0.2s ease;
 }
 .close:hover { color: var(--text, #fff); }
+
 .attachment-body {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: var(--radius-sm);
     background: var(--bg-card);
-    border-radius: 6px;
     user-select: none;
     margin-top: 0.5rem;
 }
@@ -846,8 +848,8 @@ main::-webkit-scrollbar-thumb:hover {
     height: 100%;
     text-align: center;
     cursor: grab;
+    border-radius: var(--radius-sm);
     background: var(--bg-card);
-    border-radius: 6px;
 }
 
 #modalImage {
@@ -865,7 +867,8 @@ main::-webkit-scrollbar-thumb:hover {
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
 }
 
 #modalText {

@@ -500,23 +500,24 @@ let isDragging = false;
 let startX = 0, startY = 0, scrollLeft = 0, scrollTop = 0;
 
 function openAttachment(name, type) {
-    const path = `./attachments/${name}`;
+    const path = `attachments/${name}`;
 
     resetModal();
-
     if (titleEl) titleEl.textContent = name;
 
     if (type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(name)) {
-        if (image) {
-            image.src = path;
-            imageContainer.style.display = 'block';
-        }
-    } else if (type === 'application/pdf' || /\.pdf$/i.test(name)) {
+        image.src = path;
+        imageContainer.style.display = 'block';
+    }
+
+    else if (type === 'application/pdf' || /\.pdf$/i.test(name)) {
         pdfContainer.src = path;
         pdfContainer.style.display = 'block';
-    } else if (type?.startsWith('text/') || /\.(json|log|txt|py|md)$/i.test(name)) {
+    }
+
+    else if (type?.startsWith('text/') || /\.(json|log|txt|py|md|yaml|yml)$/i.test(name)) {
         fetch(path)
-            .then(res => res.text())
+            .then(res => res.ok ? res.text() : Promise.reject())
             .then(text => {
                 textPreview.textContent = text;
                 textPreview.style.display = 'block';
@@ -525,8 +526,11 @@ function openAttachment(name, type) {
                 textPreview.textContent = '[Error Loading Content]';
                 textPreview.style.display = 'block';
             });
-    } else {
+    }
+
+    else {
         download.href = path;
+        download.textContent = 'Download File';
         download.style.display = 'inline-block';
     }
 
@@ -552,6 +556,9 @@ function resetModal() {
     });
 }
 
+// ======================================================
+//  Image Zoom & Drag
+// ======================================================
 if (imageContainer) {
     imageContainer.addEventListener('wheel', (e) => {
         e.preventDefault();

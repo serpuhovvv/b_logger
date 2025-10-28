@@ -310,7 +310,7 @@ from b_logger import blog
 from pathlib import Path
 
 blog.attach({"a": 1, "b": 2}, 'some_data')
-blog.attach(Path('path_to_your_file.ext'))
+blog.attach(Path('path/to/your/file.ext'))
 blog.attach(excel_data, 'excel_file.xlsx')
 ```
 

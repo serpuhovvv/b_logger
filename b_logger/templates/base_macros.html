@@ -447,7 +447,7 @@
                                 {% endif %}
                             {% endfor %}
                             {% if count_steps.count > 0 %}
-                                <span>{{ count_steps.count }} sub step{{ 's' if count_steps.count > 1 else '' }}</span>
+                                <span>{{ count_steps.count }} sub-step{{ 's' if count_steps.count > 1 else '' }}</span>
                             {% endif %}
                             {% if count_steps.prints > 0 %}
                                 <span>{{ count_steps.prints }} print{{ 's' if count_steps.prints > 1 else '' }}</span>
@@ -505,13 +505,24 @@
 {% macro render_attachments(attachments) %}
 <div class="attachments">
     {% for attachment in attachments %}
-    <div class="attachment" onclick="openAttachment('{{ attachment.name }}', '{{ attachment.type_ }}')">
-        {% if attachment.type_.startswith('image/') %}
-        <img src="./attachments/{{ attachment.name }}" alt="{{ attachment.name }}">
+    {% set name = attachment.name %}
+    {% set type = attachment.type_ or '' %}
+    {% set lower_name = name.lower() %}
+    <div class="attachment" onclick="openAttachment('{{ name }}', '{{ type }}')">
+        {% if type.startswith('image/') or lower_name.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')) %}
+            <img src="attachments/{{ name }}" alt="{{ name }}">
+        {% elif type == 'application/pdf' or lower_name.endswith('.pdf') %}
+            <i class="fas fa-file-pdf"></i>
+        {% elif 'spreadsheet' in type or lower_name.endswith(('.xls', '.xlsx', '.ods')) %}
+            <i class="fas fa-file-excel"></i>
+        {% elif type.startswith('text/') or lower_name.endswith(('.txt', '.log', '.json', '.md', '.py', '.yml', '.yaml')) %}
+            <i class="fas fa-file-alt"></i>
+        {% elif lower_name.endswith(('.zip', '.tar', '.gz', '.rar')) %}
+            <i class="fas fa-file-archive"></i>
         {% else %}
-        <i class="fas fa-file"></i>
+            <i class="fas fa-file"></i>
         {% endif %}
-        <span>{{ attachment.name }}</span>
+        <span>{{ name }}</span>
     </div>
     {% endfor %}
 </div>
