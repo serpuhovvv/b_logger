@@ -394,7 +394,7 @@ function copyTestName(name, event) {
 
   navigator.clipboard.writeText(name).then(() => {
     btn.classList.add("copied");
-    setTimeout(() => btn.classList.remove("copied"), 1000);
+    setTimeout(() => btn.classList.remove("copied"), 750);
   }).catch(err => console.error("Clipboard error:", err));
 }
 

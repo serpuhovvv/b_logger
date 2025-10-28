@@ -105,9 +105,9 @@ button, input, select, textarea {
    TYPOGRAPHY
 ================================= */
 h1, h2, h3, h4 { font-weight: 600; }
-h1 { font-size: 1.875rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
+h1 { font-size: 1.375rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.125rem; }
 h4 { font-size: 1rem; }
 a { color: var(--text-muted); text-decoration: underline; }
 
@@ -435,7 +435,7 @@ main::-webkit-scrollbar-thumb:hover {
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -495,12 +495,12 @@ main::-webkit-scrollbar-thumb:hover {
 }
 .copy-name-btn {
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-muted);
     background: var(--bg-card);
     border: 1px solid var(--bg-card);
     border-radius: var(--radius-sm);
-    padding: 0.25rem 0.5rem;
+    padding: 0.15rem 0.25rem;
     text-align: center;
     transition: all 0.2s ease;
 }
@@ -532,7 +532,7 @@ main::-webkit-scrollbar-thumb:hover {
 }
 
 /* Test info band */
-.test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1rem; }
+.test-info { display: grid; grid-template-columns: max-content 1fr auto; align-items: center; gap: 1.25rem; }
 
 .test-results { display: grid; grid-auto-flow: column; column-gap: 0.75rem; align-items: center; }
 
@@ -543,9 +543,9 @@ main::-webkit-scrollbar-thumb:hover {
 .test-duration {
     color: var(--text-muted);
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 600;
     background: var(--bg-card);
-    padding: 0.25rem 0.5rem;
+    padding: 0.15rem 0.25rem;
     border: 1px solid var(--bg-card);
     border-radius: var(--radius-sm);
     text-align: center;
@@ -567,7 +567,7 @@ main::-webkit-scrollbar-thumb:hover {
     background: var(--bg-accent);
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text);
     transition: all 0.2s ease;
 }
@@ -754,7 +754,7 @@ main::-webkit-scrollbar-thumb:hover {
 .step .info-item { padding: 0.75rem; }
 .step .bug-item { padding: 0.75rem; }
 
-.step-badge { font-size: 0.875rem; font-weight: 700; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
+.step-badge { font-size: 0.875rem; font-weight: 600; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
 .step-title {
     font-weight: 500;
     white-space: pre-wrap;
