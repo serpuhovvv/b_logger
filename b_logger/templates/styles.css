@@ -186,7 +186,7 @@ a { color: var(--text-muted); text-decoration: underline; }
 .layout-wrapper { display: flex; height: 100vh; overflow: hidden; }
 
 .sidebar {
-  width: 350px;
+  width: 420px;
   background: var(--bg);
   overflow-y: auto;
   flex-shrink: 0;
@@ -409,8 +409,8 @@ main::-webkit-scrollbar-thumb:hover {
 
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
 }
 .summary-card {
     text-align: center;

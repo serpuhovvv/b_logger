@@ -21,7 +21,7 @@
         <img src="./static/icon.svg" alt="main-icon" class="main-icon" id="themeToggle" title="Click to switch theme"/>
         <div class="search-container">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Search tests...">
+            <input type="text" id="searchInput" placeholder="Search Tests...">
         </div>
     </div>
 
@@ -35,8 +35,8 @@
 
     <select id="moduleFilter">
         <option value="all">All Modules</option>
-        {% for module_path in report.modules.keys() %}
-        <option value="{{ module_path }}">{{ module_path.split('\\')[-1] or module_path }}</option>
+        {% for module_path in report.modules.keys() | sort %}
+        <option value="{{ module_path }}">{{ module_path }}</option>
         {% endfor %}
     </select>
 

@@ -194,8 +194,17 @@ class RunTime:
 
     def print_message(self, message):
         if isinstance(message, (dict, list)):
-            data = json.dumps(message, indent=2, ensure_ascii=False)
-            type_ = 'application/json'
+            try:
+                data = json.dumps(
+                    message,
+                    indent=4,
+                    ensure_ascii=False,
+                    default=lambda m: str(m)
+                )
+                type_ = 'application/json'
+            except Exception as e:
+                data = f'<<JSON encode error: {e}>>\n{message}'
+                type_ = 'text/plain'
         else:
             data = str(message)
             type_ = 'text/plain'
