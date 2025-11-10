@@ -11,6 +11,7 @@ from b_logger.entities.steps import Step, StepStatus, StepError, StepContainer
 from b_logger.entities.statuses import py_outcome_to_tstatus
 from b_logger.integrations import Integrations
 from b_logger.utils.browser_adapters import get_browser_adapter
+from b_logger.utils.json_handler import process_json
 
 
 class RunTime:
@@ -194,17 +195,8 @@ class RunTime:
 
     def print_message(self, message):
         if isinstance(message, (dict, list)):
-            try:
-                data = json.dumps(
-                    message,
-                    indent=4,
-                    ensure_ascii=False,
-                    default=lambda m: str(m)
-                )
-                type_ = 'application/json'
-            except Exception as e:
-                data = f'<<JSON encode error: {e}>>\n{message}'
-                type_ = 'text/plain'
+            data = process_json(message)
+            type_ = 'application/json'
         else:
             data = str(message)
             type_ = 'text/plain'
@@ -229,7 +221,7 @@ class RunTime:
 
         scr_name = (
             f'{"err_" if is_error else ""}'
-            f'scr_{self.test_report.name if not scr_name else scr_name}'
+            f'scr_{self.test_report.name if not scr_name else scr_name}.png'
         )
 
         adapter = get_browser_adapter(self.browser)
@@ -271,8 +263,8 @@ class RunTime:
     def apply_integrations(self):
         i = self.test_report.info
         if i:
-            Integrations.attach(json.dumps(i, indent=4), 'blog_info', 'text/html')
+            Integrations.attach(process_json(i), 'blog_info', 'text/html')
 
         kb = self.test_report.known_bugs
         if kb:
-            Integrations.attach(json.dumps(kb, indent=4), 'blog_known_bugs', 'text/html')
+            Integrations.attach(process_json(kb), 'blog_known_bugs', 'text/html')

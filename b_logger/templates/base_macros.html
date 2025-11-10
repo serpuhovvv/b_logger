@@ -418,7 +418,7 @@
 {% set has_addons = step.expected or step.info or step.error or step.attachments or step.known_bugs %}
 {% if step.id.startswith('print_') %}
     <div class="step print level-0">
-        <span class="step-title">{{ step.title }}</span>
+        <span class="step-title">{{ step.title | escape }}</span>
     </div>
 {% else %}
     <div class="step {{ step.status }} level-0">
@@ -428,7 +428,7 @@
         <div class="step-header-no-addons">
         {% endif %}
             <div class="step-info">
-                <span class="step-title">{{ step.title }}</span>
+                <span class="step-title">{{ step.title | escape }}</span>
                 {% if has_addons or step.steps %}
                     <div class="step-badge">
                         {% if step.error %}<span><i class="fas fa-exclamation-triangle error-icon"></i></span>{% endif %}

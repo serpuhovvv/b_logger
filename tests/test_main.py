@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from pathlib import Path
 
 import pytest
@@ -10,6 +11,38 @@ from b_logger import blog
 blog.set_env('prod')
 
 blog.set_base_url('https://base-url.url')
+
+
+class ABC:
+    def __init__(self):
+        super().__init__()
+        self.a = 123
+
+    def aaa(self):
+        pass
+
+
+class CBA :
+    def __init__(self):
+        super().__init__()
+        self.a = 123
+
+    def aaa(self):
+        pass
+
+
+@pytest.mark.regression
+@blog.link(jira_link="https://admortgage.atlassian.net/browse/QA-234")
+@pytest.mark.parametrize("strategy_class", [ABC, CBA])
+def test_tasks(strategy_class):
+    blog.info(title=f"Create a new task and verify fields via")
+    blog.description(f"This test verifies the creation of a new task via and checks that all task fields are correctly filled.")
+
+    blog.print({'a': CBA})
+
+    link = ''
+
+    blog.link(qase_link=link, name='case_for_allure')
 
 
 @pytest.fixture()
@@ -72,9 +105,10 @@ def test_main_functionality(some_fixture):
                         pass
 
 
-@pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (333, 444)])  # <-- These parameters will be added to test automatically
-def test_parametrized(py_param_1, py_param_2):
+@pytest.mark.parametrize('py_param_1, py_param_2', [(f'qase.link/and/one_more.link', 222), (333, f'qase.link/and/one_more.link')])  # <-- These parameters will be added to test automatically
+def test_parametrized(selenium_driver, py_param_1, py_param_2):
     with blog.step('Step 1'):
+        selenium_driver.get(f'https://en.wikipedia.org/wiki/Jalape%C3%B1o')
         with blog.step('Step 2'):
             with blog.step('Step 3', 'Step is expected to fail'):
                 blog.print(py_param_1)
@@ -144,7 +178,7 @@ def test_selenium_without_set_browser(selenium_driver):  #  <-- Will be detected
     blog.info(run_requirement='To run this test you\'ll need to download chromedriver and put it in your python folder')
 
     with blog.step('Open any URL'):
-        selenium_driver.get(f'https://google.com')
+        selenium_driver.get(f'https://en.wikipedia.org/wiki/Jalape%C3%B1o')
 
         with blog.step('Raise fake error to check error screenshot'):
             print(empty_variable)

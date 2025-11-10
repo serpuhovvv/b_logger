@@ -7,6 +7,7 @@ from pathlib import Path
 from pprint import pformat
 
 from b_logger.config import blog_config
+from b_logger.utils.json_handler import process_json
 
 
 class IntegrationBase(ABC):
@@ -58,7 +59,7 @@ class AllureAdapter(IntegrationBase):
     def info(self, name, value):
         if self._allure:
             try:
-                self._allure.attach(json.dumps(value, indent=4), name, self._AttachmentType.TEXT)
+                self._allure.attach(process_json(value), name, self._AttachmentType.TEXT)
             except:
                 pass
 
@@ -90,7 +91,7 @@ class AllureAdapter(IntegrationBase):
                 return
 
             if isinstance(content, (dict, list)):
-                content = json.dumps(content, indent=2)
+                content = process_json(content)
                 type_ = "application/json"
 
             if isinstance(content, (int, float, bool)):
@@ -145,7 +146,7 @@ class QaseAdapter(IntegrationBase):
     def info(self, name, value):
         if self._qase:
             if isinstance(value, (dict, list, tuple, set)):
-                content = json.dumps(value, indent=4, ensure_ascii=False)
+                content = process_json(value)
                 mimetype = 'application/json'
             elif isinstance(value, (str, int, float, bool)):
                 content = str(value)
@@ -169,7 +170,7 @@ class QaseAdapter(IntegrationBase):
         if self._qase:
             if not type_:
                 if isinstance(content, (dict, list, tuple, set)):
-                    content = json.dumps(content, indent=4, ensure_ascii=False)
+                    content = process_json(content)
                     type_ = 'application/json'
                 elif isinstance(content, (str, int, float, bool)):
                     content = str(content)

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Union, Optional, BinaryIO
 
 from b_logger.utils.basedatamodel import BaseDataModel
+from b_logger.utils.json_handler import process_json
 from b_logger.utils.paths import attachments_path
 
 
@@ -38,7 +39,7 @@ class Attachment(BaseDataModel):
 
         elif isinstance(content, (dict, list, int, float, bool, type(None))):
             self._detect_type_and_extension(default_ext='.json')
-            data = json.dumps(content, ensure_ascii=False, indent=4).encode('utf-8')
+            data = process_json(content).encode('utf-8')
             self._save_from_bytes(data)
 
         elif isinstance(content, str):
@@ -76,7 +77,7 @@ class Attachment(BaseDataModel):
         try:
             parsed = json.loads(content)
             self._detect_type_and_extension(default_ext='.json')
-            formatted = json.dumps(parsed, ensure_ascii=False, indent=4).encode('utf-8')
+            formatted = process_json(parsed).encode('utf-8')
             self._save_from_bytes(formatted)
         except json.JSONDecodeError:
             self._detect_type_and_extension(default_ext='.txt')
