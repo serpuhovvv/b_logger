@@ -1,4 +1,3 @@
-import json
 import traceback
 from pathlib import Path
 from typing import Union, BinaryIO
@@ -228,24 +227,33 @@ class RunTime:
 
         try:
             screenshot_bytes = adapter.make_screenshot()
-            if isinstance(screenshot_bytes, list):
-                for scr in screenshot_bytes:
-                    self.attach(scr, scr_name)
-            else:
-                self.attach(screenshot_bytes, scr_name)
+
+            if screenshot_bytes:
+                if isinstance(screenshot_bytes, list):
+                    for scr in screenshot_bytes:
+                        self.attach(scr, scr_name)
+                else:
+                    self.attach(screenshot_bytes, scr_name)
         except Exception as e:
             print(f'[BLogger][ERROR] Unable to make screenshot: {e}')
 
     def make_step_err_scr(self, step):
-        if self.browser:
-            adapter = get_browser_adapter(self.browser)
+        if self.browser is None:
+            return
+
+        adapter = get_browser_adapter(self.browser)
+
+        try:
             screenshot_bytes = adapter.make_screenshot()
 
-            if isinstance(screenshot_bytes, list):
-                for scr in screenshot_bytes:
-                    step.add_attachment(Attachment(scr))
-            else:
-                step.add_attachment(Attachment(screenshot_bytes))
+            if screenshot_bytes:
+                if isinstance(screenshot_bytes, list):
+                    for scr in screenshot_bytes:
+                        step.add_attachment(Attachment(scr))
+                else:
+                    step.add_attachment(Attachment(screenshot_bytes))
+        except Exception as e:
+            print(f'[BLogger][ERROR] Unable to make step error screenshot for step {step.title}: {e}')
 
     def attach(self, content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: str = None):
 

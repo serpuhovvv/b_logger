@@ -628,6 +628,9 @@ main::-webkit-scrollbar-thumb:hover {
     word-wrap: break-word;
     word-break: break-word;
 }
+.info-indent {
+    padding-left: 15px;
+}
 
 /* ===============================
    BUGS AND ERRORS

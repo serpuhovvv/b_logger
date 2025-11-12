@@ -368,25 +368,45 @@
 
 
 {% macro render_info_value(value, is_sub=False) %}
-{% set indent = 15 if is_sub else 0 %}
 {% if value is mapping %}
     {% for sub_key, sub_value in value.items() %}
-        <div style="padding-left: {{ indent }}px;">
-        🞂 <span><strong>{{ sub_key }}:</strong> {{ render_info_value(sub_value, True) }}</span>
+        {% if is_sub %}
+            <div class="info-indent">
+        {% else %}
+            <div>
+        {% endif %}
+            🞂 <span>
+                <strong>{{ sub_key | escape }}:</strong>
+                {{ render_info_value(sub_value, True) }}
+            </span>
         </div>
     {% endfor %}
+
 {% elif value is sequence and value is not string %}
     {% for sub_value in value %}
         {% if sub_value is mapping %}
             {{ render_info_value(sub_value, is_sub) }}
         {% else %}
-        <div style="padding-left: {{ indent }}px;">
-            ● {{ render_info_value(sub_value, True) }}
-        </div>
+            {% if is_sub %}
+                <div class="info-indent">
+            {% else %}
+                <div>
+            {% endif %}
+                ● {{ render_info_value(sub_value, True) }}
+            </div>
         {% endif %}
     {% endfor %}
+
 {% else %}
-    {{ value }}
+    {% if value is string %}
+        {% if '<a ' in value %}
+            {{ value | safe }}
+        {% else %}
+            {{ value | escape }}
+        {% endif %}
+    {% else %}
+        {{ value | escape }}
+    {% endif %}
 {% endif %}
 {% endmacro %}
 

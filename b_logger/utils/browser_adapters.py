@@ -4,7 +4,7 @@ import importlib
 
 class BrowserAdapter(ABC):
     @abstractmethod
-    def make_screenshot(self) -> bytes:
+    def make_screenshot(self) -> bytes | None:
         ...
 
 
@@ -12,8 +12,12 @@ class SeleniumAdapter(BrowserAdapter):
     def __init__(self, driver):
         self.driver = driver
 
-    def make_screenshot(self) -> bytes:
-        return self.driver.get_screenshot_as_png()
+    def make_screenshot(self) -> bytes | None:
+        try:
+            return self.driver.get_screenshot_as_png()
+        except Exception as e:
+            print(f'[BLogger][WARN] Screenshot failed: {e}')
+            return None
 
     @classmethod
     def is_valid(cls, obj) -> bool:
@@ -33,28 +37,11 @@ class PlaywrightAdapter(BrowserAdapter):
             try:
                 if page.is_closed():
                     return None
+
                 return page.screenshot(animations='disabled')
             except Exception as e:
                 print(f'[BLogger][WARN] Screenshot failed on page: {getattr(page, 'url', '?')}: {e}')
                 return None
-
-        # scr = try_screenshot(self.page)
-        # if scr:
-        #     return scr
-        #
-        # try:
-        #     for context in self.page.context.browser.contexts:
-        #         for other_page in context.pages:
-        #             if other_page == self.page:
-        #                 continue
-        #             scr = try_screenshot(other_page)
-        #             if scr:
-        #                 return scr
-        # except Exception as e:
-        #     print(f'[BLogger][WARN] Fallback screenshot iteration failed: {e}')
-        #
-        # print('[BLogger][WARN] All playwright screenshot attempts failed')
-        # return None
 
         scr_container = []
 
@@ -85,4 +72,5 @@ def get_browser_adapter(browser) -> BrowserAdapter:
     for adapter_cls in ADAPTERS:
         if adapter_cls.is_valid(browser):
             return adapter_cls(browser)
+
     raise RuntimeError(f"Unsupported browser object: {browser}")

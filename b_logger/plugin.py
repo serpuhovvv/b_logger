@@ -199,14 +199,14 @@ _possible_browser_names = ['driver', 'page', 'selenium_driver', 'driver_init', '
 
 
 def _apply_browser(item):
-    if not runtime.browser:
-        for browser_name in _possible_browser_names:
-            if browser_name in item.fixturenames:
-                try:
-                    browser = item.funcargs.get(browser_name, None)
+    for browser_name in _possible_browser_names:
+        if browser_name in item.fixturenames:
+            try:
+                browser = item.funcargs.get(browser_name, None)
+                if browser != runtime.browser:
                     runtime.set_browser(browser)
-                except Exception as e:
-                    print(f'[BLogger][WARN] Error setting up browser automatically: {e}')
+            except Exception as e:
+                print(f'[BLogger][WARN] Error setting up browser automatically: {e}')
 
 
 def _apply_blog_markers(item):
