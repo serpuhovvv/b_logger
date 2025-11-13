@@ -9,4 +9,4 @@ from .blog import BLogger
 
 __all__ = ['blog']
 
-blog = BLogger()
+blog: BLogger = BLogger()

@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from pathlib import Path
 
 import pytest
@@ -22,7 +21,7 @@ class ABC:
         pass
 
 
-class CBA :
+class CBA:
     def __init__(self):
         super().__init__()
         self.a = 123
