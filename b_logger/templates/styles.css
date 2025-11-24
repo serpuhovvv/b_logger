@@ -71,7 +71,7 @@ button, input, select, textarea {
     --bg-transparent: #F8FAFCB3;
 
     --text: #0F172A;
-    --text-muted: #64748B;
+    --text-muted: #535459;
 
     /* Misc */
     --shadow: 0px 0px 4px rgba(32, 32, 32, 0.4);
@@ -712,12 +712,35 @@ main::-webkit-scrollbar-thumb:hover {
    STEPS
 ================================= */
 .steps { margin: 0 0; }
+
+.steps.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(480px, 1fr));
+    gap: 0.5rem;
+}
+
+.attempt-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+.attempt-steps {
+    flex: 1 1 auto;
+    margin-left: 0;
+    --level: 0;
+}
+.attempt-index {
+    padding: 0.5rem;
+}
+
 .step {
-  margin-bottom: 0.5rem;
-  border-radius: var(--radius);
-  border-left: 2px solid;
-  padding-left: 1rem;
-  margin-left: calc(var(--level, 0) * 1rem);
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius);
+    border-left: 2px solid;
+    padding-left: 1rem;
+    margin-left: calc(var(--level, 0) * 1rem);
 }
 .step.print {
     padding: 0.5rem;
@@ -733,7 +756,6 @@ main::-webkit-scrollbar-thumb:hover {
 .step.skipped { border-left-color: var(--skipped); border-top-color: var(--skipped); }
 
 .step-header {
-    padding: 0.25rem;
     padding-left: 0.5rem;
     background: var(--bg-accent);
     border-radius: var(--radius-sm);
@@ -744,7 +766,6 @@ main::-webkit-scrollbar-thumb:hover {
     transition: all 0.2s ease;
 }
 .step-header-no-addons {
-    padding: 0.25rem;
     padding-left: 0.5rem;
     background: var(--bg-accent);
     border-radius: var(--radius-sm);
@@ -753,18 +774,38 @@ main::-webkit-scrollbar-thumb:hover {
     align-items: center;
 }
 
-.step-attempt-index {
-    margin-bottom: 0.5rem;
-}
-
 .step-info { display: flex; align-items: center; gap: 1.5rem; }
 
 .step .info-item { padding: 0.75rem; }
 .step .bug-item { padding: 0.75rem; }
 
-.step-badge { font-size: 0.875rem; font-weight: 600; padding: 0.25rem; align-items: center; display: flex; gap: 0.5rem; }
+.step-badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+}
+.step-badge span {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: var(--bg-card);
+    padding: 0.1rem 0.25rem;
+    border: 1px solid var(--bg-card);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+.step-badge .step-toggle {
+    color: var(--text);
+    background: none;
+    border: none;
+    text-align: center;
+}
 .step-title {
     font-weight: 500;
+    padding: 0.25rem;
     white-space: pre-wrap;
     overflow-wrap: break-word;
     word-wrap: break-word;

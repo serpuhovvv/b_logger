@@ -1,3 +1,4 @@
+import time
 import traceback
 from contextlib import contextmanager, ContextDecorator
 import uuid
@@ -45,23 +46,25 @@ class Step(BaseDataModel):
         self.status = status
         self.expected = expected
         self.parent_id = None
+        self.start_time = time.time()
+        self.duration = None
         self.error: StepError | None = None
         self.info = {}
         self.attachments = []
         self.known_bugs = []
         self.steps = []
 
-    def set_parent_id(self, parent_id):
-        self.parent_id = parent_id
-
-    def add_attachment(self, attachment: Attachment):
-        self.attachments.append(attachment)
-
     def set_status(self, status: StepStatus):
         self.status = status
 
+    def set_parent_id(self, parent_id):
+        self.parent_id = parent_id
+
     def set_error(self, error: StepError):
         self.error = error
+
+    def count_duration(self):
+        self.duration = round(time.time() - self.start_time, 2)
 
     def add_sub_step(self, step):
         self.steps.append(step)
@@ -76,6 +79,12 @@ class Step(BaseDataModel):
             else:
                 self.info[key] = value
 
+    def add_attachment(self, attachment: Attachment):
+        self.attachments.append(attachment)
+
+    def add_known_bug(self, bug):
+        self.known_bugs.append(bug)
+
     def add_links(self, links: dict):
         existing_links = self.info.get('links', {})
         if existing_links:
@@ -86,14 +95,11 @@ class Step(BaseDataModel):
             for key, value in links.items():
                 self.info['links'][key] = value
 
-    def add_known_bug(self, bug):
-        self.known_bugs.append(bug)
-
-    def get_sub_steps(self, as_dict: bool = False):
-        if as_dict:
-            return {step.id: step for step in self.steps}
-        else:
-            return self.steps
+    # def get_sub_steps(self, as_dict: bool = False):
+    #     if as_dict:
+    #         return {step.id: step for step in self.steps}
+    #     else:
+    #         return self.steps
 
 
 class StepContainer(BaseDataModel, dict):

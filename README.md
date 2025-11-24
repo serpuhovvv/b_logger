@@ -343,3 +343,18 @@ Also, you can store b_logs as artifact for the build:
 archiveArtifacts artifacts: 'b_logs/**', fingerprint: true, allowEmptyArchive: true
 zip zipFile: 'b_logs.zip', archive: true, dir: 'b_logs/'
 ```
+
+## Useful Features
+
+### Use Search, Filters and Sorting
+![img.png](readme_content/sidebar_filters.png)
+___
+
+### Compare Retries
+![img.png](readme_content/retry_comparison.png)
+___
+
+### Automatic Error Screenshots
+![img.png](readme_content/auto_err_scr_1.png)
+![img.png](readme_content/auto_err_scr_2.png)
+___

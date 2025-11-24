@@ -409,13 +409,39 @@ function copyTestName(name, event) {
 // ======================================================
 
 function toggleTestAndHash(header){
+    const selection = window.getSelection && window.getSelection();
+    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+        const range  = selection.getRangeAt(0);
+        const nameEl = header.querySelector('.test-name');
+
+        if (nameEl) {
+            try {
+                if (range.intersectsNode(nameEl)) {
+                    return;
+                }
+            } catch (e) {
+                let node = range.commonAncestorContainer;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node = node.parentElement;
+                }
+                if (node && nameEl.contains(node)) {
+                    return;
+                }
+            }
+        }
+    }
+
     const el = header.closest(".test, .card");
     if(!el||!el.id) return;
     const content = header.nextElementSibling;
     const isOpening = !content.classList.contains("active");
     toggleBlock(header);
     updateExpandedState(el.id, isOpening);
-    history.pushState(isOpening ? {openedId: el.id} : {}, "", isOpening ? `#${el.id}` : location.pathname + location.search);
+    history.pushState(
+        isOpening ? {openedId: el.id} : {},
+        "",
+        isOpening ? `#${el.id}` : location.pathname + location.search
+    );
 }
 
 function updateExpandedState(id,isOpen){

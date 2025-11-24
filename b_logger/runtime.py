@@ -139,6 +139,7 @@ class RunTime:
         step.set_status(StepStatus.PASSED)
 
     def finish_step(self, step: Step):
+        step.count_duration()
         self.step_container.set_current_step(step.parent_id)
 
     def apply_description(self, description):
