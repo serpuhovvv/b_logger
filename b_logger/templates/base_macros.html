@@ -58,6 +58,8 @@
         <button type="button" class="sort-btn" data-sort="duration_desc">Duration ↓</button>
         <button type="button" class="sort-btn" data-sort="status_asc">Status ↑</button>
         <button type="button" class="sort-btn" data-sort="status_desc">Status ↓</button>
+        <button type="button" class="sort-btn" data-sort="exec_asc">Retries ↑</button>
+        <button type="button" class="sort-btn" data-sort="exec_desc">Retries ↓</button>
         <button type="button" class="reset-btn" id="reset-sorting">Reset Sorting</button>
     </div>
 
@@ -199,14 +201,16 @@
 
 
 {% macro render_test(test_name, test_runs, steps) %}
-    {% if test_runs|length == 1 %}
+    {% if test_runs | length == 1 %}
         {{ render_test_block(test_runs[0], steps) }}
     {% else %}
-        {% set ns = namespace(max_dur=0, min_start=none, has_failed=False, has_broken=False, has_skipped=False, has_passed=False) %}
+        {% set ns = namespace(min_start=none, max_dur=0, max_exec=0, has_failed=False, has_broken=False, has_skipped=False, has_passed=False) %}
         {% for run in test_runs %}
             {% set ns.min_start = run.start_time if ns.min_start is none else (run.start_time if run.start_time < ns.min_start else ns.min_start) %}
             {% set dur = (run.duration or 0) %}
             {% set ns.max_dur = dur if dur > ns.max_dur else ns.max_dur %}
+            {% set exec = run.execution_count %}
+            {% set ns.max_exec = exec if exec > ns.max_exec else ns.max_exec %}
             {% if run.status == 'FAILED' %}{% set ns.has_failed = True %}{% endif %}
             {% if run.status == 'BROKEN' %}{% set ns.has_broken = True %}{% endif %}
             {% if run.status == 'SKIPPED' %}{% set ns.has_skipped = True %}{% endif %}
@@ -224,7 +228,7 @@
         {% endif %}
 
         <div class="test test-multi" data-test="{{ test_name }}" data-status="{{ agg_status }}"
-            data-start-time="{{ ns.min_start }}" data-duration="{{ ns.max_dur }}">
+            data-start-time="{{ ns.min_start }}" data-duration="{{ ns.max_dur }}" data-exec="{{ ns.max_exec }}">
             <div class="test-header-multi">
                 <div class="test-info">
                     <span class="test-name">{{ test_name }}</span>
@@ -251,7 +255,7 @@
 {% set test_id = "test_" ~ (test_run.name|replace(" ", "_")) %}
 <div id="{{ test_id }}" class="test {{ sub_class }} {{ test_run.status.lower() }}"
     data-test="{{ test_run.name }}" data-status="{{ test_run.status }}"
-    data-start-time="{{ test_run.start_time }}" data-duration="{{ test_run.duration or 0 }}">
+    data-start-time="{{ test_run.start_time }}" data-duration="{{ test_run.duration or 0 }}" data-exec="{{ test_run.execution_count }}">
     <div class="test-header" onclick="toggleTestAndHash(this)">
         {{ render_test_header(test_run) }}
     </div>
@@ -267,9 +271,15 @@
 {% macro render_test_header(test_run) %}
 <div class="test-info">
     <div class="test-results">
+        {% if test_run.execution_count > 1 %}
+        <span class="badge {{ test_run.status.lower() }}">
+            <i class="fa-solid fa-arrow-rotate-left"></i> {{ test_run.execution_count - 1 }}
+        </span>
+        {% else %}
         <span class="badge {{ test_run.status.lower() }}">
             {{ render_status_icon(test_run.status) }}
         </span>
+        {% endif %}
     </div>
 
     <div class="test-name-block">
@@ -295,14 +305,30 @@
 <div class="tabs">
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab(this, 'overview')">Overview</button>
-        {% set step_data = steps[test.steps] %}
-        {% if step_data %}
-            {% if step_data.get('setup') %}<button class="tab-btn" onclick="switchTab(this, 'setup')">Setup</button>{% endif %}
-            {% if step_data.get('call') %}<button class="tab-btn" onclick="switchTab(this, 'call')">Steps</button>{% endif %}
-            {% if step_data.get('teardown') %}<button class="tab-btn" onclick="switchTab(this, 'teardown')">Teardown</button>{% endif %}
+
+        {% set step_data = None %}
+        {% if test.steps %}
+            {% set step_data = steps.get(test.steps[-1]) %}
         {% endif %}
-        {% if test.attachments %}<button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>{% endif %}
-        {% if test.error %}<button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>{% endif %}
+
+        {% if step_data %}
+            {% if step_data.get('setup') %}
+                <button class="tab-btn" onclick="switchTab(this, 'setup')">Setup</button>
+            {% endif %}
+            {% if step_data.get('call') %}
+                <button class="tab-btn" onclick="switchTab(this, 'call')">Steps</button>
+            {% endif %}
+            {% if step_data.get('teardown') %}
+                <button class="tab-btn" onclick="switchTab(this, 'teardown')">Teardown</button>
+            {% endif %}
+        {% endif %}
+
+        {% if test.attachments %}
+            <button class="tab-btn" onclick="switchTab(this, 'attachments')">Attachments</button>
+        {% endif %}
+        {% if test.error %}
+            <button class="tab-btn error" onclick="switchTab(this, 'error')">Error</button>
+        {% endif %}
     </div>
 
     <div class="tab-content active" data-tab="overview">
@@ -311,18 +337,49 @@
         {% if test.known_bugs %}{{ render_known_bugs(test.known_bugs) }}{% endif %}
     </div>
 
-    {% if step_data %}
-        {% for stage, steps in step_data.items() %}
-        <div class="tab-content" data-tab="{{ stage }}">
-            <div class="steps">
-                {% for step in steps %}
-                    {{ render_step(step) }}
+    {% if test.steps %}
+        {% if test.steps | length > 1 %}
+            {% set last_step_data = steps.get(test.steps[-1]) %}
+            {% if last_step_data %}
+                {% for stage, _ in last_step_data.items() %}
+                    <div class="tab-content" data-tab="{{ stage }}">
+                        <div class="steps">
+                        {% for attempt_id in test.steps %}
+                            {% set step_data = steps.get(attempt_id) %}
+                            {% if step_data %}
+                                {% set attempt_index = loop.index %}
+                                {% if attempt_index > 1 %}
+                                    <h4 class="step-attempt-index">
+                                        <i class="fa-solid fa-arrow-rotate-left"></i> {{ attempt_index - 1 }}
+                                    </h4>
+                                {% endif %}
+                                {% for _, stage_steps in step_data.items() %}
+                                    {% for step in stage_steps %}
+                                        {{ render_step(step) }}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </div>
                 {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
+            {% endif %}
+        {% else %}
+            {% set step_data = steps.get(test.steps[0]) %}
+            {% if step_data %}
+                {% for stage, stage_steps in step_data.items() %}
+                    <div class="tab-content" data-tab="{{ stage }}">
+                        <div class="steps">
+                            {% for step in stage_steps %}
+                                {{ render_step(step) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endif %}
     {% else %}
-        <div class="no-steps">No step details available</div>
+        <div class="no-steps tab-content" data-tab="call">No step details available</div>
     {% endif %}
 
     {% if test.attachments %}

@@ -40,7 +40,7 @@ class PlaywrightAdapter(BrowserAdapter):
 
                 return page.screenshot(animations='disabled')
             except Exception as e:
-                print(f'[BLogger][WARN] Screenshot failed on page: {getattr(page, 'url', '?')}: {e}')
+                print(f'[BLogger][WARN] Screenshot failed on page: {getattr(page, "url", "?")}: {e}')
                 return None
 
         scr_container = []

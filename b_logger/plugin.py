@@ -105,6 +105,13 @@ def pytest_runtest_protocol(item, nextitem):
     runtime.run_report.save_json()
 
 
+@pytest.hookimpl
+def pytest_runtest_logstart(nodeid, location):
+    runtime.test_report.execution_count += 1
+    if runtime.test_report.execution_count > 1:
+        runtime.start_retry()
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item):
     runtime.step_container.current_stage = 'setup'

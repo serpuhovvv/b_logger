@@ -1,5 +1,3 @@
-import os
-import json
 import uuid
 from collections import defaultdict
 from datetime import datetime
@@ -77,7 +75,7 @@ class RunReport(BaseDataModel):
             self.end_time = parser.parse(self.end_time)
         return self.end_time
 
-    def add_result(self, test_report: TestReport):
+    def add_test_report(self, test_report: TestReport):
         module = test_report.module
         test_name = test_report.originalname
         status = test_report.status
@@ -93,13 +91,14 @@ class RunReport(BaseDataModel):
             for module_data in self.modules.values():
                 for test_name, test_reports in module_data['tests'].items():
                     for report in test_reports:
-                        steps_id = report.get('steps')
-                        if steps_id:
-                            path = f'{b_logs_tmp_steps_path()}/{steps_id}.json'
-                            try:
-                                steps_by_id[steps_id] = StepContainer.from_json(path)
-                            except FileNotFoundError:
-                                continue
+                        step_attempts = report.get('steps')
+                        if step_attempts:
+                            for attempt_id in step_attempts:
+                                path = f'{b_logs_tmp_steps_path()}/{attempt_id}.json'
+                                try:
+                                    steps_by_id[attempt_id] = StepContainer.from_json(path)
+                                except FileNotFoundError:
+                                    continue
         return steps_by_id
 
     def combine_modules_from_report(self, run_report):

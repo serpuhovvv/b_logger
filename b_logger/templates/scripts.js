@@ -228,7 +228,12 @@ function compareTests(a, b, field, order = 'asc') {
             valA = (a.dataset.status || '').toUpperCase();
             valB = (b.dataset.status || '').toUpperCase();
             break;
-        default: return 0;
+        case 'exec':
+            valA = parseInt(a.dataset.exec || '0', 10) || 0;
+            valB = parseInt(b.dataset.exec || '0', 10) || 0;
+            break;
+        default:
+            return 0;
     }
     if (valA < valB) return order === 'asc' ? -1 : 1;
     if (valA > valB) return order === 'asc' ? 1 : -1;

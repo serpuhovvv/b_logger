@@ -1,45 +1,24 @@
 import time
-import uuid
-from typing import Any
 
 from b_logger.entities.attachments import Attachment
-from b_logger.entities.steps import StepContainer
 from b_logger.entities.statuses import TestStatus
 from b_logger.utils.basedatamodel import BaseDataModel
-from b_logger.utils.paths import b_logs_tmp_steps_path
-
-
-# class TestError(BaseDataModel):
-#     def __init__(self, exc, stacktrace):
-#         self.exception = exc
-#         self.stacktrace = stacktrace
-
-
-# class TestInfo(BaseDataModel):
-#     def __init__(self):
-#         self.description = None
-#         self.parameters = {}
-#         self.known_bugs = []
-#         self.other = []
-#
-#     def add_parameter(self, key, value):
-#         self.parameters[key]= value
 
 
 class TestReport(BaseDataModel):
-
     def __init__(self, module: str = None, name: str = None, originalname: str = None):
         self.module: str = module
         self.name: str = name
         self.originalname: str = originalname
         self.status: TestStatus = TestStatus.NONE
+        self.execution_count = 0
         self.start_time = round(time.time(), 4)
         self.duration: float | None = None
         self.description: str | None = None
         self.info = {}
         self.attachments = []
         self.known_bugs = []
-        self.steps = None
+        self.steps = []
         self.error = None
         self.stacktrace = None
 
@@ -48,9 +27,6 @@ class TestReport(BaseDataModel):
 
     def set_duration(self, duration: float):
         self.duration = duration
-
-    def set_steps(self, steps_id):
-        self.steps = steps_id
 
     def set_error(self, error: str):
         self.error = error
@@ -63,9 +39,6 @@ class TestReport(BaseDataModel):
 
     def modify_description(self, description: str):
         self.description += f'\n\n{description}'
-
-    def add_known_bug(self, bug):
-        self.known_bugs.append(bug)
 
     def add_info(self, info: dict):
         for key, value in info.items():
@@ -90,10 +63,11 @@ class TestReport(BaseDataModel):
     def add_attachment(self, attachment: Attachment):
         self.attachments.append(attachment)
 
-    # def get_steps(self):
-    #     steps_path = f'{b_logs_tmp_steps_path()}/{self.steps}.json'
-    #     try:
-    #         steps = StepContainer.from_json(steps_path)
-    #         return steps
-    #     except Exception as e:
-    #         print(f'[BLogger][WARN] Unable to get steps for {self.name}: {e}')
+    def add_known_bug(self, bug):
+        self.known_bugs.append(bug)
+
+    def add_steps(self, steps_id):
+        if not isinstance(self.steps, list):
+            self.steps = [self.steps]
+
+        self.steps.append(steps_id)

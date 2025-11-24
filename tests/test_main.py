@@ -104,7 +104,7 @@ def test_main_functionality(some_fixture):
                         pass
 
 
-@pytest.mark.parametrize('py_param_1, py_param_2', [(f'qase.link/and/one_more.link', 222), (333, f'qase.link/and/one_more.link')])  # <-- These parameters will be added to test automatically
+@pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (333, f'qase.link/and/one_more.link')])  # <-- These parameters will be added to test automatically
 def test_parametrized(selenium_driver, py_param_1, py_param_2):
     with blog.step('Step 1'):
         selenium_driver.get(f'https://en.wikipedia.org/wiki/Jalape%C3%B1o')
@@ -113,7 +113,8 @@ def test_parametrized(selenium_driver, py_param_1, py_param_2):
                 blog.print(py_param_1)
                 with blog.step('Step 4'):
                     blog.print(py_param_2)
-                assert py_param_1 in [111, 444]
+                x = random.choice([111, 222, 444, 555])
+                assert py_param_1 == x
 
 
 @pytest.fixture()

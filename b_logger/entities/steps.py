@@ -129,17 +129,17 @@ class StepContainer(BaseDataModel, dict):
 
     @staticmethod
     def _recursive_search(step: Step, step_id: str) -> Step | None:
-        if step.id.startswith('print_'):
-            return
+        if not step.id.startswith('print'):
+            if step.id == step_id:
+                return step
 
-        if step.id == step_id:
-            return step
+            sub_steps = step.steps or None
+            if sub_steps:
+                for sub_step in sub_steps:
+                    found = StepContainer._recursive_search(sub_step, step_id)
+                    if found:
+                        return found
 
-        for sub_step in step.steps:
-            if not sub_step.id.startswith('print_'):
-                found = StepContainer._recursive_search(sub_step, step_id)
-                if found:
-                    return found
         return None
 
     def save_json(self, file_name=None):

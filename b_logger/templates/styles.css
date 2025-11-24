@@ -711,7 +711,7 @@ main::-webkit-scrollbar-thumb:hover {
 /* ===============================
    STEPS
 ================================= */
-.steps { margin: 0.5rem 0; }
+.steps { margin: 0 0; }
 .step {
   margin-bottom: 0.5rem;
   border-radius: var(--radius);
@@ -751,6 +751,10 @@ main::-webkit-scrollbar-thumb:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.step-attempt-index {
+    margin-bottom: 0.5rem;
 }
 
 .step-info { display: flex; align-items: center; gap: 1.5rem; }

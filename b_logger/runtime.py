@@ -34,18 +34,31 @@ class RunTime:
         test_name = item.name
         test_originalname = item.originalname
 
-        self.step_container = StepContainer()
         self.test_report = TestReport(module, test_name, test_originalname)
+        self.step_container = StepContainer()
 
     def finish_test(self):
         self.step_container.save_json()
-        self.test_report.set_steps(self.step_container.container_id)
+        self.test_report.add_steps(self.step_container.container_id)
 
-        self.run_report.add_result(self.test_report)
+        self.run_report.add_test_report(self.test_report)
 
-        del self.step_container, self.test_report
+        del self.test_report, self.step_container
+
         if self.browser:
             self.browser = None
+
+    def start_retry(self):
+        self.test_report.description = None
+        self.test_report.info = {}
+        self.test_report.known_bugs = []
+
+        self.step_container.save_json()
+        self.test_report.add_steps(self.step_container.container_id)
+
+        self.step_container = StepContainer()
+
+        # self.apply_info(retries=self.test_report.execution_count - 1)
 
     def process_test_result(self, report, call, item):
         """Process test results and set appropriate status."""
@@ -116,7 +129,7 @@ class RunTime:
 
                 self.step_container.failed = True
 
-            if step.parent_id is None:
+            if not step.parent_id:
                 self.step_container.failed = False
 
             step.set_status(StepStatus.FAILED)
