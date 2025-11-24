@@ -104,12 +104,17 @@ def test_main_functionality(some_fixture):
                         pass
 
 
+@pytest.fixture()
+def jumba():
+    with blog.step('Aaaaa'):
+        pass
+
+
 @pytest.mark.parametrize('py_param_1, py_param_2', [(111, 222), (777, f'qase.link/and/one_more.link')])  # <-- These parameters will be added to test automatically
-def test_parametrized(py_param_1, py_param_2):
-    with blog.step('Step Pre'):
+def test_parametrized(jumba, py_param_1, py_param_2):
+    with blog.step('Pre'):
         pass
     with blog.step('Step 1'):
-        # selenium_driver.get(f'https://en.wikipedia.org/wiki/Jalape%C3%B1o')
         with blog.step('Step 2'):
             with blog.step('Step 3', 'Step is expected to fail'):
                 with blog.step('Step 4'):

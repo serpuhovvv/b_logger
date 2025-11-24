@@ -715,14 +715,14 @@ main::-webkit-scrollbar-thumb:hover {
 
 .steps.steps-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(480px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    justify-items: stretch;
     gap: 0.5rem;
 }
 
 .attempt-block {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
     align-items: flex-start;
     gap: 0.5rem;
 }
@@ -732,7 +732,11 @@ main::-webkit-scrollbar-thumb:hover {
     --level: 0;
 }
 .attempt-index {
-    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
 }
 
 .step {
