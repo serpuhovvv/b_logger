@@ -340,17 +340,31 @@
                     <div class="tab-content" data-tab="{{ stage }}">
                         <div class="steps steps-grid">
                         {% for attempt_id in test.steps %}
-                            {% set step_data = steps.get(attempt_id).get(stage) %}
+                            {% set step_data = steps.get(attempt_id) %}
                             {% if step_data %}
                                 {% set attempt_index = loop.index %}
-                                <div class="attempt-block">
-                                    <span class="attempt-index"><i class="fa-solid fa-arrow-rotate-left"></i> {{ attempt_index - 1 }}</span>
-                                    <div class="attempt-steps">
-                                    {% for step in step_data %}
-                                        {{ render_step(step) }}
-                                    {% endfor %}
+                                {% if attempt_index > 1 %}
+                                    <div class="attempt-block">
+                                        <span class="attempt-index"><i class="fa-solid fa-arrow-rotate-left"></i> {{ attempt_index - 1 }}</span>
+                                        <div class="attempt-steps">
+                                        {% for _, stage_steps in step_data.items() %}
+                                            {% for step in stage_steps %}
+                                                {{ render_step(step) }}
+                                            {% endfor %}
+                                        {% endfor %}
+                                        </div>
                                     </div>
-                                </div>
+                                {% else %}
+                                    <div class="attempt-block">
+                                        <div class="attempt-steps">
+                                        {% for _, stage_steps in step_data.items() %}
+                                            {% for step in stage_steps %}
+                                                {{ render_step(step) }}
+                                            {% endfor %}
+                                        {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                         </div>
