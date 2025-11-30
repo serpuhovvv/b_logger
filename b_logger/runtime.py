@@ -58,8 +58,6 @@ class RunTime:
 
         self.step_container = StepContainer()
 
-        # self.apply_info(retries=self.test_report.execution_count - 1)
-
     def process_test_result(self, report, call, item):
         """Process test results and set appropriate status."""
 

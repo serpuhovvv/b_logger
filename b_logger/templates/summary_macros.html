@@ -101,8 +101,7 @@
 <table>
   <thead>
     <tr>
-      <th>Module</th>
-      <th>Test</th>
+      <th>Name</th>
       <th>Error</th>
 <!--      <th>Attachments</th>-->
       <th>Retries</th>
@@ -118,8 +117,7 @@
             {% set known_bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
             {% set retries_count = run.execution_count - 1 if run.execution_count else 0 %}
             <tr class="row {{ run.status.lower() }}">
-              <td>{{ module_name }}</td>
-              <td>{{ run.name }}</td>
+              <td>{{ module_name }}<br>{{ run.name }}</td>
               <td class="error-td">{{ run.error.partition('Stacktrace')[0] | escape }}</td>
 <!--              <td>{{ attach_count }}</td>-->
               <td>{{ retries_count }}</td>

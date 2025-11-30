@@ -69,11 +69,46 @@ class AllureAdapter(IntegrationBase):
 
     def attach(self, content, name, type_=None):
         if self._allure:
-            if isinstance(content, (str, Path)) and os.path.exists(str(content)):
-                file_path = Path(content)
-                name = name or file_path.name
-                mime_type = mimetypes.guess_type(file_path)[0]
+            try:
+                if isinstance(content, (str, Path)) and os.path.exists(str(content)):
+                    file_path = Path(content)
+                    name = name or file_path.name
+                    mime_type = mimetypes.guess_type(file_path)[0]
 
+                    mime_map = {
+                        "image/png": self._AttachmentType.PNG,
+                        "image/jpeg": self._AttachmentType.JPG,
+                        "application/json": self._AttachmentType.JSON,
+                        "text/plain": self._AttachmentType.TEXT,
+                        "text/html": self._AttachmentType.HTML,
+                        "application/xml": self._AttachmentType.XML,
+                    }
+
+                    attach_type = mime_map.get(mime_type, self._AttachmentType.TEXT)
+                    try:
+                        self._allure.attach.file(str(file_path), name, attachment_type=attach_type)
+                    except Exception as e:
+                        print(f'[AllureAdapter][WARN] Failed to attach file {file_path}: {e}')
+                    return
+
+                if isinstance(content, (dict, list)):
+                    content = process_json(content)
+                    type_ = "application/json"
+
+                if isinstance(content, (int, float, bool)):
+                    content = str(content)
+                    type_ = "text/plain"
+
+                if isinstance(content, bytes):
+                    attach_type = self._AttachmentType.TEXT if not type_ else None
+                    self._allure.attach(content, name or "attachment", attach_type)
+                    return
+
+                mime_type = (
+                    mimetypes.guess_type(type_)[0]
+                    if type_ and not type_.startswith("image/")
+                    else type_
+                )
                 mime_map = {
                     "image/png": self._AttachmentType.PNG,
                     "image/jpeg": self._AttachmentType.JPG,
@@ -82,42 +117,10 @@ class AllureAdapter(IntegrationBase):
                     "text/html": self._AttachmentType.HTML,
                     "application/xml": self._AttachmentType.XML,
                 }
-
                 attach_type = mime_map.get(mime_type, self._AttachmentType.TEXT)
-                try:
-                    self._allure.attach.file(str(file_path), name, attachment_type=attach_type)
-                except Exception as e:
-                    print(f"[AllureAdapter] Failed to attach file {file_path}: {e}")
-                return
-
-            if isinstance(content, (dict, list)):
-                content = process_json(content)
-                type_ = "application/json"
-
-            if isinstance(content, (int, float, bool)):
-                content = str(content)
-                type_ = "text/plain"
-
-            if isinstance(content, bytes):
-                attach_type = self._AttachmentType.TEXT if not type_ else None
-                self._allure.attach(content, name or "attachment", attach_type)
-                return
-
-            mime_type = (
-                mimetypes.guess_type(type_)[0]
-                if type_ and not type_.startswith("image/")
-                else type_
-            )
-            mime_map = {
-                "image/png": self._AttachmentType.PNG,
-                "image/jpeg": self._AttachmentType.JPG,
-                "application/json": self._AttachmentType.JSON,
-                "text/plain": self._AttachmentType.TEXT,
-                "text/html": self._AttachmentType.HTML,
-                "application/xml": self._AttachmentType.XML,
-            }
-            attach_type = mime_map.get(mime_type, self._AttachmentType.TEXT)
-            self._allure.attach(str(content), name or "attachment", attach_type)
+                self._allure.attach(str(content), name or "attachment", attach_type)
+            except Exception as e:
+                print(f'[AllureAdapter][WARN] Failed to attach {name}: {e}')
 
 
 class QaseAdapter(IntegrationBase):
@@ -157,6 +160,7 @@ class QaseAdapter(IntegrationBase):
             else:
                 content = pformat(value)
                 mimetype = 'text/plain'
+
             try:
                 self._qase.attach((content, name, mimetype))
             except:
@@ -168,21 +172,24 @@ class QaseAdapter(IntegrationBase):
 
     def attach(self, content, name, type_=None):
         if self._qase:
-            if not type_:
-                if isinstance(content, (dict, list, tuple, set)):
-                    content = process_json(content)
-                    type_ = 'application/json'
-                elif isinstance(content, (str, int, float, bool)):
-                    content = str(content)
-                    type_ = 'text/plain'
-                elif isinstance(content, bytes):
-                    content = content
-                    type_ = 'application/octet-stream'
-                else:
-                    content = pformat(content)
-                    type_ = 'text/plain'
+            try:
+                if not type_:
+                    if isinstance(content, (dict, list, tuple, set)):
+                        content = process_json(content)
+                        type_ = 'application/json'
+                    elif isinstance(content, (str, int, float, bool)):
+                        content = str(content)
+                        type_ = 'text/plain'
+                    elif isinstance(content, bytes):
+                        content = content
+                        type_ = 'application/octet-stream'
+                    else:
+                        content = pformat(content)
+                        type_ = 'text/plain'
 
-            self._qase.attach((content, name, type_))
+                self._qase.attach((content, name, type_))
+            except Exception as e:
+                print(f'[QASEAdapter][WARN] Failed to attach {name}: {e}')
 
 
 adapters = [QaseAdapter(), AllureAdapter()]
