@@ -51,42 +51,59 @@ pip install pytest-b-logger
 ```
 
 ## Setup
-
 Add **blog.config.yaml** file to the root of your project.
 
-Bare minimum for everything to work is:
+### project_name
 
+Bare minimum for everything to work is project_name: 
 ```yaml
-project_name: "Project Name"
+project_name: 'Project Name'
 ```
 
-Set the desired Time Zone (IANA format, e.g. `Europe/Moscow`, `UTC`, `America/New_York`):
-
+### timezone
+Then you can set the desired Time Zone (IANA format e.g. Europe/Moscow, UTC, America/New_York).\
+The list of available timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ```yaml
-project_name: "BLogger Project"
+project_name: 'Project Name'
 
-tz: "Europe/Moscow"
+tz: 'Europe/Moscow'
 ```
 
-Enable Allure integration:
-
+### integrations
+By default, integrations are turned off. \
+If you are using Allure and want steps, info, description etc. to be duplicated to Allure, 
+simply add integrations block and set allure: True
 ```yaml
+project_name: 'Project Name'
+
+tz: 'Europe/Moscow'
+
 integrations:
-  allure: true
+  allure: True
 ```
 
-Optionally set env and base_url:
-
+### env and base_url
+You can add env and base url here.
 ```yaml
-env: "prod"
-base_url: "https://base-url.com"
+project_name: 'Project Name'
+
+tz: 'Europe/Moscow'
+
+integrations:
+  allure: True
+
+env: 'prod' # optional
+base_url: 'https://base-url.com' # optional
 ```
-
-CLI overrides:
-
+Which, could also be passed as command line options on test run, e.g. when using CI/CD:
 ```bash
-pytest --blog-env "prod" --blog-base-url "https://base-url.com"
+pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
+Now you are all set up. \
+Simply run pytest and **b_logs** folder will be generated 
+with **blog_report.html** and **blog_summary.html** \
+For more advanced usage please review [BLogger API](#blogger-api)
+
 
 ## BLogger API
 
