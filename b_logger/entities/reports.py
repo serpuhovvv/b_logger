@@ -34,7 +34,7 @@ class RunReport(BaseDataModel):
         self.base_url = blog_config.base_url
         self.env = blog_config.env
         self.worker = None
-        self.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.start_time = datetime.now(tz=blog_config.tz).strftime('%Y-%m-%d %H:%M:%S %Z')
         self.end_time = None
         self.duration = None
         self.report_ids = {}
@@ -56,23 +56,25 @@ class RunReport(BaseDataModel):
         self.worker = worker
 
     def set_end_time(self):
-        self.end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.end_time = datetime.now(tz=blog_config.tz).strftime('%Y-%m-%d %H:%M:%S %Z')
 
     def count_duration(self):
         if isinstance(self.start_time, str) or isinstance(self.end_time, str):
-            self.start_time = self.get_iso_start_time()
-            self.end_time = self.get_iso_end_time()
+            start_time = self.get_iso_start_time()
+            end_time = self.get_iso_end_time()
 
-        self.duration = self.end_time - self.start_time
+            self.duration = end_time - start_time
+        else:
+            self.duration = self.end_time - self.start_time
 
     def get_iso_start_time(self):
         if isinstance(self.start_time, str):
-            self.start_time = parser.parse(self.start_time)
+            return parser.parse(self.start_time)
         return self.start_time
 
     def get_iso_end_time(self):
         if isinstance(self.end_time, str):
-            self.end_time = parser.parse(self.end_time)
+            return parser.parse(self.end_time)
         return self.end_time
 
     def add_test_report(self, test_report: TestReport):

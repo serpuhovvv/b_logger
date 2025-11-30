@@ -1,5 +1,7 @@
 project_name: "BLogger Project"
 
+tz: 'Europe/Moscow'
+
 integrations:
   allure: True
   qase: False

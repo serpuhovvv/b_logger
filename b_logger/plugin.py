@@ -28,9 +28,9 @@ debug = False
 
 
 def pytest_addoption(parser):
-    group = parser.getgroup('blog')
+    group = parser.getgroup('pytest-b-logger')
 
-    BlogPyAddons.add_blog_options(parser, group)
+    BlogPyAddons.add_blog_options(group)
 
 
 def pytest_configure(config):

@@ -1,6 +1,7 @@
 from typing import Optional
 import yaml
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from b_logger.utils.paths import pathfinder
 
@@ -30,17 +31,27 @@ class BLoggerConfig:
         self.env: Optional[str] = self._data.get("env")
         self.base_url: Optional[str] = self._data.get("base_url")
 
-        self.integrations = self._data.get("integrations", {})
+        tz_value = self._data.get("tz", "UTC")
+        self.tz: Optional[ZoneInfo] = self._process_tz(tz_value)
+
+        self.integrations: Optional[dict] = self._data.get("integrations", {})
         self.qase: bool = bool(self.integrations.get("qase", False))
         self.allure: bool = bool(self.integrations.get("allure", False))
-
-        self.links = self._data.get("links", {})
 
         # Other
         self._extra = {
             k: v for k, v in self._data.items()
             if not hasattr(self, k)
         }
+
+    @staticmethod
+    def _process_tz(tz_value):
+        try:
+            return ZoneInfo(tz_value)
+        except ZoneInfoNotFoundError as e:
+            raise RuntimeError(
+                f"[BLogger] Timezone '{tz_value}' not found. Set a valid IANA timezone (e.g. 'UTC', 'Europe/Moscow', 'America/New_York')."
+            ) from e
 
     @staticmethod
     def _load_config_file(path: Path = None) -> dict:
@@ -67,15 +78,16 @@ class BLoggerConfig:
             self._extra[key] = value
 
     def __getattr__(self, key):
-        _extra = object.__getattribute__(self, "_extra") if "_extra" in self.__dict__ else {}
-        if key in _extra:
-            return _extra[key]
+        if key in self._extra:
+            return self._extra[key]
         print(f'[BLogger][WARN] blog_config object has no attribute "{key}"')
 
     def __setattr__(self, key, value):
         if key in {
-            "_data", "_extra", "project_name", "env", "base_url",
-            "qase", "allure", "links"
+            "_data", "_extra",
+            "project_name", "tz",
+            "env", "base_url",
+            "qase", "allure"
         }:
             object.__setattr__(self, key, value)
         else:
@@ -84,11 +96,11 @@ class BLoggerConfig:
     def as_dict(self) -> dict:
         base = {
             "project_name": self.project_name,
+            "tz": self.tz,
             "env": self.env,
             "base_url": self.base_url,
-            "qase": self.qase,
             "allure": self.allure,
-            "links": self.links,
+            "qase": self.qase
         }
         return {**base, **self._extra}
 

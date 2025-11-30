@@ -19,12 +19,12 @@ class ReportGenerator:
 
     def load_reports(self):
         report_files = glob(f'{b_logs_tmp_reports_path()}/report_*.json')
-        for rep in report_files:
+        for rep_path in report_files:
             try:
-                report = RunReport.from_json(rep)
+                report = RunReport.from_json(rep_path)
                 self.merge(report)
             except Exception as e:
-                print(f'[BLogger][ERROR] Failed to process {rep}: {e}')
+                print(f'[BLogger][ERROR] Failed to process {rep_path}: {e}')
                 raise e
 
     def merge(self, report: RunReport):
@@ -41,7 +41,6 @@ class ReportGenerator:
         output_path = f'{b_logs_path()}/{filename}'
         with FileLock(f'{output_path}.lock'):
             self.combined.to_json_file(output_path)
-        # print(f"[INFO] Combined report saved to {output_path}")
 
     @staticmethod
     def clear_locks():
@@ -87,7 +86,6 @@ class ReportGenerator:
     def _merge_run_results(self, report: RunReport):
         for status, count in report.run_results.items():
             self.combined.run_results.increase(status, count)
-            # self.combined.run_results[status] += count
 
     def _merge_module_results(self, report: RunReport):
         self.combined.combine_modules_from_report(report)

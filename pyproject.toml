@@ -1,8 +1,8 @@
 [project]
 name = "pytest-b-logger"
-version = "1.1.8"
+version = "1.1.9"
 description = "BLogger is a Pytest plugin for enhanced test logging and generating convenient and lightweight reports."
-readme = "README.md"
+readme = "README_pypi.md"
 authors = [
     {name="serpuhovvv", email="pudikovserg@gmail.com"}
 ]
@@ -15,7 +15,8 @@ dependencies = [
     'pyyaml',
     'filelock',
     'Jinja2',
-    'python-dateutil'
+    'python-dateutil',
+    'tzdata'
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
