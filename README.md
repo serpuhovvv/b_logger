@@ -1,10 +1,13 @@
 # BLogger — Pytest Logging Plugin
 
-## Table of Contents
 - [Overview](#overview)
 - [Report Examples](#report-examples)
 - [Installation](#installation)
 - [Setup](#setup)
+  - [Project Name](#project_name)
+  - [Time Zone](#timezone)
+  - [Integrations](#integrations)
+  - [Env and Base URL](#env-and-base_url)
 - [BLogger API](#blogger-api)
   - [Set Base URL](#set-base-url)
   - [Set Env](#set-env)
@@ -18,10 +21,13 @@
   - [Screenshot](#screenshot)
   - [Attach](#attach)
 - [Publishing to CI/CD](#publishing-to-cicd)
+  - [Jenkins](#jenkins)
 - [Useful Features](#useful-features)
+  - [Notes](#notes)
   - [Search, Filters and Sorting](#search-filters-and-sorting)
   - [Compare Retries](#compare-retries)
   - [Automatic Error Screenshots](#automatic-error-screenshots)
+---
 
 
 ## Overview
@@ -30,31 +36,41 @@ BLogger is a Pytest plugin for enhanced test logging and generating convenient a
 It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots.  
 Works seamlessly with Selenium WebDriver and Playwright Page instances. \
 Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
+---
+
 
 ## Report Examples
+
 ### Sample Report
 [Download sample_b_logs.zip](readme_content/sample_b_logs.zip)
+
 ### blog_report.html
 Click on main icon (pepper) to switch themes
 
 ![img.png](readme_content/report_overview_1.png)
 ![img.png](readme_content/report_overview_2.png)
 ![img.png](readme_content/report_overview_3.png)
+
 ### blog_summary.html
 ![img.png](readme_content/summary_overview.png)
+
+---
+
+
 
 ## Installation
 
 ```bash
 pip install pytest-b-logger
 ```
+---
+
 
 
 ## Setup
-Add **blog.config.yaml** file to the root of your project.
+Add ***blog.config.yaml*** file to the ***root*** of your project.
 
 ### project_name
-
 Bare minimum for everything to work is project_name: 
 ```yaml
 project_name: 'Project Name'
@@ -100,12 +116,15 @@ Which, could also be passed as command line options on test run, e.g. when using
 pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
 Now you are all set up. \
-Simply run pytest and **b_logs** folder will be generated 
-with **blog_report.html** and **blog_summary.html** \
-For more advanced usage please review [BLogger API](#blogger-api)
+Simply run pytest and ***b_logs*** folder will be generated 
+with ***blog_report.html*** and ***blog_summary.html*** \
+For more advanced usage please review ***[BLogger API](#blogger-api)***
+---
+
 
 
 ## BLogger API
+
 
 ### Set Base URL
 `blog.set_base_url(base_url: str)`
@@ -361,7 +380,7 @@ blog.attach(excel_data, 'excel_file.xlsx')
 
 ## Usage examples
 
----
+
 
 ## Publishing to CI/CD
 ### Jenkins
@@ -392,13 +411,40 @@ zip zipFile: 'b_logs.zip', archive: true, dir: 'b_logs/'
 
 ## Useful Features
 
+### Notes
+Add ***blog.notes.yaml*** to the ***root*** of your project 
+
+You can add ***style*** block if you want notes to be formatted in blog_summary.html. \
+Inside simple css styles like color and font-size
+```yaml
+style: # optional
+  color: red
+  font-size: 20px
+
+notes:
+  - 'Here you can add any useful info about project'
+  - 'For example floating bugs or specifications'
+  - 'These notes will appear in blog_report.html and blog_summary.html'
+```
+This ***blog.notes.yaml*** will result in
+
+blog_summary.html
+![img.png](readme_content/notes_1.png)
+
+blog_report.html
+![img.png](readme_content/notes_2.png)
+___
+
+
 ### Search, Filters and Sorting
 ![img.png](readme_content/sidebar_filters.png)
 ___
 
+
 ### Compare Retries
 ![img.png](readme_content/retry_comparison.png)
 ___
+
 
 ### Automatic Error Screenshots
 ![img.png](readme_content/auto_err_scr_1.png)

@@ -17,6 +17,7 @@
                 {{ macros.render_search_filter(report) }}
                 {{ macros.render_report_header(report) }}
                 {{ macros.render_summary(report) }}
+                {{ macros.render_notes(report) }}
             </aside>
             <main class="main-content">
                 {% for module_name, module_data in report.modules.items() %}

@@ -20,10 +20,9 @@ class BLoggerConfig:
             cls._instance = BLoggerConfig()
         return cls._instance
 
-    def __init__(self, path: str = f'{pathfinder.project_root()}/blog.config.yaml'):
+    def __init__(self, config_path: str = f'{pathfinder.project_root()}/blog.config.yaml', notes_path: str = f'{pathfinder.project_root()}/blog.notes.yaml'):
         self._extra = {}
 
-        config_path = Path(path)
         self._data = self._load_config_file(config_path)
 
         # YAML
@@ -38,11 +37,32 @@ class BLoggerConfig:
         self.qase: bool = bool(self.integrations.get("qase", False))
         self.allure: bool = bool(self.integrations.get("allure", False))
 
+        self.notes: Optional[dict] = self._load_notes_file(notes_path)
+
         # Other
         self._extra = {
             k: v for k, v in self._data.items()
             if not hasattr(self, k)
         }
+
+    @staticmethod
+    def _load_config_file(path: str = None) -> dict:
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f'[BLogger][ERROR] blog.config.yaml file not found: {path}')
+
+        with path.open("r", encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+
+    @staticmethod
+    def _load_notes_file(path: str = None) -> dict:
+        path = Path(path)
+        if not path.exists():
+            # print(f'[BLogger][WARN] blog.notes.yaml file not found: {path}')
+            return {}
+
+        with path.open("r", encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
 
     @staticmethod
     def _process_tz(tz_value):
@@ -52,13 +72,6 @@ class BLoggerConfig:
             raise RuntimeError(
                 f"[BLogger] Timezone '{tz_value}' not found. Set a valid IANA timezone (e.g. 'UTC', 'Europe/Moscow', 'America/New_York')."
             ) from e
-
-    @staticmethod
-    def _load_config_file(path: Path = None) -> dict:
-        if not path.exists():
-            raise FileNotFoundError(f'[BLogger][ERROR] blog.config.yaml file not found: {path}')
-        with path.open("r", encoding="utf-8") as f:
-            return yaml.safe_load(f) or {}
 
     def apply_cli_options(self, config):
         for opt_name in config.option.__dict__:
@@ -87,7 +100,7 @@ class BLoggerConfig:
             "_data", "_extra",
             "project_name", "tz",
             "env", "base_url",
-            "qase", "allure"
+            "qase", "allure", "notes"
         }:
             object.__setattr__(self, key, value)
         else:
@@ -100,7 +113,8 @@ class BLoggerConfig:
             "env": self.env,
             "base_url": self.base_url,
             "allure": self.allure,
-            "qase": self.qase
+            "qase": self.qase,
+            "notes": self.notes
         }
         return {**base, **self._extra}
 

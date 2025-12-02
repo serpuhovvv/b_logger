@@ -31,8 +31,9 @@ class RunReport(BaseDataModel):
     def __init__(self):
         self.report_id = f'report_{uuid.uuid4()}'
         self.proj_name = blog_config.project_name
-        self.base_url = blog_config.base_url
         self.env = blog_config.env
+        self.base_url = blog_config.base_url
+        self.notes = blog_config.notes
         self.worker = None
         self.start_time = datetime.now(tz=blog_config.tz).strftime('%Y-%m-%d %H:%M:%S %Z')
         self.end_time = None
@@ -46,11 +47,11 @@ class RunReport(BaseDataModel):
             }
         )
 
-    def set_base_url(self, base_url: str):
-        self.base_url = base_url
-
     def set_env(self, env: str):
         self.env = env
+
+    def set_base_url(self, base_url: str):
+        self.base_url = base_url
 
     def set_worker(self, worker):
         self.worker = worker
@@ -69,12 +70,12 @@ class RunReport(BaseDataModel):
 
     def get_iso_start_time(self):
         if isinstance(self.start_time, str):
-            return parser.parse(self.start_time)
+            return parser.parse(self.start_time, ignoretz=True)
         return self.start_time
 
     def get_iso_end_time(self):
         if isinstance(self.end_time, str):
-            return parser.parse(self.end_time)
+            return parser.parse(self.end_time, ignoretz=True)
         return self.end_time
 
     def add_test_report(self, test_report: TestReport):

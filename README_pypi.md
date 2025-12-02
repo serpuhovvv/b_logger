@@ -1,11 +1,13 @@
 # BLogger — Pytest Logging Plugin
 
-## Table of Contents
 - [Overview](#overview)
-- [Features](#features)
 - [Report Examples](#report-examples)
 - [Installation](#installation)
 - [Setup](#setup)
+  - [Project Name](#project_name)
+  - [Time Zone](#timezone)
+  - [Integrations](#integrations)
+  - [Env and Base URL](#env-and-base_url)
 - [BLogger API](#blogger-api)
   - [Set Base URL](#set-base-url)
   - [Set Env](#set-env)
@@ -19,7 +21,9 @@
   - [Screenshot](#screenshot)
   - [Attach](#attach)
 - [Publishing to CI/CD](#publishing-to-cicd)
+  - [Jenkins](#jenkins)
 - [Useful Features](#useful-features)
+---
 
 
 ## Overview
@@ -28,6 +32,7 @@ BLogger is a Pytest plugin for enhanced test logging and generating convenient a
 It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots.  
 Works seamlessly with Selenium WebDriver and Playwright Page instances. \
 Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
+---
 
 
 ## Features
@@ -39,10 +44,13 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 - **Print** messages attached to current step (supports multiline and complex data).  
 - Take and attach **screenshots** automatically on demand or on errors.  
 - **Attach** files or arbitrary data to steps.
+---
+
 
 ## Report Examples
+Sample HTML reports and screenshots are available in the [GitHub repository](https://github.com/serpuhovvv/b_logger).
 
-Sample HTML reports and screenshots are available in the GitHub repository.
+
 
 ## Installation
 
@@ -356,6 +364,7 @@ blog.attach({"a": 1, "b": 2}, 'some_data')
 blog.attach(Path('path/to/your/file.ext'))
 blog.attach(excel_data, 'excel_file.xlsx')
 ```
+---
 
 
 ## Publishing to CI/CD
@@ -385,7 +394,7 @@ zip zipFile: 'b_logs.zip', archive: true, dir: 'b_logs/'
 ```
 
 ## Useful Features
-
+- Notes
 - Filtering, Sorting and Search  
 - Retry comparison  
 - Automatic error screenshots  

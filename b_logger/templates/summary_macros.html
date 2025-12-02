@@ -1,3 +1,18 @@
+{% macro render_notes(report) %}
+{% if report.notes %}
+{% set notes = report.notes.notes or [] %}
+{% set style = report.notes.style or {} %}
+<h3>Notes</h3>
+  <ul>
+  {% for note in notes %}
+    <li style="{% for k, v in style.items() %}{{ k | e }}: {{ v | e }}; {% endfor %}">{{ note | escape }}</li>
+  {% endfor %}
+  </ul>
+{% endif %}
+{% endmacro %}
+
+
+
 {% macro render_run_info(report) %}
 <h3>Run Information</h3>
 <div>
@@ -65,6 +80,7 @@
 {% endmacro %}
 
 
+
 {% macro render_module_statistics(report) %}
 <h3>Module Statistics</h3>
 <table>
@@ -96,6 +112,7 @@
 {% endmacro %}
 
 
+
 {% macro render_failed_tests(report) %}
 <h3>Failed Tests Details</h3>
 <table>
@@ -103,7 +120,6 @@
     <tr>
       <th>Name</th>
       <th>Error</th>
-<!--      <th>Attachments</th>-->
       <th>Retries</th>
       <th>Known Bugs</th>
     </tr>
@@ -113,13 +129,11 @@
       {% for test_name, test_runs in module_data.tests.items() %}
         {% for run in test_runs %}
           {% if run.status in ["FAILED", "BROKEN"] %}
-            {% set attach_count = run.attachments | length if run.attachments else 0 %}
             {% set known_bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
             {% set retries_count = run.execution_count - 1 if run.execution_count else 0 %}
             <tr class="row {{ run.status.lower() }}">
-              <td>{{ module_name }}<br>{{ run.name }}</td>
+              <td class="name-td">{{ module_name }}<br>{{ run.name }}</td>
               <td class="error-td">{{ run.error.partition('Stacktrace')[0] | escape }}</td>
-<!--              <td>{{ attach_count }}</td>-->
               <td>{{ retries_count }}</td>
               <td>{{ known_bugs_count }}</td>
             </tr>
@@ -132,7 +146,9 @@
 {% endmacro %}
 
 
+
 {% macro render_full_report_summary(report) %}
+  {{ render_notes(report) }}
   {{ render_run_info(report) }}
   {{ render_module_statistics(report) }}
   {{ render_failed_tests(report) }}

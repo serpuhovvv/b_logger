@@ -133,6 +133,28 @@
 
 
 
+{% macro render_notes(report) %}
+<div class="card">
+    <div class="header expanded" onclick="toggleBlock(this)">
+        <h3><i class="fas fa-book-open"></i> Notes</h3>
+        <i class="fas fa-chevron-down toggle-icon"></i>
+    </div>
+    <div class="content active">
+        {% if report.notes %}
+            {% set notes = report.notes.notes or [] %}
+            {% for note in notes %}
+                <div>
+                ● {{ note | escape }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+
+
+
 {% macro render_module(module_name, module_data, steps) %}
 <div id="module_{{ module_name|replace('\\','_') }}" class="card module" data-module="{{ module_name }}">
     <div class="header" onclick="toggleBlock(this)">
