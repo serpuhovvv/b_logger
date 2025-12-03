@@ -386,6 +386,10 @@ main::-webkit-scrollbar-thumb:hover {
 	border-color: var(--primary);
 }
 
+.sidebar .note {
+    margin-bottom: 0.5rem;
+}
+
 /* ===============================
    CARDS & SUMMARY
 ================================= */

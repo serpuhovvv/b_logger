@@ -132,7 +132,7 @@
             {% set known_bugs_count = run.known_bugs | length if run.known_bugs else 0 %}
             {% set retries_count = run.execution_count - 1 if run.execution_count else 0 %}
             <tr class="row {{ run.status.lower() }}">
-              <td class="name-td">{{ module_name }}<br>{{ run.name }}</td>
+              <td class="name-td">{{ module_name }}<br>----------<br>{{ run.name }}</td>
               <td class="error-td">{{ run.error.partition('Stacktrace')[0] | escape }}</td>
               <td>{{ retries_count }}</td>
               <td>{{ known_bugs_count }}</td>

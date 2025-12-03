@@ -40,12 +40,11 @@ def pytest_configure(config):
 
     blog_config.rootpath = str(config.rootpath)
 
-    if not runtime.run_report.base_url:
-        runtime.set_base_url(config.option.blog_base_url)
-
     if not runtime.run_report.env:
-        runtime.set_env(config.option.blog_env)
+        runtime.set_env(blog_config.env)
 
+    if not runtime.run_report.base_url:
+        runtime.set_base_url(blog_config.base_url)
 
 # def pytest_unconfigure(config):
 #     try:

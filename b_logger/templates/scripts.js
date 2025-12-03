@@ -446,14 +446,14 @@ function toggleTestAndHash(header){
 
 function updateExpandedState(id,isOpen){
     let state = {};
-    try { state = loadFromStorage("expandedTests", {}); } catch {}
+    try { state = loadFromStorage("expandedBlocks", {}); } catch {}
     state[id] = isOpen;
-    saveToStorage("expandedTests", state)
+    saveToStorage("expandedBlocks", state)
 }
 
 function restoreExpandedState(){
     let state = {};
-    try { state = loadFromStorage("expandedTests", {}); } catch {}
+    try { state = loadFromStorage("expandedBlocks", {}); } catch {}
     Object.keys(state).forEach(id => {
         const el = getElById(id);
         if(!el) return;
@@ -483,7 +483,7 @@ function expandTestAndParents(el){
 function resetAllBlocks(){
     getAll(".test-content").forEach(c => toggleClass(c, "active", false));
     getAll(".test-header").forEach(h => toggleClass(h, "expanded", false));
-    sessionStorage.removeItem("expandedTests");
+    sessionStorage.removeItem("expandedBlocks");
 }
 
 // ===================== HASH HANDLING =====================
