@@ -1,5 +1,7 @@
 # BLogger — Pytest Logging Plugin
 
+[Switch to RU version of README.md](README_ru.md)
+
 - [Overview](#overview)
 - [Report Examples](#report-examples)
 - [Installation](#installation)
@@ -37,12 +39,13 @@ BLogger is a Pytest plugin for enhanced test logging and generating convenient a
 It supports structured test steps, descriptions, info notes, known bugs, and automatic screenshots.  
 Works seamlessly with Selenium WebDriver and Playwright Page instances. \
 Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
+
 ---
 
 
 ## Report Examples
 
-### Sample Report
+### b_logs
 [Download sample_b_logs.zip](readme_content/sample_b_logs.zip)
 
 ### blog_report.html
@@ -97,7 +100,7 @@ tz: 'Europe/Moscow'
 ### integrations
 By default, integrations are turned off. \
 If you are using Allure and want steps, info, description etc. to be duplicated to Allure, 
-simply add integrations block and set ***allure: True***
+simply add integrations block and set ***integrations: allure: True***
 ```yaml
 project_name: 'Project Name'
 
@@ -163,7 +166,6 @@ For more advanced usage please review ***[BLogger API](#blogger-api)***
 `blog.set_base_url(base_url: str)`
 
 Set `base_url` for the entire Run
-
 ```python
 from b_logger import blog
 
@@ -266,8 +268,8 @@ Will be added to the Overview Tab and Current Step
 
 Can be used as marker @blog.info(k=v) as well as function blog.info(k=v)\
 
-k is a name of an info block\
-v supports any data type, but {} is most readable and convenient
+k: name of an info block \
+v: supports any data type, but {} is most readable and convenient
 
 Any amount of info blocks is allowed: @blog.info(k=v, k=v, k=v, ...)
 
@@ -417,7 +419,9 @@ blog.attach(excel_data, 'excel_file.xlsx')
 
 ## Publishing to CI/CD
 ### Jenkins
-To post results to Jenkins you could simply use the HTMLpublisher utility and the following command:
+To post results to Jenkins you could simply use the HTMLpublisher utility.
+
+Add the following command to ***pipeline script*** or ***Jenkinsfile***:
 ```
 publishHTML([
     reportName: 'BLog Report',
