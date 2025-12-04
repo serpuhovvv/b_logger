@@ -3,11 +3,9 @@
 {% set notes = report.notes.notes or [] %}
 {% set style = report.notes.style or {} %}
 <h3>Notes</h3>
-  <ul>
   {% for note in notes %}
-    <li style="{% for k, v in style.items() %}{{ k | e }}: {{ v | e }}; {% endfor %}">{{ note | escape }}</li>
+    <div class="note" style="{% for k, v in style.items() %}{{ k | e }}: {{ v | e }}; {% endfor %}">{{ note | escape }}</div>
   {% endfor %}
-  </ul>
 {% endif %}
 {% endmacro %}
 
