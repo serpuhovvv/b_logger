@@ -40,10 +40,6 @@ def pytest_configure(config):
 
     blog_config.rootpath = str(config.rootpath)
 
-    runtime.set_env(blog_config.env)
-
-    runtime.set_base_url(blog_config.base_url)
-
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session):

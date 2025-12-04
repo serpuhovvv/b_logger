@@ -132,7 +132,7 @@ Which, could also be passed as command line options on test run, e.g. when using
 pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
 
-***!!! Note !!!*** Options apply in the following order: blog.config.yaml > Command Line Arguments > blog methods inside code
+***!!! Note !!!*** Options apply in the following order: blog.config.yaml > blog methods inside code > Command Line Arguments 
 
 Now you are all set up. \
 Simply run pytest and ***b_logs*** folder will be generated 

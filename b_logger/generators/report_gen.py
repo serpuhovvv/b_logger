@@ -9,6 +9,7 @@ from b_logger.utils.paths import b_logs_path, clear_b_logs_tmp, b_logs_tmp_repor
 class ReportGenerator:
     def __init__(self):
         self.combined = RunReport()
+        self.combined.apply_config()
 
     def generate_combined_report(self):
         self.load_reports()
@@ -52,8 +53,6 @@ class ReportGenerator:
         if self.combined.proj_name and self.combined.proj_name != report.proj_name:
             print(f'[BLogger][WARN] Project name changed. Config: {report.proj_name} | CLI: {self.combined.proj_name}')
             return
-
-        self.combined.proj_name = report.proj_name
 
     def _merge_env(self, report: RunReport):
         if self.combined.env and self.combined.env != report.env:

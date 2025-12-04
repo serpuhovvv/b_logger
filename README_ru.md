@@ -81,17 +81,20 @@ project_name: 'Project Name'
 ```bash
 pytest --blog-project-name '...'
 ```
+---
 
 
 ### timezone
 Укажите желаемый часовой пояс в формате IANA (например: Europe/Moscow, UTC, America/New_York). \
 Список доступных часовых поясов: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-![img.png](readme_content/tz.png)
 ```yaml
 project_name: 'Project Name'
 
 tz: 'Europe/Moscow'
 ```
+![img.png](readme_content/tz.png)
+
+---
 
 
 ### integrations
@@ -106,6 +109,7 @@ tz: 'Europe/Moscow'
 integrations:
   allure: True
 ```
+---
 
 
 ### hide_passwords
@@ -124,6 +128,7 @@ integrations:
 
 hide_passwords: False
 ```
+---
 
 
 ### env and base_url
@@ -145,10 +150,11 @@ base_url: 'https://base-url.com' # optional
 ```bash
 pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
+---
 
 ***!!! Важно !!!***
 Параметры применяются в следующем порядке:
-blog.config.yaml → CLI аргументы → методы blog внутри тестов
+blog.config.yaml → методы blog внутри тестов → аргументы командной строки
 
 Теперь настройка завершена.
 При запуске pytest автоматически появится папка b_logs

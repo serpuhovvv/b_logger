@@ -13,19 +13,6 @@ from b_logger.plugin import runtime
 class BLogger:
 
     @staticmethod
-    def set_base_url(base_url: str):
-        """
-        Set base_url for the entire Run
-
-        Can also be added in blog.config.yaml:
-            base_url: 'https://base-url.com'
-
-        Or via command line options:
-            --blog_base_url 'https://base-url.com'
-        """
-        runtime.set_base_url(base_url)
-
-    @staticmethod
     def set_env(env: str):
         """
         Set env for the entire Run
@@ -34,9 +21,22 @@ class BLogger:
             env: 'prod'
 
         Or via command line options:
-            --blog_env 'prod'
+            --blog-env 'prod'
         """
         runtime.set_env(env)
+
+    @staticmethod
+    def set_base_url(base_url: str):
+        """
+        Set base_url for the entire Run
+
+        Can also be added in blog.config.yaml:
+            base_url: 'https://base-url.com'
+
+        Or via command line options:
+            --blog-base-url 'https://base-url.com'
+        """
+        runtime.set_base_url(base_url)
 
     @staticmethod
     def set_browser(browser: "RemoteWebDriver | WebDriver | Page"):

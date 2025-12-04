@@ -83,18 +83,20 @@ Can be changed later via CLI when running tests
 ```bash
 pytest --blog-project-name '...'
 ```
+---
 
 
 ### timezone
 Then you can set the desired Time Zone (IANA format e.g. Europe/Moscow, UTC, America/New_York).\
 The list of available timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-![img.png](readme_content/tz.png)
 ```yaml
 project_name: 'Project Name'
 
 tz: 'Europe/Moscow'
 ```
+![img.png](readme_content/tz.png)
+
+---
 
 
 ### integrations
@@ -109,6 +111,7 @@ tz: 'Europe/Moscow'
 integrations:
   allure: True
 ```
+---
 
 
 ### hide_passwords
@@ -127,6 +130,7 @@ integrations:
 
 hide_passwords: False
 ```
+---
 
 
 ### env and base_url
@@ -148,8 +152,9 @@ Which, could also be passed as command line options on test run, e.g. when using
 ```bash
 pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
+---
 
-***!!! Note !!!*** Options apply in the following order: blog.config.yaml > Command Line Arguments > blog methods inside code
+***!!! Note !!!*** Options apply in the following order: blog.config.yaml > blog methods inside code > Command Line Arguments
 
 Now you are all set up. \
 Simply run pytest and ***b_logs*** folder will be generated 

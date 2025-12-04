@@ -31,9 +31,9 @@ class RunReport(BaseDataModel):
     def __init__(self):
         self.report_id = f'report_{uuid.uuid4()}'
         self.proj_name = blog_config.project_name
-        self.env = blog_config.env
-        self.base_url = blog_config.base_url
-        self.notes = blog_config.notes
+        self.env = None
+        self.base_url = None
+        self.notes = None
         self.worker = None
         self.start_time = datetime.now(tz=blog_config.tz).strftime('%Y-%m-%d %H:%M:%S %Z')
         self.end_time = None
@@ -46,6 +46,12 @@ class RunReport(BaseDataModel):
                 "tests": defaultdict(list)
             }
         )
+
+    def apply_config(self):
+        self.proj_name = blog_config.project_name
+        self.env = blog_config.env
+        self.base_url = blog_config.base_url
+        self.notes = blog_config.notes
 
     def set_env(self, env: str):
         self.env = env

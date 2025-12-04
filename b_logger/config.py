@@ -8,6 +8,7 @@ from b_logger.utils.paths import pathfinder
 
 class BLoggerConfig:
     _instance: Optional["BLoggerConfig"] = None
+    _initialized: bool = False
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -20,33 +21,34 @@ class BLoggerConfig:
             cls._instance = BLoggerConfig()
         return cls._instance
 
-    def __init__(self, config_path: str = f'{pathfinder.project_root()}/blog.config.yaml', notes_path: str = f'{pathfinder.project_root()}/blog.notes.yaml'):
-        self._extra = {}
+    def __init__(
+        self,
+        config_path: str = f"{pathfinder.project_root()}/blog.config.yaml",
+        notes_path: str = f"{pathfinder.project_root()}/blog.notes.yaml",
+    ):
+        if self._initialized:
+            return
 
         self._data = self._load_config_file(config_path)
 
         # blog.config.yaml
         self.project_name: Optional[str] = self._data.get("project_name")
-        self.env: Optional[str] = self._data.get("env")
-        self.base_url: Optional[str] = self._data.get("base_url")
+        self.env: Optional[str] = self._data.get("env", None)
+        self.base_url: Optional[str] = self._data.get("base_url", None)
 
         tz_value = self._data.get("tz", "UTC")
         self.tz: Optional[ZoneInfo] = self._process_tz(tz_value)
 
-        self.integrations: Optional[dict] = self._data.get("integrations", {})
+        self.integrations: dict = self._data.get("integrations", {}) or {}
         self.qase: bool = bool(self.integrations.get("qase", False))
         self.allure: bool = bool(self.integrations.get("allure", False))
 
         self.hide_passwords: bool = bool(self._data.get("hide_passwords", True))
 
         # blog.notes.yaml
-        self.notes: Optional[dict] = self._load_notes_file(notes_path)
+        self.notes: dict = self._load_notes_file(notes_path) or {}
 
-        # Other
-        self._extra = {
-            k: v for k, v in self._data.items()
-            if not hasattr(self, k)
-        }
+        self._initialized = True
 
     @staticmethod
     def _load_config_file(path: str = None) -> dict:
@@ -73,7 +75,8 @@ class BLoggerConfig:
             return ZoneInfo(tz_value)
         except ZoneInfoNotFoundError as e:
             raise RuntimeError(
-                f"[BLogger] Timezone '{tz_value}' not found. Set a valid IANA timezone (e.g. 'UTC', 'Europe/Moscow', 'America/New_York')."
+                f'[BLogger] Timezone "{tz_value}" not found. '
+                f'Set a valid IANA timezone (e.g. "UTC", "Europe/Moscow", "America/New_York").'
             ) from e
 
     def apply_cli_options(self, config):
@@ -85,46 +88,20 @@ class BLoggerConfig:
                     setattr(self, field_name, value)
 
     def __getitem__(self, key: str):
-        return getattr(self, key, self._extra.get(key, None))
+        return getattr(self, key, None)
 
     def __setitem__(self, key: str, value):
-        if hasattr(self, key):
-            setattr(self, key, value)
-        else:
-            self._extra[key] = value
-
-    def __getattr__(self, key):
-        if key in self._extra:
-            return self._extra[key]
-        print(f'[BLogger][WARN] blog_config object has no attribute "{key}"')
-
-    def __setattr__(self, key, value):
-        if key in {
-            "_data", "_extra",
-            "project_name", "tz",
-            "env", "base_url",
-            "qase", "allure",
-            "hide_passwords", "notes"
-        }:
-            object.__setattr__(self, key, value)
-        else:
-            self._extra[key] = value
+        setattr(self, key, value)
 
     def as_dict(self) -> dict:
-        base = {
-            "project_name": self.project_name,
-            "tz": self.tz,
-            "env": self.env,
-            "base_url": self.base_url,
-            "allure": self.allure,
-            "qase": self.qase,
-            "hide_passwords": self.hide_passwords,
-            "notes": self.notes
+        return {
+            k: v
+            for k, v in self.__dict__.items()
+            if not k.startswith("_")
         }
-        return {**base, **self._extra}
 
     def __repr__(self):
-        return f"<BLoggerConfig {self.as_dict()}>"
+        return f'<BLoggerConfig {self.as_dict()}>'
 
 
 blog_config = BLoggerConfig.get()
