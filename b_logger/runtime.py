@@ -20,11 +20,11 @@ class RunTime:
         self.test_report: TestReport = TestReport()
         self.step_container: StepContainer = StepContainer()
 
-    def set_base_url(self, base_url: str):
-        self.run_report.set_base_url(base_url)
-
     def set_env(self, env: str):
         self.run_report.set_env(env)
+
+    def set_base_url(self, base_url: str):
+        self.run_report.set_base_url(base_url)
 
     def set_browser(self, browser: "RemoteWebDriver | WebDriver | Page"):
         self.browser = browser
@@ -143,7 +143,6 @@ class RunTime:
     def apply_description(self, description):
         if not self.test_report.description:
             self.test_report.set_description(description)
-            Integrations.description(description)
         else:
             self.test_report.modify_description(description)
 
@@ -281,6 +280,10 @@ class RunTime:
             Integrations.attach(content, attachment.name, attachment.type_)
 
     def apply_integrations(self):
+        d = self.test_report.description
+        if d:
+            Integrations.description(d)
+
         i = self.test_report.info
         if i:
             Integrations.attach(process_json(i), 'blog_info', 'text/html')

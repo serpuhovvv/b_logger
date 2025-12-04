@@ -1,5 +1,7 @@
 # BLogger — Pytest Logging Plugin
 
+### Full README.md available at [GitHub](#https://github.com/serpuhovvv/b_logger)
+
 - [Overview](#overview)
 - [Report Examples](#report-examples)
 - [Installation](#installation)
@@ -7,6 +9,7 @@
   - [Project Name](#project_name)
   - [Time Zone](#timezone)
   - [Integrations](#integrations)
+  - [Hide Passwords](#hide_passwords)
   - [Env and Base URL](#env-and-base_url)
 - [BLogger API](#blogger-api)
   - [Set Base URL](#set-base-url)
@@ -23,6 +26,10 @@
 - [Publishing to CI/CD](#publishing-to-cicd)
   - [Jenkins](#jenkins)
 - [Useful Features](#useful-features)
+  - [Notes](#notes)
+  - [Search, Filters and Sorting](#search-filters-and-sorting)
+  - [Compare Retries](#compare-retries)
+  - [Automatic Error Screenshots](#automatic-error-screenshots)
 ---
 
 
@@ -35,20 +42,10 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 ---
 
 
-## Features
-
-- Set global **base URL**, **environment**, and **browser** instance (Selenium or Playwright).  
-- Add/update **test descriptions** dynamically.
-- Log any important **info** during tests or steps.  
-- Mark tests/steps with **known bugs** and optional bug tracker URLs.
-- **Print** messages attached to current step (supports multiline and complex data).  
-- Take and attach **screenshots** automatically on demand or on errors.  
-- **Attach** files or arbitrary data to steps.
----
-
-
 ## Report Examples
 Sample HTML reports and screenshots are available in the [GitHub repository](https://github.com/serpuhovvv/b_logger).
+
+---
 
 
 
@@ -57,16 +54,23 @@ Sample HTML reports and screenshots are available in the [GitHub repository](htt
 ```bash
 pip install pytest-b-logger
 ```
+---
+
+
 
 ## Setup
-Add **blog.config.yaml** file to the root of your project.
+!!! Add ***blog.config.yaml*** file to the ***root*** of your project. !!!
 
 ### project_name
-
 Bare minimum for everything to work is project_name: 
 ```yaml
 project_name: 'Project Name'
 ```
+Can be changed later via CLI when running tests
+```bash
+pytest --blog-project-name '...'
+```
+
 
 ### timezone
 Then you can set the desired Time Zone (IANA format e.g. Europe/Moscow, UTC, America/New_York).\
@@ -77,10 +81,11 @@ project_name: 'Project Name'
 tz: 'Europe/Moscow'
 ```
 
+
 ### integrations
 By default, integrations are turned off. \
 If you are using Allure and want steps, info, description etc. to be duplicated to Allure, 
-simply add integrations block and set allure: True
+simply add integrations block and set ***allure: True***
 ```yaml
 project_name: 'Project Name'
 
@@ -89,6 +94,23 @@ tz: 'Europe/Moscow'
 integrations:
   allure: True
 ```
+
+
+### hide_passwords
+By default, passwords inside parameters are hidden.
+
+If you want passwords to be shown simply set ***hide_passwords: False***
+```yaml
+project_name: 'Project Name'
+
+tz: 'Europe/Moscow'
+
+integrations:
+  allure: True
+
+hide_passwords: False
+```
+
 
 ### env and base_url
 You can add env and base url here.
@@ -100,6 +122,8 @@ tz: 'Europe/Moscow'
 integrations:
   allure: True
 
+hide_passwords: True
+
 env: 'prod' # optional
 base_url: 'https://base-url.com' # optional
 ```
@@ -107,13 +131,19 @@ Which, could also be passed as command line options on test run, e.g. when using
 ```bash
 pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
+
+***!!! Note !!!*** Options apply in the following order: blog.config.yaml > Command Line Arguments > blog methods inside code
+
 Now you are all set up. \
-Simply run pytest and **b_logs** folder will be generated 
-with **blog_report.html** and **blog_summary.html** \
-For more advanced usage please review [BLogger API](#blogger-api)
+Simply run pytest and ***b_logs*** folder will be generated 
+with ***blog_report.html*** and ***blog_summary.html*** \
+For more advanced usage please review ***[BLogger API](#blogger-api)***
+---
+
 
 
 ## BLogger API
+
 
 ### Set Base URL
 `blog.set_base_url(base_url: str)`
@@ -133,7 +163,7 @@ base_url: 'https://base-url.com'
 
 Or via command line options:
 ```bash
-pytest --blog-base-url "https://base-url.com"
+pytest --blog-base-url 'https://base-url.com'
 ```
 ---
 
@@ -367,8 +397,11 @@ blog.attach(excel_data, 'excel_file.xlsx')
 ---
 
 
-## Publishing to CI/CD
+## Usage examples
 
+
+
+## Publishing to CI/CD
 ### Jenkins
 To post results to Jenkins you could simply use the HTMLpublisher utility and the following command:
 ```
@@ -392,9 +425,36 @@ Also, you can store b_logs as artifact for the build:
 archiveArtifacts artifacts: 'b_logs/**', fingerprint: true, allowEmptyArchive: true
 zip zipFile: 'b_logs.zip', archive: true, dir: 'b_logs/'
 ```
+---
+
 
 ## Useful Features
-- Notes
-- Filtering, Sorting and Search  
-- Retry comparison  
-- Automatic error screenshots  
+
+### Notes
+Add ***blog.notes.yaml*** to the ***root*** of your project 
+
+You can add ***style*** block if you want notes to be formatted in blog_summary.html. \
+Inside simple css styles like color and font-size
+```yaml
+style: # optional
+  color: red
+  font-size: 20px
+
+notes:
+  - 'Here you can add any useful info about project'
+  - 'For example floating bugs or specifications'
+  - 'These notes will appear in blog_report.html and blog_summary.html'
+```
+___
+
+
+### Search, Filters and Sorting
+___
+
+
+### Compare Retries
+___
+
+
+### Automatic Error Screenshots
+___

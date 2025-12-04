@@ -15,19 +15,25 @@ class HTMLGenerator:
     def generate_html(self):
         combined_report = RunReport.from_json(self.report_path)
 
-        steps = combined_report.get_steps()
+        try:
+            steps = combined_report.get_steps()
 
-        html = self.template.render(
-            report=combined_report,
-            steps=steps
-        )
+            html = self.template.render(
+                report=combined_report,
+                steps=steps
+            )
 
-        with open(f'{b_logs_path()}/blog_report.html', 'w', encoding='utf-8') as f:
-            f.write(html)
+            with open(f'{b_logs_path()}/blog_report.html', 'w', encoding='utf-8') as f:
+                f.write(html)
+        except Exception as e:
+            raise RuntimeError(f'blog_report.html generation failed: {e}')
 
-        html_summary = self.summary_template.render(
-            report=combined_report
-        )
+        try:
+            html_summary = self.summary_template.render(
+                report=combined_report
+            )
 
-        with open(f'{b_logs_path()}/blog_summary.html', 'w', encoding='utf-8') as f:
-            f.write(html_summary)
+            with open(f'{b_logs_path()}/blog_summary.html', 'w', encoding='utf-8') as f:
+                f.write(html_summary)
+        except Exception as e:
+            raise RuntimeError(f'blog_summary.html generation failed: {e}')

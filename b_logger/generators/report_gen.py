@@ -50,20 +50,21 @@ class ReportGenerator:
 
     def _merge_proj_name(self, report: RunReport):
         if self.combined.proj_name and self.combined.proj_name != report.proj_name:
-            print(f'[BLogger][WARN] Inconsistent project name: {self.combined.proj_name} vs {report.proj_name}')
+            print(f'[BLogger][WARN] Project name changed. Config: {report.proj_name} | CLI: {self.combined.proj_name}')
+            return
 
         self.combined.proj_name = report.proj_name
 
     def _merge_env(self, report: RunReport):
         if self.combined.env and self.combined.env != report.env:
-            print(f'[BLogger][WARN] Inconsistent env: {self.combined.env} vs {report.env}')
+            print(f'[BLogger][WARN] Inconsistent env! Config/CLI: {self.combined.env} | blog.set_env(): {report.env}')
             return
 
         self.combined.env = report.env
 
     def _merge_base_url(self, report: RunReport):
         if self.combined.base_url and self.combined.base_url != report.base_url:
-            print(f'[BLogger][WARN] Inconsistent base url: {self.combined.base_url} vs {report.base_url}')
+            print(f'[BLogger][WARN] Inconsistent base url! Config/CLI: {self.combined.base_url} | blog.set_base_url(): {report.base_url}')
             return
 
         self.combined.base_url = report.base_url

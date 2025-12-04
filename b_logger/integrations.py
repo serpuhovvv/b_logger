@@ -54,7 +54,13 @@ class AllureAdapter(IntegrationBase):
 
     def description(self, text):
         if self._allure:
-            self._allure.dynamic.description(text)
+            try:
+                self._allure.dynamic.description(text)
+            except:
+                try:
+                    self._allure.description(text)
+                except:
+                    pass
 
     def info(self, name, value):
         if self._allure:

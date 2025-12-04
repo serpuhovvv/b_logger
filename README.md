@@ -7,6 +7,7 @@
   - [Project Name](#project_name)
   - [Time Zone](#timezone)
   - [Integrations](#integrations)
+  - [Hide Passwords](#hide_passwords)
   - [Env and Base URL](#env-and-base_url)
 - [BLogger API](#blogger-api)
   - [Set Base URL](#set-base-url)
@@ -68,13 +69,18 @@ pip install pytest-b-logger
 
 
 ## Setup
-Add ***blog.config.yaml*** file to the ***root*** of your project.
+!!! Add ***blog.config.yaml*** file to the ***root*** of your project. !!!
 
 ### project_name
 Bare minimum for everything to work is project_name: 
 ```yaml
 project_name: 'Project Name'
 ```
+Can be changed later via CLI when running tests
+```bash
+pytest --blog-project-name '...'
+```
+
 
 ### timezone
 Then you can set the desired Time Zone (IANA format e.g. Europe/Moscow, UTC, America/New_York).\
@@ -85,10 +91,11 @@ project_name: 'Project Name'
 tz: 'Europe/Moscow'
 ```
 
+
 ### integrations
 By default, integrations are turned off. \
 If you are using Allure and want steps, info, description etc. to be duplicated to Allure, 
-simply add integrations block and set allure: True
+simply add integrations block and set ***allure: True***
 ```yaml
 project_name: 'Project Name'
 
@@ -97,6 +104,25 @@ tz: 'Europe/Moscow'
 integrations:
   allure: True
 ```
+
+
+### hide_passwords
+By default, passwords inside parameters are hidden.
+
+![img.png](readme_content/hide_pass.png)
+
+If you want passwords to be shown simply set ***hide_passwords: False***
+```yaml
+project_name: 'Project Name'
+
+tz: 'Europe/Moscow'
+
+integrations:
+  allure: True
+
+hide_passwords: False
+```
+
 
 ### env and base_url
 You can add env and base url here.
@@ -108,6 +134,8 @@ tz: 'Europe/Moscow'
 integrations:
   allure: True
 
+hide_passwords: True
+
 env: 'prod' # optional
 base_url: 'https://base-url.com' # optional
 ```
@@ -115,6 +143,9 @@ Which, could also be passed as command line options on test run, e.g. when using
 ```bash
 pytest --blog-env 'prod' --blog-base-url 'https://base-url.com'
 ```
+
+***!!! Note !!!*** Options apply in the following order: blog.config.yaml > Command Line Arguments > blog methods inside code
+
 Now you are all set up. \
 Simply run pytest and ***b_logs*** folder will be generated 
 with ***blog_report.html*** and ***blog_summary.html*** \

@@ -40,25 +40,9 @@ def pytest_configure(config):
 
     blog_config.rootpath = str(config.rootpath)
 
-    if not runtime.run_report.env:
-        runtime.set_env(blog_config.env)
+    runtime.set_env(blog_config.env)
 
-    if not runtime.run_report.base_url:
-        runtime.set_base_url(blog_config.base_url)
-
-# def pytest_unconfigure(config):
-#     try:
-#         report_generator: ReportGenerator = ReportGenerator()
-#         html_generator: HTMLGenerator = HTMLGenerator()
-#
-#         report_generator.generate_combined_report()
-#         html_generator.generate_html()
-#
-#         if not debug:
-#             clear_b_logs_tmp(rmdir=True)
-#
-#     except Exception as e:
-#         print(f'[BLogger][ERROR] Unable to generate blog_report: {e}')
+    runtime.set_base_url(blog_config.base_url)
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -80,16 +64,18 @@ def pytest_sessionfinish(session):
     if _is_main_worker(session):
         try:
             report_generator: ReportGenerator = ReportGenerator()
-            html_generator: HTMLGenerator = HTMLGenerator()
-
             report_generator.generate_combined_report()
-            html_generator.generate_html()
-
-            if not debug:
-                clear_b_logs_tmp(rmdir=True)
-
         except Exception as e:
-            print(f'[BLogger][ERROR] Unable to generate blog_report: {e}')
+            print(f'[BLogger][ERROR] Unable to generate blog_report.json: {e}')
+
+        try:
+            html_generator: HTMLGenerator = HTMLGenerator()
+            html_generator.generate_html()
+        except Exception as e:
+            print(f'[BLogger][ERROR] Unable to generate html reports! {e}')
+
+        if not debug:
+            clear_b_logs_tmp(rmdir=True)
 
 
 def _is_main_worker(session):
@@ -141,20 +127,23 @@ def pytest_runtest_makereport(call, item):
 
     report = (yield).get_result()
 
-    if call.when in ["setup", "call"]:
+    if call.when == 'setup' and report.outcome == 'passed':
+        return
 
-        runtime.process_test_result(report, call, item)
-
-        if report.when == 'setup' and report.outcome == 'passed':
-            return
-
-        runtime.process_test_status(report, call, item)
-
-    if call.when in ["teardown"]:
+    if call.when == "teardown":
+        if report.outcome == 'failed' and not runtime.test_report.error:
+            runtime.process_test_result(report, call, item)
+            runtime.process_test_status(report, call, item)
 
         runtime.apply_integrations()
 
         _apply_py_output(report)
+
+        return
+
+    runtime.process_test_result(report, call, item)
+
+    runtime.process_test_status(report, call, item)
 
 
 def _apply_py_params(item):
@@ -162,7 +151,10 @@ def _apply_py_params(item):
         params = {}
         py_params = item.callspec.params
         for param_name, param_value in py_params.items():
-            params[param_name] = param_value
+            if param_name in ['password', 'pass', 'pwd', 'passw'] and blog_config.hide_passwords is True:
+                params[param_name] = '*****'
+            else:
+                params[param_name] = param_value
 
         runtime.apply_info(parameters=params)
 

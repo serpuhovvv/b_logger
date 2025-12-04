@@ -25,7 +25,7 @@ class BLoggerConfig:
 
         self._data = self._load_config_file(config_path)
 
-        # YAML
+        # blog.config.yaml
         self.project_name: Optional[str] = self._data.get("project_name")
         self.env: Optional[str] = self._data.get("env")
         self.base_url: Optional[str] = self._data.get("base_url")
@@ -37,6 +37,9 @@ class BLoggerConfig:
         self.qase: bool = bool(self.integrations.get("qase", False))
         self.allure: bool = bool(self.integrations.get("allure", False))
 
+        self.hide_passwords: bool = bool(self._data.get("hide_passwords", True))
+
+        # blog.notes.yaml
         self.notes: Optional[dict] = self._load_notes_file(notes_path)
 
         # Other
@@ -100,7 +103,8 @@ class BLoggerConfig:
             "_data", "_extra",
             "project_name", "tz",
             "env", "base_url",
-            "qase", "allure", "notes"
+            "qase", "allure",
+            "hide_passwords", "notes"
         }:
             object.__setattr__(self, key, value)
         else:
@@ -114,6 +118,7 @@ class BLoggerConfig:
             "base_url": self.base_url,
             "allure": self.allure,
             "qase": self.qase,
+            "hide_passwords": self.hide_passwords,
             "notes": self.notes
         }
         return {**base, **self._extra}
