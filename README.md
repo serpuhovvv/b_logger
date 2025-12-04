@@ -85,6 +85,8 @@ pytest --blog-project-name '...'
 ### timezone
 Then you can set the desired Time Zone (IANA format e.g. Europe/Moscow, UTC, America/New_York).\
 The list of available timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+![img.png](readme_content/tz.png)
 ```yaml
 project_name: 'Project Name'
 
