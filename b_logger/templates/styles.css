@@ -899,23 +899,29 @@ main::-webkit-scrollbar-thumb:hover {
 
 #imageContainer {
     display: none;
-    overflow: scroll;
+    overflow: hidden;
     width: 100%;
     height: 100%;
-    text-align: center;
     cursor: grab;
     border-radius: var(--radius-sm);
     background: var(--bg-card);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #modalImage {
-    max-width: 100%;
-    max-height: 100%;
-    transition: transform 0.2s ease;
+    max-width: none;
+    max-height: none;
+    width: auto;
+    height: auto;
+    transition: none;
     transform-origin: center center;
     user-select: none;
     pointer-events: auto;
     -webkit-user-drag: none;
+    display: block;
 }
 
 #modalPDF {

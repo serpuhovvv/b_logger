@@ -85,8 +85,7 @@ class Attachment(BaseDataModel):
 
     def _process_path(self, path: Path):
         if not path.exists() or not path.is_file():
-            print(f'[BLogger][WARN] Attachment path is invalid: {path}')
-            return
+            raise RuntimeError(f'[BLogger][ERROR] Attachment path is invalid: {path}')
 
         ext = path.suffix or '.bin'
         self._ensure_extension(ext)

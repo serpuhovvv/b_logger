@@ -82,6 +82,10 @@ class RunTime:
         if report.longrepr:
             self.test_report.set_stacktrace(report.longreprtext)
 
+        if hasattr(report, 'wasxfail'):
+            self._handle_xfail(report, call, item)
+            return
+
         if report.failed:
             self._handle_failed_test(call, report, item)
 
@@ -101,6 +105,19 @@ class RunTime:
 
     def _handle_passed_test(self, call, report, item):
         pass
+
+    def _handle_xfail(self, report, call, item):
+        if report.outcome == 'skipped':
+            if call.excinfo:
+                msg = 'XFAIL: test failed as expected with error: \n\n'
+                self.test_report.set_error(msg + call.excinfo.exconly())
+            else:
+                msg = 'XFAIL: test failed as expected'
+                self.test_report.set_error(msg)
+
+        elif report.outcome == 'passed':
+            msg = 'XPASS: test passed unexpectedly, but was marked xfail'
+            self.test_report.set_error(msg)
 
     def process_test_status(self, report, call, item):
         if hasattr(report, 'wasxfail'):

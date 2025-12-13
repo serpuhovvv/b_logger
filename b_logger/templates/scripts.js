@@ -544,7 +544,8 @@ const download       = getElById('modalDownload');
 
 let scale = 1;
 let isDragging = false;
-let startX = 0, startY = 0, scrollLeft = 0, scrollTop = 0;
+let startX = 0, startY = 0;
+let offsetX = 0, offsetY = 0;
 
 function openAttachment(name, type) {
     const path = `attachments/${name}`;
@@ -559,7 +560,7 @@ function openAttachment(name, type) {
 
     if (type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(name)) {
         image.src = path;
-        imageContainer.style.display = 'block';
+        imageContainer.style.display = 'flex';
     }
 
     else if (type === 'application/pdf' || /\.pdf$/i.test(name)) {
@@ -599,8 +600,10 @@ function closeModal(event) {
 
 function resetModal() {
     scale = 1;
+    offsetX = 0;
+    offsetY = 0;
     if (image) {
-        image.style.transform = 'scale(1)';
+        image.style.transform = 'translate(0, 0) scale(1)';
         image.src = '';
     }
     if (pdfContainer) pdfContainer.src = '';
@@ -632,31 +635,67 @@ document.addEventListener('keydown', (e) => {
 //  Image Zoom & Drag
 // ======================================================
 if (imageContainer) {
+    function updateImageTransform() {
+        if (image) {
+            // Apply offset and scale (image is already centered via flexbox)
+            image.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        }
+    }
+
+    function centerImage() {
+        if (image && imageContainer) {
+            // Reset to center when image loads
+            offsetX = 0;
+            offsetY = 0;
+            scale = 1;
+            updateImageTransform();
+        }
+    }
+
+    if (image) {
+        image.addEventListener('load', centerImage);
+    }
+
     imageContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
         const delta = -e.deltaY * 0.001;
+        const oldScale = scale;
         scale = Math.min(Math.max(scale + delta, 0.5), 5);
-        image.style.transform = `scale(${scale})`;
+        
+        // Adjust offset to zoom towards mouse position
+        if (image && imageContainer) {
+            const rect = imageContainer.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const containerCenterX = rect.width / 2;
+            const containerCenterY = rect.height / 2;
+            
+            // Calculate offset adjustment to zoom towards mouse
+            const scaleChange = scale - oldScale;
+            offsetX -= (mouseX - containerCenterX) * scaleChange * 0.5;
+            offsetY -= (mouseY - containerCenterY) * scaleChange * 0.5;
+        }
+        
+        updateImageTransform();
     });
 
     imageContainer.addEventListener('mousedown', (e) => {
         isDragging = true;
-        startX = e.pageX - imageContainer.offsetLeft;
-        startY = e.pageY - imageContainer.offsetTop;
-        scrollLeft = imageContainer.scrollLeft;
-        scrollTop = imageContainer.scrollTop;
+        startX = e.clientX;
+        startY = e.clientY;
         imageContainer.style.cursor = 'grabbing';
     });
 
     imageContainer.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         e.preventDefault();
-        const x = e.pageX - imageContainer.offsetLeft;
-        const y = e.pageY - imageContainer.offsetTop;
-        const walkX = (x - startX);
-        const walkY = (y - startY);
-        imageContainer.scrollLeft = scrollLeft - walkX;
-        imageContainer.scrollTop  = scrollTop - walkY;
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+        offsetX += deltaX;
+        offsetY += deltaY;
+        startX = e.clientX;
+        startY = e.clientY;
+        updateImageTransform();
     });
 
     ['mouseup', 'mouseleave'].forEach(evt => {
