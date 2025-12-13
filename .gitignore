@@ -1,3 +1,4 @@
+*.pyc
 b_logs
 b_logs_tmp
 *.egg-info/

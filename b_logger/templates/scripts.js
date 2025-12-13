@@ -10,14 +10,14 @@ document.addEventListener('DOMContentLoaded', initPage);
 // ======================================================
 
 function initPage() {
-    const searchInput  = getElById('searchInput');
+    const searchInput = getElById('searchInput');
     const statusFilter = getElById('statusFilter');
     const moduleFilter = getElById('moduleFilter');
     const resetFilters = getElById('reset-filters');
     const resetSorting = getElById('reset-sorting');
-    const resetExp     = getElById('reset-expanded');
-    const sortBtns     = getAll('.sort-btn');
-    const filterBtns   = getAll('.filter-btn');
+    const resetExp = getElById('reset-expanded');
+    const sortBtns = getAll('.sort-btn');
+    const filterBtns = getAll('.filter-btn');
 
     restoreFilters();
     restoreSort();
@@ -49,27 +49,29 @@ function initPage() {
         filterTests();
     }));
 
-    resetFilters?.addEventListener("click", () => {
-        searchInput.value = "";
+    resetFilters?.addEventListener('click', () => {
+        searchInput.value = '';
         clearSelect(statusFilter);
         clearSelect(moduleFilter);
 
-        filterBtns.forEach(btn => toggleClass(btn, "active", false));
-        toggleClass(document.querySelector('.filter-btn[data-filter="all"]'), "active", true);
+        filterBtns.forEach(btn => toggleClass(btn, 'active', false));
+        const allFilterBtn = getElBySelector('.filter-btn[data-filter="all"]');
+        if (allFilterBtn) toggleClass(allFilterBtn, 'active', true);
 
         saveFilters();
         filterTests();
     });
 
-    resetSorting?.addEventListener("click", () => {
-        sortBtns.forEach(b => toggleClass(b, "active", false));
-        toggleClass(document.querySelector('.sort-btn[data-sort="starttime_asc"]'), "active", true);
+    resetSorting?.addEventListener('click', () => {
+        sortBtns.forEach(b => toggleClass(b, 'active', false));
+        const defaultSortBtn = getElBySelector('.sort-btn[data-sort="starttime_asc"]');
+        if (defaultSortBtn) toggleClass(defaultSortBtn, 'active', true);
 
         saveSort();
         filterTests();
     });
 
-    resetExp?.addEventListener("click", () => {
+    resetExp?.addEventListener('click', () => {
         const allTests = getAll('.test').filter(
             test => !test.querySelector(':scope > .test-content-multi')
         );
@@ -83,7 +85,7 @@ function initPage() {
         const newState = !anyOpened;
 
         for (const test of allTests) {
-            const header  = test.querySelector(':scope > .test-header');
+            const header = test.querySelector(':scope > .test-header');
             const content = test.querySelector(':scope > .test-content');
 
             if (!header || header.classList.contains('test-header-multi')) continue;
@@ -97,9 +99,9 @@ function initPage() {
 
         if (newState) {
             const firstId = allTests[0]?.id;
-            if (firstId) history.replaceState({ openedId: firstId }, "", `#${firstId}`);
+            if (firstId) history.replaceState({ openedId: firstId }, '', `#${firstId}`);
         } else {
-            history.replaceState({}, "", location.pathname + location.search);
+            history.replaceState({}, '', location.pathname + location.search);
         }
     });
 
@@ -112,30 +114,40 @@ function initPage() {
 // ======================================================
 
 function saveFilters() {
-    const search  = getElById('searchInput')?.value || '';
-    const status  = getSelectedValues(getElById('statusFilter'));
-    const module  = getSelectedValues(getElById('moduleFilter'));
+    const search = getElById('searchInput')?.value || '';
+    const status = getSelectedValues(getElById('statusFilter'));
+    const module = getSelectedValues(getElById('moduleFilter'));
     const buttons = getAll('.filter-btn.active').map(b => b.dataset.filter || '');
-    saveToStorage("filters", { search, status, module, buttons });
+    saveToStorage('filters', { search, status, module, buttons });
 }
 
 function restoreFilters() {
     try {
-        const stored = loadFromStorage("filters", {});
-        if (stored.search) getElById('searchInput').value = stored.search;
+        const stored = loadFromStorage('filters', {});
+        const searchInput = getElById('searchInput');
+        const statusFilter = getElById('statusFilter');
+        const moduleFilter = getElById('moduleFilter');
 
-        if (stored.status) {
-            Array.from(getElById('statusFilter').options).forEach(o => o.selected = stored.status.includes(o.value));
+        if (stored.search && searchInput) {
+            searchInput.value = stored.search;
         }
 
-        if (stored.module) {
-            Array.from(getElById('moduleFilter').options).forEach(o => o.selected = stored.module.includes(o.value));
+        if (stored.status && statusFilter) {
+            Array.from(statusFilter.options).forEach(o => {
+                o.selected = stored.status.includes(o.value);
+            });
+        }
+
+        if (stored.module && moduleFilter) {
+            Array.from(moduleFilter.options).forEach(o => {
+                o.selected = stored.module.includes(o.value);
+            });
         }
 
         if (stored.buttons) {
             stored.buttons.forEach(f => {
                 const btn = getElBySelector(`.filter-btn[data-filter="${f}"]`);
-                toggleClass(btn, "active", true);
+                toggleClass(btn, 'active', true);
             });
         }
     } catch {}
@@ -143,18 +155,18 @@ function restoreFilters() {
 
 function saveSort() {
     const active = getElBySelector('.sort-btn.active')?.dataset.sort || 'starttime_asc';
-    saveToStorage("sort", active);
+    saveToStorage('sort', active);
 }
 
 function restoreSort() {
-    const sortValue = loadFromStorage("sort", "starttime_asc");
-    getAll('.sort-btn').forEach(b => b.classList.remove("active"));
+    const sortValue = loadFromStorage('sort', 'starttime_asc');
+    getAll('.sort-btn').forEach(b => b.classList.remove('active'));
     const btn = getElBySelector(`.sort-btn[data-sort="${sortValue}"]`);
     if (btn) {
-        btn.classList.add("active");
+        btn.classList.add('active');
     } else {
-        const def = getElBySelector(`.sort-btn[data-sort="starttime_asc"]`);
-        if (def) def.classList.add("active");
+        const def = getElBySelector('.sort-btn[data-sort="starttime_asc"]');
+        if (def) def.classList.add('active');
     }
 }
 
@@ -245,15 +257,15 @@ function compareTests(a, b, field, order = 'asc') {
 // ======================================================
 
 function filterTests() {
-    const search = (getElById('searchInput')?.value||'').toLowerCase().trim();
-    const statusSelected = getSelectedValues(getElById('statusFilter')).map(v=>v.toUpperCase());
+    const search = (getElById('searchInput')?.value || '').toLowerCase().trim();
+    const statusSelected = getSelectedValues(getElById('statusFilter')).map(v => v.toUpperCase());
     const moduleSelected = getSelectedValues(getElById('moduleFilter'));
     const activeButtons = getAll('.filter-btn.active')
-        .map(b => (b.dataset.filter||'').toLowerCase().trim())
+        .map(b => (b.dataset.filter || '').toLowerCase().trim())
         .filter(f => f && f !== 'all');
 
-    const {field: sortField, order: sortOrder} = getSortOptions();
-    const filters = {search, status: statusSelected, module: moduleSelected, buttonStatuses: activeButtons};
+    const { field: sortField, order: sortOrder } = getSortOptions();
+    const filters = { search, status: statusSelected, module: moduleSelected, buttonStatuses: activeButtons };
 
     const modules = getAll('.module');
     let modulesVisible = 0;
@@ -265,13 +277,13 @@ function filterTests() {
 
         const allTests = getAll(':scope > .test', container);
 
-        // 1) sorting
+        // 1) Sorting
         if (sortField) {
             allTests.sort((a, b) => compareTests(a, b, sortField, sortOrder));
             allTests.forEach(t => container.appendChild(t));
         }
 
-        // 2) sorting test-multi
+        // 2) Sorting test-multi
         allTests.forEach(test => {
             if (test.classList.contains('test-multi')) {
                 const subTests = getAll('.test-sub', test);
@@ -280,23 +292,23 @@ function filterTests() {
             }
         });
 
-        // 2) filters
+        // 3) Filters
         let moduleHasVisible = false;
         allTests.forEach(test => {
             const isGroup = test.classList.contains('test-multi');
-            const testName = (test.dataset.test||'').toLowerCase();
+            const testName = (test.dataset.test || '').toLowerCase();
             let visible = false;
 
-            if(isGroup){
+            if (isGroup) {
                 let subVisible = 0;
-                getAll('.test-sub', test).forEach(sub=>{
-                    const subName = (sub.dataset.test||'').toLowerCase();
+                getAll('.test-sub', test).forEach(sub => {
+                    const subName = (sub.dataset.test || '').toLowerCase();
                     const subStatus = sub.dataset.status;
                     const show = matchesFilters(subName, subStatus, moduleName, filters);
-                    sub.style.display = show?'block':'none';
-                    if(show) subVisible++;
+                    sub.style.display = show ? 'block' : 'none';
+                    if (show) subVisible++;
                 });
-                visible = subVisible>0;
+                visible = subVisible > 0;
             } else {
                 visible = matchesFilters(testName, test.dataset.status, moduleName, filters);
             }
@@ -306,23 +318,24 @@ function filterTests() {
         });
 
         toggleClass(moduleEl, 'hidden', !moduleHasVisible);
-        if(moduleHasVisible) modulesVisible++;
-
+        
         moduleEl.style.display = moduleHasVisible ? 'block' : 'none';
         if (moduleHasVisible) modulesVisible++;
     });
 
-    // no results
+    // No results message
     let noResults = getElById('noResults');
-    if(modulesVisible===0){
-        if(!noResults){
+    if (modulesVisible === 0) {
+        if (!noResults) {
             noResults = document.createElement('div');
-            noResults.id='noResults';
-            noResults.className='no-results';
-            noResults.innerHTML='<i class="fas fa-search"></i><br>No tests match your filters';
+            noResults.id = 'noResults';
+            noResults.className = 'no-results';
+            noResults.innerHTML = '<i class="fas fa-search"></i><br>No tests match your filters';
             getElBySelector('.main-content')?.appendChild(noResults);
         }
-    } else { noResults?.remove(); }
+    } else {
+        noResults?.remove();
+    }
 }
 
 
@@ -330,17 +343,17 @@ function filterTests() {
 //  UI-Toggles
 // ======================================================
 
-function toggleBlock(header){
+function toggleBlock(header) {
     const content = header.nextElementSibling;
-    if(!content) return;
+    if (!content) return;
 
-    const el = header.closest(".test, .card");
-    const isOpening = !content.classList.contains("active");
+    const el = header.closest('.test, .card');
+    const isOpening = !content.classList.contains('active');
 
-    header.classList.toggle("expanded");
-    content.classList.toggle("active");
+    header.classList.toggle('expanded');
+    content.classList.toggle('active');
 
-    if(el && el.id) updateExpandedState(el.id, isOpening);
+    if (el && el.id) updateExpandedState(el.id, isOpening);
 }
 
 function toggleAllTests() {
@@ -394,13 +407,13 @@ function switchTab(btn, tabName) {
 }
 
 function copyTestName(name, event) {
-  event.stopPropagation();
-  const btn = event.currentTarget;
+    event.stopPropagation();
+    const btn = event.currentTarget;
 
-  navigator.clipboard.writeText(name).then(() => {
-    btn.classList.add("copied");
-    setTimeout(() => btn.classList.remove("copied"), 750);
-  }).catch(err => console.error("Clipboard error:", err));
+    navigator.clipboard.writeText(name).then(() => {
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 750);
+    }).catch(err => console.error('Clipboard error:', err));
 }
 
 
@@ -408,10 +421,10 @@ function copyTestName(name, event) {
 //  Navigation / Hash
 // ======================================================
 
-function toggleTestAndHash(header){
+function toggleTestAndHash(header) {
     const selection = window.getSelection && window.getSelection();
     if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-        const range  = selection.getRangeAt(0);
+        const range = selection.getRangeAt(0);
         const nameEl = header.querySelector('.test-name');
 
         if (nameEl) {
@@ -431,86 +444,88 @@ function toggleTestAndHash(header){
         }
     }
 
-    const el = header.closest(".test, .card");
-    if(!el||!el.id) return;
+    const el = header.closest('.test, .card');
+    if (!el || !el.id) return;
     const content = header.nextElementSibling;
-    const isOpening = !content.classList.contains("active");
+    const isOpening = !content.classList.contains('active');
     toggleBlock(header);
     updateExpandedState(el.id, isOpening);
     history.pushState(
-        isOpening ? {openedId: el.id} : {},
-        "",
+        isOpening ? { openedId: el.id } : {},
+        '',
         isOpening ? `#${el.id}` : location.pathname + location.search
     );
 }
 
-function updateExpandedState(id,isOpen){
+function updateExpandedState(id, isOpen) {
     let state = {};
-    try { state = loadFromStorage("expandedBlocks", {}); } catch {}
+    try {
+        state = loadFromStorage('expandedBlocks', {});
+    } catch {}
     state[id] = isOpen;
-    saveToStorage("expandedBlocks", state)
+    saveToStorage('expandedBlocks', state);
 }
 
-function restoreExpandedState(){
+function restoreExpandedState() {
     let state = {};
-    try { state = loadFromStorage("expandedBlocks", {}); } catch {}
+    try {
+        state = loadFromStorage('expandedBlocks', {});
+    } catch {}
     Object.keys(state).forEach(id => {
         const el = getElById(id);
-        if(!el) return;
+        if (!el) return;
 
-        const header = getElBySelector(":scope > .header, :scope > .test-header, :scope > .test-header-multi", el);
-        const content = getElBySelector(":scope > .content, :scope > .test-content", el);
-        if(!header||!content) return;
+        const header = getElBySelector(':scope > .header, :scope > .test-header, :scope > .test-header-multi', el);
+        const content = getElBySelector(':scope > .content, :scope > .test-content', el);
+        if (!header || !content) return;
 
-        toggleClass(header, "expanded", state[id]);
-        toggleClass(content, "active", state[id]);
+        toggleClass(header, 'expanded', state[id]);
+        toggleClass(content, 'active', state[id]);
     });
 }
 
-function expandTestAndParents(el){
-    if(!el) return;
+function expandTestAndParents(el) {
+    if (!el) return;
     let current = el;
-    while(current){
-        const header = getElBySelector(":scope > .test-header, :scope > .test-header-multi, :scope > .header", current);
-        const content = getElBySelector(":scope > .test-content, :scope > .content", current);
-        toggleClass(header, "expanded", true);
-        toggleClass(content, "active", true);
-        if(current.id) updateExpandedState(current.id, true);
-        current = current.parentElement?.closest(".test, .card");
+    while (current) {
+        const header = getElBySelector(':scope > .test-header, :scope > .test-header-multi, :scope > .header', current);
+        const content = getElBySelector(':scope > .test-content, :scope > .content', current);
+        toggleClass(header, 'expanded', true);
+        toggleClass(content, 'active', true);
+        if (current.id) updateExpandedState(current.id, true);
+        current = current.parentElement?.closest('.test, .card');
     }
 }
 
-function resetAllBlocks(){
-    getAll(".test-content").forEach(c => toggleClass(c, "active", false));
-    getAll(".test-header").forEach(h => toggleClass(h, "expanded", false));
-    sessionStorage.removeItem("expandedBlocks");
+function resetAllBlocks() {
+    getAll('.test-content').forEach(c => toggleClass(c, 'active', false));
+    getAll('.test-header').forEach(h => toggleClass(h, 'expanded', false));
+    sessionStorage.removeItem('expandedBlocks');
 }
 
 // ===================== HASH HANDLING =====================
-window.addEventListener("load", () => {
+function handleHashNavigation(id) {
+    if (!id) return;
+    const el = getElById(id);
+    if (el) {
+        el.classList.add('highlight');
+        el.scrollIntoView({ behavior: 'smooth' });
+        expandTestAndParents(el);
+    }
+}
+
+window.addEventListener('load', () => {
     restoreExpandedState();
     const hash = location.hash.slice(1);
-    if(hash){
-        const el = getElById(hash);
-        if(el){
-            el.classList.add("highlight");
-            el.scrollIntoView({behavior:"smooth"});
-            expandTestAndParents(el);
-        }
+    if (hash) {
+        handleHashNavigation(hash);
     }
 });
 
-window.addEventListener("popstate", event => {
+window.addEventListener('popstate', event => {
     restoreExpandedState();
     const id = event.state?.openedId;
-    if(id){
-        const el = getElById(id);
-        if(el){
-            el.classList.add("highlight");
-            el.scrollIntoView({behavior:"smooth"});
-            expandTestAndParents(el);
-        }
-    }
+    handleHashNavigation(id);
 });
 
 
@@ -518,6 +533,7 @@ window.addEventListener("popstate", event => {
 //  Attachment Modal
 // ======================================================
 
+const IS_FILE_PROTOCOL = window.location.protocol === 'file:';
 const modal          = getElById('attachmentModal');
 const titleEl        = getElById('modalTitle');
 const image          = getElById('modalImage');
@@ -535,6 +551,11 @@ function openAttachment(name, type) {
 
     resetModal();
     if (titleEl) titleEl.textContent = name;
+
+    if (IS_FILE_PROTOCOL) {
+        window.open(path, '_blank');
+        return;
+    }
 
     if (type?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(name)) {
         image.src = path;
@@ -569,7 +590,8 @@ function openAttachment(name, type) {
 }
 
 function closeModal(event) {
-    if (event.target.id === modal.id || event.target.classList.contains('close')) {
+    // Close on Escape (no event) or click on backdrop/close button
+    if (!event || event.target === modal || event.target.classList.contains('close')) {
         modal.style.display = 'none';
         resetModal();
     }
@@ -577,8 +599,10 @@ function closeModal(event) {
 
 function resetModal() {
     scale = 1;
-    if (image) image.style.transform = 'scale(1)';
-    if (image) image.src = '';
+    if (image) {
+        image.style.transform = 'scale(1)';
+        image.src = '';
+    }
     if (pdfContainer) pdfContainer.src = '';
     if (textPreview) textPreview.textContent = '';
 
@@ -586,6 +610,23 @@ function resetModal() {
         if (el) el.style.display = 'none';
     });
 }
+
+// Close modal on click outside or on close button
+if (modal) {
+    modal.addEventListener('click', closeModal);
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) && modal) {
+        const display = modal.style.display || window.getComputedStyle(modal).display;
+        if (display === 'flex' || display === 'block') {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal();
+        }
+    }
+}, true);
 
 // ======================================================
 //  Image Zoom & Drag
@@ -632,21 +673,19 @@ if (imageContainer) {
 // ======================================================
 
 const root = document.documentElement;
-const themeToggle = getElById("themeToggle");
-const savedTheme = loadFromStorage("theme");
+const themeToggle = getElById('themeToggle');
+const savedTheme = loadFromStorage('theme');
 
 if (root) {
-    root.setAttribute(
-        "data-theme",
-        savedTheme || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-    );
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.setAttribute('data-theme', savedTheme || (prefersDark ? 'dark' : 'light'));
 }
 
-themeToggle?.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme");
-    const next = current === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    saveToStorage("theme", next);
+themeToggle?.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    saveToStorage('theme', next);
 });
 
 
