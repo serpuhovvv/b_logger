@@ -31,10 +31,10 @@ except ImportError:
 try:
     from xdist import is_xdist_controller, get_xdist_worker_id
 except ImportError:
-    def is_xdist_controller(*args, **kwargs):
+    def is_xdist_controller(*args, **kwargs) -> bool:
         return False
 
-    def get_xdist_worker_id(*args, **kwargs):
+    def get_xdist_worker_id(*args, **kwargs) -> str:
         return 'master'
 
 
@@ -90,7 +90,7 @@ def pytest_sessionfinish(session):
             clear_b_logs_tmp(rmdir=True)
 
 
-def _is_main_worker(session):
+def _is_main_worker(session) -> bool:
     return is_xdist_controller(session) or get_xdist_worker_id(session) == 'master'
 
 

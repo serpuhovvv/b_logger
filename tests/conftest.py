@@ -46,4 +46,5 @@ def playwright_page(playwright: Playwright):
 
     yield page
 
+    page.close()
     browser.close()

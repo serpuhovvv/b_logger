@@ -17,7 +17,7 @@ limitations under the License.
 import pytest
 
 from pathlib import Path
-from typing import Union, BinaryIO
+from typing import Union, BinaryIO, Optional, Any
 from contextlib import contextmanager
 
 from b_logger.entities.steps import Step
@@ -160,7 +160,7 @@ class BLogger:
         return pytest.mark.blog_link(kwargs=kwargs)
 
     @staticmethod
-    def known_bug(url: str = None, description: str = None):
+    def known_bug(url: Optional[str] = None, description: Optional[str] = None):
         """
         Add known bug for Test or Step
         Will be added to the Overview Tab and Current Step
@@ -182,7 +182,7 @@ class BLogger:
 
     @staticmethod
     @contextmanager
-    def step(title: str, expected: str = None):
+    def step(title: str, expected: Optional[str] = None):
         """
         Wrap a code block into a step.
         Will be displayed in Setup, Steps and Teardown blocks depending on a test stage.
@@ -211,7 +211,7 @@ class BLogger:
                 runtime.finish_step(step)
 
     @staticmethod
-    def print(data):
+    def print(data: Any):
         """
         Print any message (str, dict, list, object, etc.)
         Will be added to a Current Step and stdout.txt
@@ -226,7 +226,7 @@ class BLogger:
         runtime.print_message(data)
 
     @staticmethod
-    def screenshot(name: str = None, is_error: bool = False):
+    def screenshot(name: Optional[str] = None, is_error: bool = False):
         """
         Make screenshot
 
@@ -242,7 +242,7 @@ class BLogger:
         runtime.make_screenshot(name, is_error)
 
     @staticmethod
-    def attach(content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: str = None):
+    def attach(content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: Optional[str] = None):
         """
         Attach file or data
         Will be added to the Attachments Tab and Current Step

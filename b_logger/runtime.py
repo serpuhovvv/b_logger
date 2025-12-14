@@ -16,7 +16,7 @@ limitations under the License.
 
 import traceback
 from pathlib import Path
-from typing import Union, BinaryIO
+from typing import Union, BinaryIO, Optional, Any
 
 from b_logger.entities.reports import RunReport
 from b_logger.entities.tests import TestReport, TestStatus
@@ -174,7 +174,7 @@ class RunTime:
         step.count_duration()
         self.step_container.set_current_step(step.parent_id)
 
-    def apply_description(self, description):
+    def apply_description(self, description: str):
         if not self.test_report.description:
             self.test_report.set_description(description)
         else:
@@ -220,7 +220,7 @@ class RunTime:
 
         self.test_report.add_links(links)
 
-    def apply_known_bug(self, url: str = None, description: str = None):
+    def apply_known_bug(self, url: Optional[str] = None, description: Optional[str] = None):
         if not url and not description:
             print('[BLogger][WARN] blog.known_bug() requires at least url or description')
             return
@@ -237,7 +237,7 @@ class RunTime:
 
         self.test_report.add_known_bug(bug)
 
-    def print_message(self, message):
+    def print_message(self, message: Any):
         if isinstance(message, (dict, list)):
             data = process_json(message)
             type_ = 'application/json'
@@ -259,7 +259,7 @@ class RunTime:
 
         Integrations.attach(data, print_.id, type_)
 
-    def make_screenshot(self, scr_name: str = None, is_error: bool = False):
+    def make_screenshot(self, scr_name: Optional[str] = None, is_error: bool = False):
         if self.browser is None:
             return
 
@@ -282,7 +282,7 @@ class RunTime:
         except Exception as e:
             print(f'[BLogger][ERROR] Unable to make screenshot: {e}')
 
-    def make_step_err_scr(self, step):
+    def make_step_err_scr(self, step: Step):
         if self.browser is None:
             return
 
@@ -300,7 +300,7 @@ class RunTime:
         except Exception as e:
             print(f'[BLogger][ERROR] Unable to make step error screenshot for step {step.title}: {e}')
 
-    def attach(self, content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: str = None):
+    def attach(self, content: Union[bytes, Path, BinaryIO, str, dict, list, int, float, bool, None], name: Optional[str] = None):
 
         attachment = Attachment(content=content, name=name)
 
