@@ -100,7 +100,6 @@ class RunTime:
         self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_skipped_test(self, call, report, item):
-        self.make_screenshot(is_error=True)
         self.test_report.set_error(call.excinfo.exconly())
 
     def _handle_passed_test(self, call, report, item):
@@ -108,14 +107,16 @@ class RunTime:
 
     def _handle_xfail(self, report, call, item):
         if report.outcome == 'skipped':
+            self.make_screenshot()
             if call.excinfo:
-                msg = 'XFAIL: test failed as expected with error: \n\n'
+                msg = 'XFAIL: test failed as expected\n\n'
                 self.test_report.set_error(msg + call.excinfo.exconly())
             else:
                 msg = 'XFAIL: test failed as expected'
                 self.test_report.set_error(msg)
 
         elif report.outcome == 'passed':
+            self.make_screenshot(is_error=True)
             msg = 'XPASS: test passed unexpectedly, but was marked xfail'
             self.test_report.set_error(msg)
 
