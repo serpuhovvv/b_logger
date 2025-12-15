@@ -25,6 +25,7 @@
   - [Jenkins](#jenkins)
 - [Полезные фичи](#полезные-фичи)
   - [Notes](#notes)
+  - [Switch Themes](#switch-themes)
   - [Search, Filters and Sorting](#search-filters-and-sorting)
   - [Compare Retries](#compare-retries)
   - [Automatic Error Screenshots](#automatic-error-screenshots)
@@ -47,11 +48,8 @@ BLogger — это плагин Pytest для улучшенного логир�
 [Скачать sample_b_logs.zip](readme_content/sample_b_logs.zip)
 
 ### blog_report.html
-Нажмите на главный значок (перчик), чтобы переключать темы оформления.
-
 ![img.png](readme_content/report_overview_1.png)
 ![img.png](readme_content/report_overview_2.png)
-![img.png](readme_content/report_overview_3.png)
 
 ### blog_summary.html
 ![img.png](readme_content/summary_overview.png)
@@ -478,6 +476,13 @@ blog_report.html
 ___
 
 
+### Switch Themes
+Нажмите на главный значок (перчик), чтобы сменить тему оформления.
+![img.png](readme_content/switch_themes_1.png)
+![img.png](readme_content/switch_themes_2.png)
+___
+
+
 ### Search, Filters and Sorting
 ![img.png](readme_content/sidebar_filters.png)
 ___
@@ -489,6 +494,9 @@ ___
 
 
 ### Automatic Error Screenshots
+Если браузер настроен, он также будет автоматически делать скриншоты ошибок, если тест завершится неудачно. \
+Скриншоты будут автоматически прикреплены к текущему шагу и к информации об ошибке
+
 ![img.png](readme_content/auto_err_scr_1.png)
 ![img.png](readme_content/auto_err_scr_2.png)
 ___

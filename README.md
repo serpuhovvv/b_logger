@@ -27,6 +27,7 @@
   - [Jenkins](#jenkins)
 - [Useful Features](#useful-features)
   - [Notes](#notes)
+  - [Switch Themes](#switch-themes)
   - [Search, Filters and Sorting](#search-filters-and-sorting)
   - [Compare Retries](#compare-retries)
   - [Automatic Error Screenshots](#automatic-error-screenshots)
@@ -49,11 +50,8 @@ Integrates with Allure and Qase for fewer duplicates like .steps, .attach etc.
 [Download sample_b_logs.zip](readme_content/sample_b_logs.zip)
 
 ### blog_report.html
-Click on main icon (pepper) to switch themes
-
 ![img.png](readme_content/report_overview_1.png)
 ![img.png](readme_content/report_overview_2.png)
-![img.png](readme_content/report_overview_3.png)
 
 ### blog_summary.html
 ![img.png](readme_content/summary_overview.png)
@@ -219,7 +217,7 @@ Set browser in a browser init fixture or in a test
 
 If browser init fixture name is "driver", "page", "selenium_driver", "driver_init", "playwright_page"
 then it will be detected and applied automatically.\
-If browser is set it will also automatically make error screenshots on test fails and attach them to current step and error info.
+If browser is set it will also automatically make error screenshots if test fails and attach them to current step and error info.
 
 ```python
 import pytest
@@ -478,6 +476,13 @@ blog_report.html
 ___
 
 
+### Switch Themes
+Click on main icon (pepper) to switch themes
+![img.png](readme_content/switch_themes_1.png)
+![img.png](readme_content/switch_themes_2.png)
+___
+
+
 ### Search, Filters and Sorting
 ![img.png](readme_content/sidebar_filters.png)
 ___
@@ -489,6 +494,9 @@ ___
 
 
 ### Automatic Error Screenshots
+If browser is set it will also automatically make error screenshots if test fails. \
+Screenshots will be automatically attached to current step and error info
+
 ![img.png](readme_content/auto_err_scr_1.png)
 ![img.png](readme_content/auto_err_scr_2.png)
 ___
