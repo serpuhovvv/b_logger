@@ -82,7 +82,7 @@ class RunTime:
         if report.longrepr:
             self.test_report.set_stacktrace(report.longreprtext)
 
-        if hasattr(report, 'wasxfail'):
+        if self._was_xfail(report):
             self._handle_xfail(report, call, item)
             return
 
@@ -97,37 +97,48 @@ class RunTime:
 
     def _handle_failed_test(self, call, report, item):
         self.make_screenshot(is_error=True)
-        self.test_report.set_error(call.excinfo.exconly())
+        self._process_exc_info(call)
 
     def _handle_skipped_test(self, call, report, item):
-        self.test_report.set_error(call.excinfo.exconly())
+        self._process_exc_info(call)
 
     def _handle_passed_test(self, call, report, item):
         pass
 
+    def _process_exc_info(self, call):
+        if call.excinfo:
+            self.test_report.set_error(call.excinfo.exconly())
+
+    @staticmethod
+    def _was_xfail(report):
+        if getattr(report, 'wasxfail', None) or hasattr(report, 'wasxfail') or ('XPASS' in report.longreprtext):
+            return True
+        return False
+
     def _handle_xfail(self, report, call, item):
         if report.outcome == 'skipped':
-            self.make_screenshot()
+            self.make_screenshot(f'xfail_{self.test_report.name}')
+
             if call.excinfo:
-                msg = 'XFAIL: test failed as expected\n\n'
+                msg = f'XFAIL: {getattr(report, 'wasxfail', None) or "test failed as expected"}\n\n'
                 self.test_report.set_error(msg + call.excinfo.exconly())
             else:
-                msg = 'XFAIL: test failed as expected'
+                msg = f'XFAIL: {getattr(report, 'wasxfail', None) or "test failed as expected"}'
                 self.test_report.set_error(msg)
 
+        elif report.outcome == 'failed':
+            msg = f'XPASS: {getattr(report, 'wasxfail', None) or "test passed, but was marked xfail"}'
+            self.test_report.set_error(msg)
+
         elif report.outcome == 'passed':
-            self.make_screenshot(is_error=True)
-            msg = 'XPASS: test passed unexpectedly, but was marked xfail'
+            msg = f'XPASS: {getattr(report, 'wasxfail', None) or "test passed, but was marked xfail"}'
             self.test_report.set_error(msg)
 
     def process_test_status(self, report, call, item):
-        if hasattr(report, 'wasxfail'):
-            if report.outcome == 'skipped':
-                status = TestStatus.PASSED
-            else:
-                status = TestStatus.FAILED
+        if self._was_xfail(report):
+            status = py_outcome_to_tstatus(report.outcome)
         else:
-            if call.excinfo and report.outcome == 'failed':
+            if report.outcome == 'failed' and call.excinfo:
                 if call.excinfo.typename == 'AssertionError':
                     status = TestStatus.FAILED
                 else:

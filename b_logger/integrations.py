@@ -88,6 +88,7 @@ class AllureAdapter(IntegrationBase):
                         "text/plain": self._AttachmentType.TEXT,
                         "text/html": self._AttachmentType.HTML,
                         "application/xml": self._AttachmentType.XML,
+                        "application/pdf": self._AttachmentType.PDF
                     }
 
                     attach_type = mime_map.get(mime_type, self._AttachmentType.TEXT)

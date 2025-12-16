@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import lru_cache
 
 
 class TestStatus(str, Enum):
@@ -9,6 +10,7 @@ class TestStatus(str, Enum):
     NONE = 'NONE'
 
 
+@lru_cache(5)
 def py_outcome_to_tstatus(outcome):
     return {
         'passed': TestStatus.PASSED,
